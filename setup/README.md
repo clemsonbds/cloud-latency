@@ -28,7 +28,7 @@ python createNetworkBastionHost.py --delete --region us-east-1 --name testing --
 The command to get the IP addresses of all the instances running for the particular experiment is:
 
 ```
-aws ec2 --region us-east-1 describe-instances --filters "Name=tag:Name,Values=testing-Instance" "Name=instance-state-name,Values=running" | grep PRIVATEIPADDRESSES\" | awk '{$1=$1};1' | cut -d'"' -s -f4 | sort -u
+aws ec2 --region us-east-1 describe-instances --filters "Name=tag:Name,Values=testing-Instance" "Name=instance-state-name,Values=running" | grep PRIVATEIPADDRESSES | awk '{$1=$1};1' | cut -d' ' -s -f3 | sort -u
 ```
 
 That will output the IPs in the following format:

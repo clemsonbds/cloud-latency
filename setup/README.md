@@ -3,12 +3,11 @@ These Python scripts will create and delete all of the required AWS Network reso
 Use both of these scripts to setup the infrastructure required for testing your scripts. We will have to make some adjustments to pass the UserData to the instances to automate the startup process but it shouldn't be too hard.
 You will need to create AWS Access Keys and have the pip package botocore installed in order to run the script, I tried to put in helpful error messages if these packages/credentials weren't found.
 
-botocore needs the AWS profile configuration file (~/.aws/config) to exist, something like 
-```
-[default]
-region=us-east-1
-output=text
-```
+After getting AWS access keys, need to have installed the AWS CLI, multiple methods here:
+
+https://docs.aws.amazon.com/cli/latest/userguide/installing.html
+
+and then ```aws configure``` to input the key pair, region, and output method.  This generates ```~/.aws/config``` which is required by botocore.
 
 After you have done that you can execute the two scripts. I have included a sample execution below which will creae the network/bastion host and launch 2 instances in the same AZ:
 

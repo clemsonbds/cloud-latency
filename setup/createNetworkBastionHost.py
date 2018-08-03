@@ -426,6 +426,6 @@ def deleteGcpResources(service, name):
 
 def dumpResourcesCreatedToFile(resourcesCreated, name):
     with open("networkResourcesCreated-" + str(name) + ".json", "w") as outputFile:
-        json.dump(resourcesCreated, outputFile)
+        json.dump(resourcesCreated, outputFile, sort_keys=True, indent=4, separators=(',', ': '))
 
 main()

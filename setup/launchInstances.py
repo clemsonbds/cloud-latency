@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import argparse
 import sys
 import json
@@ -19,9 +19,53 @@ def main():
     parser.add_argument('--instanceType', help='Specifies the Instance Type that will be used to launch the bastion host. This defaults to t2.micro for AWS and to g1-small for GCP.', default=None)
     parser.add_argument('--numInstances', help='Specifies the number of instances to launch. Must be an integer greater than 1. The default is 2 instances.', type=int, default=2)
     parser.add_argument('--experimentType', help='Specifies the type of experiment to launch. Options are placementGroup, multi-az, and single-az. PlacementGroup launches the specified number of instances into a clustered Placement Group within 1 AZ, multi-az launches the instances in multiple AZs, and single-az launches all the instances in a single AZ. The default is single-az.', default='single-az', choices=['placementGroup', 'multi-az', 'single-az'])
-    parser.add_argument('--azs', help='Specifies the exact AZs that will be used to launch the experiments. If using placementGroup or single-az only one AZ may be listed, if using multi-az a comma seperated list of AZs must be used. This is only the letter distinguishing the AZ, not the entire AZ name (ex: a,b,f)', required=True)
+    parser.add_argument('--azs', help='Specifies the exact AZs that will be used to launch the experiments. If using placementGroup or single-az only one AZ may be listed, if using multi-az a comma seperated list of AZs must be used. This is only the letter distinguishing the AZ, not the entire AZ name (ex: a,b,f)')
 
     args = vars(parser.parse_args())
+
+    if args['delete']:
+        # Get the default region if not specified via commandline
+        if args['region'] is None:
+            # Amazon Linux 2 AMI in N. Virginia
+            region = "us-east-1"
+        else:
+            region = args['region']
+
+        try:
+            import botocore
+            import botocore.session
+            import botocore.exceptions
+        except Exception as e:
+            print("In order to create AWS resources, the botocore pip package is required. Please install this package using the following command:\npip install -U botocore\n and try running the script again.")
+            sys.exit(0)
+
+        client = None
+        try:
+            session = botocore.session.Session(profile=args['profile'])
+            client = session.create_client("ec2", region_name=region)
+        except Exception as e:
+            if "NoCredentialsError: Unable to locate credentials" in ''.join(traceback.format_exc()):
+                print("Unable to create a botocore session to AWS. Please ensure that you have your credentials located in the ~/.aws/credentials file. If you do not already have this file you can create one yourself, the format is as follows:\n[default]\naws_access_key_id = YOUR_ACCESS_KEY\naws_secret_access_key = YOUR_SECRET_KEY")
+                sys.exit(0)
+            else:
+                print("There was an issue attempting to create a botocore session to AWS.")
+                print("The traceback is: " + ''.join(traceback.format_exc()))
+                sys.exit(0)
+
+        values = deleteInstancesAws(client, args['name'])
+        if values['status'] != "success":
+            print("There was an issue attempting to delete the instances for the experiment.")
+            print(values['message'])
+            sys.exit(0)
+
+        os.system("rm -rf instancesCreated-" + str(args['name']) + ".json")
+
+        print("Successfully deleted the instances for the experiment: " + str(args['name']))
+        sys.exit(0)
+
+    if args['azs'] == None:
+        print("One or more AZs must be specified for creation of instances.")
+        sys.exit(0)
 
     # Validate and ensure that if the single-az or placementGroup experiment type is chosen we only have one AZ and that we have multiple AZs for the multi-az experiment
     if args['experimentType'] == 'single-az' or args['experimentType'] == 'placementGroup':
@@ -93,46 +137,6 @@ def main():
 
             print("Successfully created the instances for the experiment: " + str(args['name']))
             sys.exit(0)
-
-    if args['delete']:
-        # Get the default region if not specified via commandline
-        if args['region'] is None:
-            # Amazon Linux 2 AMI in N. Virginia
-            region = "us-east-1"
-        else:
-            region = args['region']
-
-        try:
-            import botocore
-            import botocore.session
-            import botocore.exceptions
-        except Exception as e:
-            print("In order to create AWS resources, the botocore pip package is required. Please install this package using the following command:\npip install -U botocore\n and try running the script again.")
-            sys.exit(0)
-
-        client = None
-        try:
-            session = botocore.session.Session(profile=args['profile'])
-            client = session.create_client("ec2", region_name=region)
-        except Exception as e:
-            if "NoCredentialsError: Unable to locate credentials" in ''.join(traceback.format_exc()):
-                print("Unable to create a botocore session to AWS. Please ensure that you have your credentials located in the ~/.aws/credentials file. If you do not already have this file you can create one yourself, the format is as follows:\n[default]\naws_access_key_id = YOUR_ACCESS_KEY\naws_secret_access_key = YOUR_SECRET_KEY")
-                sys.exit(0)
-            else:
-                print("There was an issue attempting to create a botocore session to AWS.")
-                print("The traceback is: " + ''.join(traceback.format_exc()))
-                sys.exit(0)
-
-        values = deleteInstancesAws(client, args['name'])
-        if values['status'] != "success":
-            print("There was an issue attempting to delete the instances for the experiment.")
-            print(values['message'])
-            sys.exit(0)
-
-        os.system("rm -rf instancesCreated-" + str(args['name']) + ".json")
-
-        print("Successfully deleted the instances for the experiment: " + str(args['name']))
-        sys.exit(0)
 
 
 def launchInstancesAws(client, imageId, instanceType, numInstances, experimentType, azs, keyName, name, region, userData):
@@ -310,7 +314,7 @@ def loadNetworkResources(name):
 def dumpResourcesCreatedToFile(instancesCreated, name):
     try:
         with open("instancesCreated-" + str(name) + ".json", "w") as outputFile:
-            json.dump(instancesCreated, outputFile)
+            json.dump(instancesCreated, outputFile, sort_keys=True, indent=4, separators=(',', ': '))
     except Exception:
         return {"status" : "error", "message": "Unable to load the network resources created for the experiment: " + str(name), "payload": None}
 

@@ -11,4 +11,4 @@ scp -i ${bastionKey} instances.txt ${bastionUser}@${bastionIP}:.
 rm instances.txt
 
 # hand off to local instance config script on bastion
-ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "/nfs/repo/setup/bastion/configureInstances.sh"
+ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "/nfs/repos/project/setup/bastion/configureInstances.sh"

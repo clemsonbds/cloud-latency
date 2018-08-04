@@ -19,7 +19,7 @@ repo=`./getSetting.sh repo`
 ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "sudo yum install -y git"
 ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "sudo mkdir -p /nfs"
 ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "sudo chmod 777 /nfs"
-ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "git clone ${repo} /nfs/repo"
+ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "git clone ${repo} /nfs/repos/project"
 
 # hand off to bastion local configuration script
-ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "/nfs/repo/setup/bastion/configure.sh"
+ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "/nfs/repos/project/setup/bastion/configure.sh"

@@ -12,5 +12,5 @@ done
 
 # force all instances to run their config scripts
 for instance in `cat ~/instances.txt`; do
-	ssh ${instance} "/nfs/repo/setup/instance/configure.sh"
+	ssh ${instance} "/nfs/repos/project/setup/instance/configure.sh"
 done

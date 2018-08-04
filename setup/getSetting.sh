@@ -7,4 +7,4 @@ fi
 
 key=$1
 
-grep ${key} settings.txt | cut -d'=' -f2
+grep ${key} settings.ini | cut -d'=' -f2

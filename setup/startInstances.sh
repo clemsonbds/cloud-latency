@@ -20,5 +20,7 @@ esac
 region=`./getSetting.sh region`
 expName=`./getSetting.sh expName`
 
-./createNetworkBastionHost.py --create --name ${expName} --region ${region} --keyName JasonAnderson
+echo "Starting experiment '$profile' cloud resources."
 ./launchInstances.py --create --name ${expName} --region ${region} --keyName CloudLatencyExpInstance --azs ${azs} --experimentType ${expType}
+
+./configureInstances.sh ${profile}

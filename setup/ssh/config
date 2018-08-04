@@ -1,0 +1,3 @@
+IdentityFile ~/.ssh/instanceKey.private
+StrictHostKeyChecking no
+UserKnownHostsFile=/dev/null

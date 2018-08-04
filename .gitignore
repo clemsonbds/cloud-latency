@@ -1,3 +1,7 @@
+# files created by instance setup
+networkResourcesCreated-*.json
+instancesCreated-*.json
+
 # Prerequisites
 *.d
 

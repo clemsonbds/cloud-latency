@@ -287,7 +287,7 @@ def createAwsResources(client, name, region, keyName, imageId, instanceType):
         # Wait for the resource creation to complete
         time.sleep(10)
 
-        networkInterfaces = [{'AssociatePublicIpAddress': True, 'DeviceIndex': 0, 'SubnetId' : resourcesCreated['publicSubnet'], 'Groups': [resourcesCreated['publicSecurityGroup']]}]
+        networkInterfaces = [{'AssociatePublicIpAddress': True, 'DeviceIndex': 0, 'SubnetId' : resourcesCreated['publicSubnet'], 'Groups': [resourcesCreated['publicSecurityGroup'], resourcesCreated['privateSecurityGroup']]}]
 
         response = client.run_instances(ImageId=imageId, MinCount=1, MaxCount=1, KeyName=keyName, InstanceType=instanceType, Monitoring={"Enabled": False}, DisableApiTermination=False, InstanceInitiatedShutdownBehavior="stop", Placement={"AvailabilityZone": str(region) + "a"}, NetworkInterfaces=networkInterfaces)
         # Get the instanceId from the response

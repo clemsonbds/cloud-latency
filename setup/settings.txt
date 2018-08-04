@@ -1,2 +1,3 @@
 expName=latencyExp
 region=us-east-1
+repo=https://github.com/clemsonbds/cloud-latency.git

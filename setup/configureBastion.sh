@@ -19,7 +19,14 @@ rm config.temp
 # force bastion to checkout repository
 repo=`./getSetting.sh repo`
 ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "sudo yum install -y git"
-ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "git clone ${repo} repo"
+ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "sudo mkdir -p /nfs"
+ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "sudo chmod 777 /nfs"
+ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "git clone ${repo} /nfs/repo"
+
+# place a list of instance IPs on bastion
+./getInstanceIPs.sh > instances.txt
+scp -i ${bastionKey} instances.txt ${bastionUser}@${bastionIP}:.
+rm instances.txt
 
 # hand off to bastion configuration script
-ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "~/repo/setup/bastion/configure.sh"
+ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "/nfs/repo/setup/bastion/configure.sh"

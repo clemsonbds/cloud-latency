@@ -1,0 +1,2 @@
+expName=latencyExp
+region=us-east-1

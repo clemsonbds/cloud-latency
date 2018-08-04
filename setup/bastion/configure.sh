@@ -1,7 +1,5 @@
 #!/bin/bash
 
-bastionIP=`ifconfig | grep eth0 -A 1 | grep inet | awk '{print $2}'`
-
 # create NFS
 echo -e "\nStarting NFS server on bastion."
 sudo yum install -y nfs-utils rpcbind

@@ -18,8 +18,9 @@ def main():
     parser.add_argument('--imageId', help='Specifies the Image that will be used to launch the bastion host. This defaults to AWS Linux in N. Virginia for AWS and to Debian 8 in Central Iowa for GCP.', default=None)
     parser.add_argument('--instanceType', help='Specifies the Instance Type that will be used to launch the bastion host. This defaults to t2.micro for AWS and to g1-small for GCP.', default=None)
     parser.add_argument('--numInstances', help='Specifies the number of instances to launch. Must be an integer greater than 1. The default is 2 instances.', type=int, default=2)
-    parser.add_argument('--experimentType', help='Specifies the type of experiment to launch. Options are placementGroup, multi-az, and single-az. PlacementGroup launches the specified number of instances into a clustered Placement Group within 1 AZ, multi-az launches the instances in multiple AZs, and single-az launches all the instances in a single AZ. The default is single-az.', default='single-az', choices=['placementGroup', 'multi-az', 'single-az'])
-    parser.add_argument('--azs', help='Specifies the exact AZs that will be used to launch the experiments. If using placementGroup or single-az only one AZ may be listed, if using multi-az a comma seperated list of AZs must be used. This is only the letter distinguishing the AZ, not the entire AZ name (ex: a,b,f)')
+    parser.add_argument('--experimentType', help='Specifies the type of experiment to launch. Options are multi-az and single-az.  Multi-az launches the instances in multiple AZs, and single-az launches all the instances in a single AZ. The default is single-az.', default='single-az', choices=['multi-az', 'single-az'])
+    parser.add_argument('--placementGroup', help='Specifies the grouping strategy for instance placement.  Options are cluster and spread.  Cluster will attempt to locate the nodes near eachother in a single AZ, spread will attempt to maximize availability in either single or multi AZ.  Default is no explicit grouping.', default=None, choices=['cluster', 'spread'])
+    parser.add_argument('--azs', help='Specifies the exact AZs that will be used to launch the experiments. If using single-az only one AZ may be listed, if using multi-az a comma seperated list of AZs must be used. This is only the letter distinguishing the AZ, not the entire AZ name (ex: a,b,f)')
 
     args = vars(parser.parse_args())
 
@@ -67,15 +68,19 @@ def main():
         print("One or more AZs must be specified for creation of instances.")
         sys.exit(0)
 
-    # Validate and ensure that if the single-az or placementGroup experiment type is chosen we only have one AZ and that we have multiple AZs for the multi-az experiment
-    if args['experimentType'] == 'single-az' or args['experimentType'] == 'placementGroup':
-        if ',' in args['azs']:
-            print("Only one AZ can be specified when using the single-az or placementGroup experiment types.")
-            sys.exit(0)
-    elif args['experimentType'] == "multi-az":
-        if ',' not in args['azs']:
-            print("Multiple AZs are required when executing the multi-az experiment type.")
-            sys.exit(0)
+    # the cluster placement group only makes sense in a single AZ
+    if args['placementGroup'] == 'cluster' and args['experimentType'] != 'single-az':
+        print("The cluster placement group can only be used with the single-az experiment type.")
+        sys.exit(0)
+
+    # Validate and ensure that if the single-az experiment type is chosen we only have one AZ and that we have multiple AZs for the multi-az experiment
+    if args['experimentType'] == 'single-az' and ',' in args['azs']:
+        print("Only one AZ can be specified when using the single-az experiment type.")
+        sys.exit(0)
+
+    if args['experimentType'] == "multi-az" and ',' not in args['azs']:
+        print("Multiple AZs are required when executing the multi-az experiment type.")
+        sys.exit(0)
 
     if args['create']:
         if args['cloudProvider'] == "aws":
@@ -127,19 +132,20 @@ def main():
                 print("The traceback is: " + ''.join(traceback.format_exc()))
                 sys.exit(0)
 
-        values = launchInstancesAws(client, imageId, instanceType, args['numInstances'], args['experimentType'], args['azs'], args['keyName'], args['name'], region, userData)
+        values = launchInstancesAws(client, imageId, instanceType, args['numInstances'], args['experimentType'], args['placementGroup'], args['azs'], args['keyName'], args['name'], region, userData)
+
+        dumpResourcesCreatedToFile(values['payload']['instancesCreated'], args['name'])
+
         if values['status'] != "success":
             print("There was an issue attempting to launch the instances for the experiment.")
             print(values['message'])
-            sys.exit(0)
         else:
-            dumpResourcesCreatedToFile(values['payload']['instancesCreated'], args['name'])
-
             print("Successfully created the instances for the experiment: " + str(args['name']))
-            sys.exit(0)
+
+        sys.exit(0)
 
 
-def launchInstancesAws(client, imageId, instanceType, numInstances, experimentType, azs, keyName, name, region, userData):
+def launchInstancesAws(client, imageId, instanceType, numInstances, experimentType, placementGroup, azs, keyName, name, region, userData):
     # Load the AZs into a list
     azs = azs.split(",")
 
@@ -154,6 +160,18 @@ def launchInstancesAws(client, imageId, instanceType, numInstances, experimentTy
     else:
         createdNetworkResources = values['payload']
 
+    placementStrategy = {}
+
+    # Create a Placement Group that we can utilize for launching instances into
+    if placementGroup != None:
+        try:
+            print("Creating the Placement Group.")
+            placementStrategy['GroupName'] = str(name) + "-PlacementGroup" # hold for launching instances below
+            response = client.create_placement_group(GroupName=placementStrategy['GroupName'], Strategy=placementGroup)
+            instancesCreated['placementGroup'] = placementStrategy['GroupName']
+        except Exception as e:
+            return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"instancesCreated": instancesCreated}}
+
     if experimentType == "single-az":
         subnetId = None
         for subnet in createdNetworkResources['privateSubnets']:
@@ -166,36 +184,9 @@ def launchInstancesAws(client, imageId, instanceType, numInstances, experimentTy
         # Launch all the instances into the single AZ provided
         try:
             print("Launching the instances.")
-            response = client.run_instances(ImageId=imageId, MinCount=numInstances, MaxCount=numInstances, KeyName=keyName, UserData=userData, InstanceType=instanceType, Monitoring={"Enabled": False}, SubnetId=subnetId, DisableApiTermination=False, InstanceInitiatedShutdownBehavior="stop", SecurityGroupIds=[createdNetworkResources['privateSecurityGroup']], Placement={"AvailabilityZone": str(region) + azs[0]})
-            
-            # Get the instanceId from the response
-            for instance in response['Instances']:
-                instancesCreated['instances'].append(instance['InstanceId'])
-            time.sleep(5)
 
-            # Wait until the instance is in the Running state
-            print("Waiting for the Instances to become ready.")
-            waiter = client.get_waiter('instance_running')
-            waiter.wait(InstanceIds=instancesCreated['instances'])
-
-            response = client.create_tags(Resources=instancesCreated['instances'], Tags=[{'Key': 'Name', 'Value': str(name) + "-Instance"}])
-        except Exception:
-            return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"instancesCreated": instancesCreated}}
-    
-    elif experimentType == "placementGroup":
-        # Launch all the instances into the Placement Group provided
-        subnetId = None
-        for subnet in createdNetworkResources['privateSubnets']:
-            if subnet['az'] == str(region) + azs[0]:
-                subnetId = subnet['subnetId']
-
-        if subnetId is None:
-            return {"status": "error", "message": "Unable to find the subnetId for the AZ: " + str(str(region) + azs[0]), "payload": None}
-
-        # Launch all the instances into the single AZ provided
-        try:
-            print("Launching the instances.")
-            response = client.run_instances(ImageId=imageId, MinCount=numInstances, MaxCount=numInstances, KeyName=keyName, UserData=userData, InstanceType=instanceType, Monitoring={"Enabled": False}, SubnetId=subnetId, DisableApiTermination=False, InstanceInitiatedShutdownBehavior="stop", SecurityGroupIds=[createdNetworkResources['privateSecurityGroup']], Placement={"AvailabilityZone": str(region) + azs[0], "GroupName": createdNetworkResources['placementGroup']})
+            placementStrategy['AvailabilityZone'] = str(region) + azs[0] # AZ and optional placement group
+            response = client.run_instances(ImageId=imageId, MinCount=numInstances, MaxCount=numInstances, KeyName=keyName, UserData=userData, InstanceType=instanceType, Monitoring={"Enabled": False}, SubnetId=subnetId, DisableApiTermination=False, InstanceInitiatedShutdownBehavior="stop", SecurityGroupIds=[createdNetworkResources['privateSecurityGroup']], Placement=placementStrategy)
             
             # Get the instanceId from the response
             for instance in response['Instances']:
@@ -240,7 +231,8 @@ def launchInstancesAws(client, imageId, instanceType, numInstances, experimentTy
                 if subnetId is None:
                     return {"status": "error", "message": "Unable to find the subnetId for the AZ: " + str(str(region) + az), "payload": None}
                 try:
-                    response = client.run_instances(ImageId=imageId, MinCount=numPerAz, MaxCount=numPerAz, KeyName=keyName, UserData=userData, InstanceType=instanceType, Monitoring={"Enabled": False}, SubnetId=subnetId, DisableApiTermination=False, InstanceInitiatedShutdownBehavior="stop", SecurityGroupIds=[createdNetworkResources['privateSecurityGroup']], Placement={"AvailabilityZone": str(region) + az})
+                    placementStrategy['AvailabilityZone'] = str(region) + azs[0] # AZ and optional placement group
+                    response = client.run_instances(ImageId=imageId, MinCount=numPerAz, MaxCount=numPerAz, KeyName=keyName, UserData=userData, InstanceType=instanceType, Monitoring={"Enabled": False}, SubnetId=subnetId, DisableApiTermination=False, InstanceInitiatedShutdownBehavior="stop", SecurityGroupIds=[createdNetworkResources['privateSecurityGroup']], Placement=placementStrategy)
                     
                     # Get the instanceId from the response
                     for instance in response['Instances']:
@@ -298,6 +290,15 @@ def deleteInstancesAws(client, name):
             waiter = client.get_waiter('instance_terminated')
             waiter.wait(InstanceIds=resourcesToDelete['instances'])
             del resourcesToDelete['instances']
+        except Exception as e:
+            return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesToDelete": resourcesToDelete}}
+
+    # Delete the Placement Group
+    if 'placementGroup' in resourcesToDelete:
+        try:
+            print("Deleting the Placement Group.")
+            response = client.delete_placement_group(GroupName=resourcesToDelete['placementGroup'])
+            del resourcesToDelete['placementGroup']
         except Exception as e:
             return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesToDelete": resourcesToDelete}}
 

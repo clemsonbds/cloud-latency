@@ -230,14 +230,6 @@ def createAwsResources(client, name, region, keyName, imageId, instanceType, nat
     except Exception as e:
         return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesCreated": resourcesCreated}}
 
-    # Create a Placement Group that we can utilize for launching instances into
-    try:
-        print("Creating the Placement Group.")
-        response = client.create_placement_group(GroupName=str(name) + "-PlacementGroup", Strategy='cluster')
-        resourcesCreated['placementGroup'] = str(name) + "-PlacementGroup"
-    except Exception as e:
-        return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesCreated": resourcesCreated}}
-
     # Create a Public Security Group to be used by the Bastion host to allow SSH
     try:
         print("Creating the Public Security Group.")
@@ -429,15 +421,6 @@ def deleteAwsResources(client, name):
             response = client.delete_security_group(GroupId=resourcesToDelete['publicSecurityGroup'])
             del resourcesToDelete['publicSecurityGroup']
             time.sleep(5)
-        except Exception as e:
-            return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesToDelete": resourcesToDelete}}
-
-    # Delete the Placement Group
-    if 'placementGroup' in resourcesToDelete:
-        try:
-            print("Deleting the Placement Group.")
-            response = client.delete_placement_group(GroupName=resourcesToDelete['placementGroup'])
-            del resourcesToDelete['placementGroup']
         except Exception as e:
             return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesToDelete": resourcesToDelete}}
 

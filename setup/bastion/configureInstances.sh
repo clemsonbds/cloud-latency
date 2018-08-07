@@ -6,6 +6,7 @@ bastionLocalIP=`ifconfig | grep eth0 -A 1 | tail -n 1 | awk '{print $2}'`
 for instanceIP in `cat ~/hostfile`; do
 	while [ -z `nmap ${instanceIP} -PN -p ssh | grep open` ]; do
 		echo "Waiting for instance to accept SSH connections..."
+		sleep 1
 	done
 done
 

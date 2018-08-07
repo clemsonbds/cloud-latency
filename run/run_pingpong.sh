@@ -15,6 +15,5 @@ hostfile="~/hostfile"
 #rankfile="/nfs/files/scripts/env/mpi_ranks_bycore"
 executable="/nfs/repos/benchmarks/pingpong"
 mpi_params="-np 2 --hostfile ${hostfile}" #--rankfile ${rankfile}"
-out_params="2>/dev/null | tail -n ${iters}"
 
-mpirun ${mpi_params} ${executable} $((iters + trim)) ${out_params} > ${outfile}
+mpirun ${mpi_params} ${executable} -i ${iters} -s ${trim} > ${outfile}

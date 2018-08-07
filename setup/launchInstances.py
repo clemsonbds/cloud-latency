@@ -19,7 +19,7 @@ def main():
     parser.add_argument('--instanceType', help='Specifies the Instance Type that will be used to launch the bastion host. This defaults to t2.micro for AWS and to g1-small for GCP.', default=None)
     parser.add_argument('--numInstances', help='Specifies the number of instances to launch. Must be an integer greater than 1. The default is 2 instances.', type=int, default=2)
     parser.add_argument('--experimentType', help='Specifies the type of experiment to launch. Options are placementGroup, multi-az, and single-az. PlacementGroup launches the specified number of instances into a clustered Placement Group within 1 AZ, multi-az launches the instances in multiple AZs, and single-az launches all the instances in a single AZ. The default is single-az.', default='single-az', choices=['placementGroup', 'multi-az', 'single-az'])
-    parser.add_argument('--azs', help='Specifies the exact AZs that will be used to launch the experiments. If using placementGroup or single-az only one AZ may be listed, if using multi-az a comma seperated list of AZs must be used. This is only the letter distinguishing the AZ, not the entire AZ name (ex: a,b,f)', required=True)
+    parser.add_argument('--azs', help='Specifies the exact AZs that will be used to launch the experiments. If using placementGroup or single-az only one AZ may be listed, if using multi-az a comma seperated list of AZs must be used. This is only the letter distinguishing the AZ, not the entire AZ name (ex: a,b,f)')
 
     args = vars(parser.parse_args())
 

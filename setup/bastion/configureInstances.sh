@@ -1,6 +1,6 @@
 #!/bin/bash
 
-bastionLocalIP=`ifconfig | grep eth0 -A 1 | tail -n 1 | awk '{print $2}'`
+bastionLocalIP=`/usr/sbin/ifconfig | grep eth0 -A 1 | tail -n 1 | awk '{print $2}'`
 
 # wait for all instances to accept SSH
 for instanceIP in `cat ~/hostfile`; do

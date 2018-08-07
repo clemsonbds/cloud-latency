@@ -11,7 +11,7 @@ iters=$2
 
 trim=1000
 
-hostfile="~/hostfile"
+hostfile="/nfs/instances"
 #rankfile="/nfs/files/scripts/env/mpi_ranks_bycore"
 executable="/nfs/repos/benchmarks/pingpong"
 mpi_params="-np 2 --hostfile ${hostfile}" #--rankfile ${rankfile}"

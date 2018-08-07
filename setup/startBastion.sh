@@ -9,9 +9,11 @@ echo "Starting Bastion host cloud resources."
 bastionIP=`./getBastionIP.sh`
 
 # wait for bastion to accept SSH
-while [ -z `nmap ${bastionIP} -PN -p ssh | grep open` ]; do
+canSSH=
+while [ -z "${canSSH}" ]; do
 	echo "Waiting for Bastion to accept SSH connections..."
 	sleep 1
+	canSSH=`nmap ${bastionIP} -PN -p ssh | grep open`
 done
 
 ./configureBastion.sh

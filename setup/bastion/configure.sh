@@ -9,6 +9,7 @@ sudo service rpcbind start
 sudo service nfs start
 
 # installing needed stuff
+sudo yum install -y nmap
 sudo yum install -y openmpi openmpi-devel
 echo "export PATH=$PATH:/usr/lib64/openmpi/bin" >> ~/.bashrc
 

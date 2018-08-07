@@ -23,6 +23,9 @@ def main():
         # Need to create the network resources and bastion host
         if args['cloudProvider'] == "aws":
 
+            # NAT AMI Id:
+            natImage = "ami-980554e7"
+
             if args['keyName'] is None:
                 print("A key name is required to create AWS resources.")
                 sys.exit(0)
@@ -68,7 +71,7 @@ def main():
                     print("The traceback is: " + ''.join(traceback.format_exc()))
                     sys.exit(0)
 
-            values = createAwsResources(client, args['name'], region, args['keyName'], imageId, instanceType)
+            values = createAwsResources(client, args['name'], region, args['keyName'], imageId, instanceType, natImage)
             if values['status'] != "success":
                 if "NoCredentialsError: Unable to locate credentials" in ''.join(traceback.format_exc()):
                     print("Unable to locate your AWS credentials. Please ensure that you have your credentials located in the ~/.aws/credentials file. If you do not already have this file you can create one yourself, the format is as follows:\n[default]\naws_access_key_id = YOUR_ACCESS_KEY\naws_secret_access_key = YOUR_SECRET_KEY")
@@ -140,7 +143,7 @@ def main():
                     sys.exit(0)
 
 
-def createAwsResources(client, name, region, keyName, imageId, instanceType):
+def createAwsResources(client, name, region, keyName, imageId, instanceType, natImage):
     resourcesCreated = {}
     # First we need to create the VPC
     try:
@@ -253,7 +256,7 @@ def createAwsResources(client, name, region, keyName, imageId, instanceType):
         # Wait for the resource creation to complete
         time.sleep(10)
 
-        listOfPermissionsToAdd = [{"IpProtocol": "tcp", "FromPort": 22, "ToPort": 22, "IpRanges": [{"CidrIp": '0.0.0.0/0'}]}]
+        listOfPermissionsToAdd = [{"IpProtocol": "tcp", "FromPort": 22, "ToPort": 22, "IpRanges": [{"CidrIp": '0.0.0.0/0'}]}, {"IpProtocol": "-1", "IpRanges": [{"CidrIp": '10.0.0.0/16'}]}]
         response = client.authorize_security_group_ingress(GroupId=resourcesCreated['publicSecurityGroup'], IpPermissions=listOfPermissionsToAdd)
     except Exception as e:
         return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesCreated": resourcesCreated}}
@@ -281,13 +284,79 @@ def createAwsResources(client, name, region, keyName, imageId, instanceType):
     except Exception as e:
         return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesCreated": resourcesCreated}}
 
+    # Create the Route Table that will be used for the NAT Instance
+    try:
+        print("Creating the Route Table to be used for the NAT process.")
+
+        response = client.create_route_table(VpcId=resourcesCreated['vpc'])
+        resourcesCreated['natRouteTable'] = response['RouteTable']['RouteTableId']
+
+        response = client.create_tags(Resources=[resourcesCreated['natRouteTable']], Tags=[{'Key': 'Name', 'Value': str(name) + "-NatRouteTable"}])
+    except Exception as e:
+        return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesCreated": resourcesCreated}}
+
+    # Create the Subnet Route Table associations required for the use of NAT
+    try:
+        print("Creating the Subnet/Route Table associations to be used in the NAT Process.")
+        time.sleep(10)
+
+        # Loop through the private subnets and associate all of them with the new Route Table
+        for subnet in resourcesCreated['privateSubnets']:
+            try:
+                response = client.associate_route_table(RouteTableId=resourcesCreated['natRouteTable'], SubnetId=subnet['subnetId'])
+            except Exception as e:
+                 print(''.join(traceback.format_exc()))
+    except Exception as e:
+        return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesCreated": resourcesCreated}}
+
+    # Create a NAT instance so that the internal instances can access the Public Internet
+    try:
+        print("Creating the NAT Instance.")
+        # Wait for the resource creation to complete
+        time.sleep(10)
+
+        networkInterfaces = [{'AssociatePublicIpAddress': True, 'DeviceIndex': 0, 'SubnetId' : resourcesCreated['publicSubnet'], 'Groups': [resourcesCreated['publicSecurityGroup']]}]
+
+        response = client.run_instances(ImageId=natImage, MinCount=1, MaxCount=1, KeyName=keyName, InstanceType=instanceType, Monitoring={"Enabled": False}, DisableApiTermination=False, InstanceInitiatedShutdownBehavior="stop", Placement={"AvailabilityZone": str(region) + "a"}, NetworkInterfaces=networkInterfaces)
+        # Get the instanceId from the response
+        for instance in response['Instances']:
+            resourcesCreated['natInstance'] = instance['InstanceId']
+        time.sleep(5)
+
+        # Wait until the instance is in the Running state
+        print("Waiting for the NAT Instance to become ready.")
+        waiter = client.get_waiter('instance_running')
+        waiter.wait(InstanceIds=[resourcesCreated['natInstance']])
+
+        response = client.create_tags(Resources=[resourcesCreated['natInstance']], Tags=[{'Key': 'Name', 'Value': str(name) + "-NatInstance"}])
+    except Exception as e:
+        return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesCreated": resourcesCreated}}
+
+    # Modify the NAT Instance so that the SourceDestCheck attribute is disabled
+    try:
+        print("Setting the SourceDestCheck attribute to False on the NAT Instance.")
+
+        response = client.modify_instance_attribute(SourceDestCheck={'Value': False}, InstanceId=resourcesCreated['natInstance'])
+    except Exception as e:
+        return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesCreated": resourcesCreated}}
+
+    # Create the route for the Route Table to route all internal outbound traffic to the NAT instance
+    try:
+        print("Creating Route to the NAT Instance")
+        # Wait for the resource creation to complete
+        time.sleep(10)
+
+        response = client.create_route(InstanceId=resourcesCreated['natInstance'], RouteTableId=resourcesCreated['natRouteTable'], DestinationCidrBlock="0.0.0.0/0")
+    except Exception as e:
+        return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesCreated": resourcesCreated}}
+
     # Create the bastion host that will allow us to SSH into the private instances
     try:
         print("Creating the Bastion Host.")
         # Wait for the resource creation to complete
         time.sleep(10)
 
-        networkInterfaces = [{'AssociatePublicIpAddress': True, 'DeviceIndex': 0, 'SubnetId' : resourcesCreated['publicSubnet'], 'Groups': [resourcesCreated['publicSecurityGroup'], resourcesCreated['privateSecurityGroup']]}]
+        networkInterfaces = [{'AssociatePublicIpAddress': True, 'DeviceIndex': 0, 'SubnetId' : resourcesCreated['publicSubnet'], 'Groups': [resourcesCreated['publicSecurityGroup']]}]
 
         response = client.run_instances(ImageId=imageId, MinCount=1, MaxCount=1, KeyName=keyName, InstanceType=instanceType, Monitoring={"Enabled": False}, DisableApiTermination=False, InstanceInitiatedShutdownBehavior="stop", Placement={"AvailabilityZone": str(region) + "a"}, NetworkInterfaces=networkInterfaces)
         # Get the instanceId from the response
@@ -303,7 +372,6 @@ def createAwsResources(client, name, region, keyName, imageId, instanceType):
         response = client.create_tags(Resources=[resourcesCreated['bastionHost']], Tags=[{'Key': 'Name', 'Value': str(name) + "-BastionHost"}])
     except Exception as e:
         return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesCreated": resourcesCreated}}
-
 
     return {"status": "success", "payload": {"resourcesCreated": resourcesCreated}}
 
@@ -328,6 +396,19 @@ def deleteAwsResources(client, name):
             waiter = client.get_waiter('instance_terminated')
             waiter.wait(InstanceIds=[resourcesToDelete['bastionHost']])
             del resourcesToDelete['bastionHost']
+        except Exception as e:
+            return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesToDelete": resourcesToDelete}}
+
+    if 'natInstance' in resourcesToDelete:
+        try:
+            print("Deleting the NAT Instance.")
+            response = client.terminate_instances(InstanceIds=[resourcesToDelete['natInstance']])
+
+            # Wait until the instance is in the Terminate state
+            print("Waiting for the NAT Instance to terminate.")
+            waiter = client.get_waiter('instance_terminated')
+            waiter.wait(InstanceIds=[resourcesToDelete['natInstance']])
+            del resourcesToDelete['natInstance']
         except Exception as e:
             return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesToDelete": resourcesToDelete}}
 
@@ -407,6 +488,15 @@ def deleteAwsResources(client, name):
         except Exception as e:
             return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesToDelete": resourcesToDelete}}
     
+    if 'natRouteTable' in resourcesToDelete:
+        try:
+            print("Deleting the NAT Route Table.")
+
+            response = client.delete_route_table(RouteTableId=resourcesToDelete['natRouteTable'])
+            del resourcesToDelete['natRouteTable']
+        except Exception as e:
+            return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesToDelete": resourcesToDelete}}
+
      # Delete the VPC
     if 'vpc' in resourcesToDelete:
         try:

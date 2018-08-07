@@ -7,7 +7,7 @@ import time
 import os
 
 def main():
-    parser = argparse.ArgumentParser(description='Creates a VPC network with a 10.0.0.0/16 CIDR that contains a public (10.0.1.0/24) and private subnet for each Availability Zone in the Region (10.0.2.0/24 - 10.0.X.0/24) and a bastion host within the public subnet.')
+    parser = argparse.ArgumentParser(description='Launches Instances utilizing the network resources created utilizing the createNetworkBastionHost.py script in the way specified by the experimentType parameter given.')
     parser.add_argument('--create', action='store_true', help='Specifies that the script should create resources.')
     parser.add_argument('--delete', action='store_true', help='Specifies that the script should delete resources.')
     parser.add_argument('--name', help='Specifies the name of the experiment, this will be used when creating tags for the resources.', required=True)
@@ -19,7 +19,7 @@ def main():
     parser.add_argument('--instanceType', help='Specifies the Instance Type that will be used to launch the bastion host. This defaults to t2.micro for AWS and to g1-small for GCP.', default=None)
     parser.add_argument('--numInstances', help='Specifies the number of instances to launch. Must be an integer greater than 1. The default is 2 instances.', type=int, default=2)
     parser.add_argument('--experimentType', help='Specifies the type of experiment to launch. Options are placementGroup, multi-az, and single-az. PlacementGroup launches the specified number of instances into a clustered Placement Group within 1 AZ, multi-az launches the instances in multiple AZs, and single-az launches all the instances in a single AZ. The default is single-az.', default='single-az', choices=['placementGroup', 'multi-az', 'single-az'])
-    parser.add_argument('--azs', help='Specifies the exact AZs that will be used to launch the experiments. If using placementGroup or single-az only one AZ may be listed, if using multi-az a comma seperated list of AZs must be used. This is only the letter distinguishing the AZ, not the entire AZ name (ex: a,b,f)')
+    parser.add_argument('--azs', help='Specifies the exact AZs that will be used to launch the experiments. If using placementGroup or single-az only one AZ may be listed, if using multi-az a comma seperated list of AZs must be used. This is only the letter distinguishing the AZ, not the entire AZ name (ex: a,b,f)', required=True)
 
     args = vars(parser.parse_args())
 

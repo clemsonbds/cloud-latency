@@ -13,7 +13,7 @@ trim=1000
 
 hostfile="/nfs/instances"
 #rankfile="/nfs/files/scripts/env/mpi_ranks_bycore"
-executable="/nfs/repos/benchmarks/pingpong"
+executable="/nfs/repos/benchmarks/pingpong/pingpong"
 mpi_params="-np 2 --hostfile ${hostfile}" #--rankfile ${rankfile}"
 
 mpirun ${mpi_params} ${executable} -i ${iters} -s ${trim} > ${outfile}

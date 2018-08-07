@@ -9,9 +9,10 @@ sudo service rpcbind start
 sudo service nfs start
 
 # installing needed stuff
+sudo yum update -y
 sudo yum install -y nmap
 sudo yum install -y openmpi openmpi-devel
-echo "export PATH=$PATH:/usr/lib64/openmpi/bin" >> ~/.bashrc
+echo 'export PATH=$PATH:/usr/lib64/openmpi/bin' >> ~/.bashrc
 
 # fetch benchmarks
 git clone https://github.com/Rakurai/mpi-pingpong.git /nfs/repos/benchmarks/pingpong

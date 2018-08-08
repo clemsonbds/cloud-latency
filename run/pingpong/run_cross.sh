@@ -1,6 +1,6 @@
 #!/bin/bash
 
-resultPrefix=none
+resultName=none
 hostfile="/nfs/instances"
 
 DIR="$(dirname "${BASH_SOURCE[0]}")"
@@ -11,8 +11,8 @@ do
 key="$1"
 
 case $key in
---resultPrefix)
-    resultPrefix="$2"
+--resultName)
+    resultName="$2"
     shift # past argument
     shift # past value
     ;;
@@ -39,7 +39,7 @@ for src in `cat ${hostfile}`; do
         if [ "${dstIndex}" -gt "${srcIndex}" ]; then
             srcLetter=${letters:srcIndex:1}
             dstLetter=${letters:dstIndex:1}
-            ${DIR}/run.sh --resultPrefix "${resultPrefix}-${srcLetter}-${dstLetter}" --hosts "${src},${dst}" $@
+            ${DIR}/run.sh --resultName "${resultName}-${srcLetter}-${dstLetter}" --hosts "${src},${dst}" $@
         fi
 
         dstIndex=$((dstIndex+1))

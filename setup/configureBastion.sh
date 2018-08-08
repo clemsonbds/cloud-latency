@@ -14,7 +14,7 @@ ${utilDir}/scpBastion.sh ${sshConfig} .ssh/config
 
 # force bastion to checkout repository
 echo -e "\nChecking out repository on bastion."
-repo=`./getSetting.sh repo`
+repo=`${utilDir}/getSetting.sh repo`
 ${utilDir}/sshBastion.sh "sudo yum install -y git"
 ${utilDir}/sshBastion.sh "sudo mkdir -p /nfs"
 ${utilDir}/sshBastion.sh "sudo chmod 777 /nfs"

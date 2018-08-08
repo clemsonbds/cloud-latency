@@ -6,6 +6,7 @@ utilDir=${DIR}/../util
 # just a set of shortcuts to start an experiment
 
 profile=${1:-"default"}
+
 shift
 extraArgs=$*
 
@@ -38,11 +39,13 @@ multi-az-bare)
 	expType="multi-az"
 	instanceType="i3.metal"
 	azs="a,b,c,d,e,f"
+	numInstances="6"
 	;;
 multi-az-hv)
 	expType="multi-az"
 	instanceType="i3.16xlarge"
 	azs="a,b,c,d,e,f"
+	numInstances="6"
 	;;
 default)
 	expType="single-az"
@@ -55,11 +58,23 @@ default)
 esac
 
 instanceType="c4.large"
-
 region=`${utilDir}/getSetting.sh region`
 expName=`${utilDir}/getSetting.sh expName`
+options="--create --name ${expName} --region ${region} --keyName CloudLatencyExpInstance --azs ${azs} --experimentType ${expType}"
+
+if [ ! -z "${placementGroup}" ]; then
+	options+=" --placementGroup ${placementGroup}"
+fi
+
+if [ ! -z "${instanceType}" ]; then
+	options+=" --instanceType ${instanceType}"
+fi
+
+if [ ! -z "${numInstances}" ]; then
+	options+=" --numInstances ${numInstances}"
+fi
 
 echo "Starting experiment '$profile' cloud resources."
-${DIR}/launchInstances.py --create --name ${expName} --region ${region} --keyName CloudLatencyExpInstance --azs ${azs} --experimentType ${expType} --placementGroup ${placementGroup} --instanceType=${instanceType}
+${DIR}/launchInstances.py ${options}
 
 ${DIR}/configureInstances.sh ${profile}

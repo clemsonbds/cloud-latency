@@ -1,7 +1,7 @@
 #!/bin/bash
 
 resultDir=.
-resultPrefix=none
+resultName=none
 iters=20
 hostfile="/nfs/instances"
 msgBytes=1
@@ -17,8 +17,8 @@ case $key in
     shift # past argument
     shift # past value
     ;;
---resultPrefix)
-    resultPrefix="$2"
+--resultName)
+    resultName="$2"
     shift # past argument
     shift # past value
     ;;
@@ -70,7 +70,7 @@ if [ ! -z "${rankfile}"]; then
     mpiParams+=" --rankfile ${rankfile}"
 fi
 
-outFile="${resultDir}/${resultPrefix}-pingpong.raw"
+outFile="${resultDir}/pingpong-${resultName}.raw"
 
 echo ${outFile}
 #mpirun ${mpiParams} ${executable} -i ${iters} -s ${skip} -b ${msgBytes} > ${outFile}

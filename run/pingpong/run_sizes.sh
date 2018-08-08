@@ -1,6 +1,6 @@
 #!/bin/bash
 
-resultPrefix=none
+resultName=none
 maxBytes=1024
 
 DIR="$(dirname "${BASH_SOURCE[0]}")"
@@ -11,8 +11,8 @@ do
 key="$1"
 
 case $key in
---resultPrefix)
-    resultPrefix="$2"
+--resultName)
+    resultName="$2"
     shift # past argument
     shift # past value
     ;;
@@ -32,6 +32,6 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 currentBytes=1
 
 while [ "${currentBytes}" -le "${maxBytes}" ]; do
-	${DIR}/run.sh --resultPrefix "${resultPrefix}-${currentBytes}b" --msgBytes "${currentBytes}" $@
+	${DIR}/run.sh --resultName "${resultName}-${currentBytes}b" --msgBytes "${currentBytes}" $@
 	currentBytes=$((currentBytes * 2))
 done

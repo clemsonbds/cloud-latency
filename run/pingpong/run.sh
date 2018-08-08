@@ -61,7 +61,7 @@ mpiParams="-np 2"
 skip=1000
 
 if [ ! -z "${hosts}" ]; then
-    mpiParams+=" --hosts ${hosts}"
+    mpiParams+=" --host ${hosts}"
 else
     mpiParams+=" --hostfile ${hostfile}"
 fi

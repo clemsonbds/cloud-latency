@@ -1,8 +1,11 @@
 #!/bin/bash
 
+DIR="$(dirname "${BASH_SOURCE[0]}")"
+utilDir=${DIR}/../util
+
 # tear down any resources for this experiment
 
-region=`./getSetting.sh region`
-expName=`./getSetting.sh expName`
+region=`${utilDir}/getSetting.sh region`
+expName=`${utilDir}/getSetting.sh expName`
 
-./createNetworkBastionHost.py --delete --name ${expName} --region ${region}
+${DIR}/createNetworkBastionHost.py --delete --name ${expName} --region ${region}

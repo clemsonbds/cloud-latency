@@ -1,25 +1,25 @@
 #!/bin/bash
 
-instanceKey="ssh/CloudLatencyExpInstance.private"
-sshConfig="ssh/config"
+DIR="$(dirname "${BASH_SOURCE[0]}")"
+utilDir=${DIR}/../util
 
-bastionKey=`./getSetting.sh bastionKey`
-bastionUser=`./getSetting.sh bastionUser`
-bastionIP=`./getBastionIP.sh`
+instanceKey="${DIR}/ssh/CloudLatencyExpInstance.private"
+sshConfig="${DIR}/ssh/config"
 
 # upload the key and config file so bastion can ssh to instances
 echo -e "\nConfiguring SSH between bastion and instances."
-scp -i ${bastionKey} ${instanceKey} ${bastionUser}@${bastionIP}:.ssh/instanceKey.private
-ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "chmod 600 .ssh/instanceKey.private"
-scp -i ${bastionKey} ${sshConfig} ${bastionUser}@${bastionIP}:.ssh/config
+${utilDir}/scpBastion.sh ${instanceKey} .ssh/instanceKey.private
+${utilDir}/sshBastion.sh "chmod 600 .ssh/instanceKey.private"
+${utilDir}/scpBastion.sh ${sshConfig} .ssh/config
 
 # force bastion to checkout repository
 echo -e "\nChecking out repository on bastion."
 repo=`./getSetting.sh repo`
-ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "sudo yum install -y git"
-ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "sudo mkdir -p /nfs"
-ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "sudo chmod 777 /nfs"
-ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "git clone ${repo} /nfs/repos/project"
+${utilDir}/sshBastion.sh "sudo yum install -y git"
+${utilDir}/sshBastion.sh "sudo mkdir -p /nfs"
+${utilDir}/sshBastion.sh "sudo chmod 777 /nfs"
+${utilDir}/sshBastion.sh "git clone ${repo} /nfs/repos/project"
+${utilDir}/sshBastion.sh "ln -s /nfs/repos/project ~/project"
 
 # hand off to bastion local configuration script
-ssh -i ${bastionKey} ${bastionUser}@${bastionIP} "/nfs/repos/project/setup/bastion/configure.sh"
+${utilDir}/sshBastion.sh "~/project/setup/bastion/configure.sh"

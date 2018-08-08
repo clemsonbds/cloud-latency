@@ -1,5 +1,8 @@
 #!/bin/bash
 
+DIR="$(dirname "${BASH_SOURCE[0]}")"
+utilDir=${DIR}/../util
+
 # just a set of shortcuts to start an experiment
 
 profile=${1:-"default"}
@@ -53,10 +56,10 @@ esac
 
 instanceType="c4.large"
 
-region=`./getSetting.sh region`
-expName=`./getSetting.sh expName`
+region=`${utilDir}/getSetting.sh region`
+expName=`${utilDir}/getSetting.sh expName`
 
 echo "Starting experiment '$profile' cloud resources."
-./launchInstances.py --create --name ${expName} --region ${region} --keyName CloudLatencyExpInstance --azs ${azs} --experimentType ${expType} --placementGroup ${placementGroup} --instanceType=${instanceType}
+${DIR}/launchInstances.py --create --name ${expName} --region ${region} --keyName CloudLatencyExpInstance --azs ${azs} --experimentType ${expType} --placementGroup ${placementGroup} --instanceType=${instanceType}
 
-./configureInstances.sh ${profile}
+${DIR}/configureInstances.sh ${profile}

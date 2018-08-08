@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DIR="$(dirname "${BASH_SOURCE[0]}")"
+benchDir=${DIR}/..
 
 resultDir=/nfs/results/micro
 expType=
@@ -44,38 +45,38 @@ cd ..
 
 case $expType in
 cluster-bare)
-	pingpong/run.sh --resultPrefix ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
-	iperf/run.sh ${expType}
-	intel/run.sh ${expType} allreduce
+	${benchDir}/pingpong/run.sh --resultPrefix ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
+	${benchDir}/iperf/run.sh ${expType}
+	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
 cluster-hv)
-	pingpong/run.sh --resultPrefix ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
-	iperf/run.sh ${expType}
-	intel/run.sh ${expType} allreduce
+	${benchDir}/pingpong/run.sh --resultPrefix ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
+	${benchDir}/iperf/run.sh ${expType}
+	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
 spread-bare)
-	pingpong/run_sizes.sh --resultPrefix ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
-	pingpong/run.sh --resultPrefix ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
-	iperf/run.sh ${expType}
-	intel/run.sh ${expType} allreduce
+	${benchDir}/pingpong/run_sizes.sh --resultPrefix ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
+	${benchDir}/pingpong/run.sh --resultPrefix ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
+	${benchDir}/iperf/run.sh ${expType}
+	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
 spread-hv)
-	pingpong/run_sizes.sh --resultPrefix ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
-	pingpong/run.sh --resultPrefix ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
-	iperf/run.sh ${expType}
-	intel/run.sh ${expType} allreduce
+	${benchDir}/pingpong/run_sizes.sh --resultPrefix ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
+	${benchDir}/pingpong/run.sh --resultPrefix ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
+	${benchDir}/iperf/run.sh ${expType}
+	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
 multi-az-bare)
-	pingpong/run_cross.sh --resultPrefix ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
-	iperf/run_cross.sh ${expType}
-	pingpong/run.sh --resultPrefix ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
-	iperf/run.sh ${expType}
-	intel/run.sh ${expType} allreduce
+	${benchDir}/pingpong/run_cross.sh --resultPrefix ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
+	${benchDir}/iperf/run_cross.sh ${expType}
+	${benchDir}/pingpong/run.sh --resultPrefix ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
+	${benchDir}/iperf/run.sh ${expType}
+	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
 multi-az-hv)
-	pingpong/run.sh --resultPrefix ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
-	iperf/run.sh ${expType}
-	intel/run.sh ${expType} allreduce
+	${benchDir}/pingpong/run.sh --resultPrefix ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
+	${benchDir}/iperf/run.sh ${expType}
+	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
 *) # unknown
 	echo "Unknown experiment type '${expType}'."

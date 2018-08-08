@@ -1,5 +1,7 @@
 #!/bin/bash
 
+DIR="$(dirname "${BASH_SOURCE[0]}")"
+
 # installing needed stuff
 sudo yum update -y -q
 sudo yum install -y -q nmap # testing SSH to instances

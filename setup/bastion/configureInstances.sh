@@ -1,5 +1,7 @@
 #!/bin/bash
 
+DIR="$(dirname "${BASH_SOURCE[0]}")"
+
 bastionLocalIP=`/usr/sbin/ifconfig | grep eth0 -A 1 | tail -n 1 | awk '{print $2}'`
 
 # wait for all instances to accept SSH

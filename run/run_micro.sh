@@ -12,6 +12,6 @@ for grouping in cluster spread multi-az; do
 		expType="${grouping}-${instance_type}"
 		${setupDir}/stopInstances.sh
 		${setupDir}/startInstances.sh ${expType}
-		${utilDir}/sshBastion.sh "~/project/run/bastion/run_micro.sh ${expType} $@"
+		${utilDir}/sshBastion.sh "~/project/run/bastion/run_micro.sh --expType ${expType} $@"
 	done
 done

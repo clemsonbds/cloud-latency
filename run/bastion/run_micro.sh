@@ -36,7 +36,7 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
-if [ -z "${expType}"]; then
+if [ -z "${expType}" ]; then
 	echo "usage: $0 <experiment type>"
 	exit
 fi

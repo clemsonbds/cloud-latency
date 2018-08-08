@@ -6,6 +6,8 @@ import traceback
 import time
 import os
 
+thisDir = os.path.realpath(__file__).rsplit('/', 1)[0]
+
 def main():
     parser = argparse.ArgumentParser(description='Launches Instances utilizing the network resources created utilizing the createNetworkBastionHost.py script in the way specified by the experimentType parameter given.')
     parser.add_argument('--create', action='store_true', help='Specifies that the script should create resources.')
@@ -59,7 +61,7 @@ def main():
             print(values['message'])
             sys.exit(0)
 
-        os.system("rm -rf instancesCreated-" + str(args['name']) + ".json")
+        os.system("rm -rf " + thisDir + "/instancesCreated-" + str(args['name']) + ".json")
 
         print("Successfully deleted the instances for the experiment: " + str(args['name']))
         sys.exit(0)
@@ -134,7 +136,8 @@ def main():
 
         values = launchInstancesAws(client, imageId, instanceType, args['numInstances'], args['experimentType'], args['placementGroup'], args['azs'], args['keyName'], args['name'], region, userData)
 
-        dumpResourcesCreatedToFile(values['payload']['instancesCreated'], args['name'])
+        if values['payload'] != None:
+            dumpResourcesCreatedToFile(values['payload']['instancesCreated'], args['name'])
 
         if values['status'] != "success":
             print("There was an issue attempting to launch the instances for the experiment.")
@@ -179,7 +182,7 @@ def launchInstancesAws(client, imageId, instanceType, numInstances, experimentTy
                 subnetId = subnet['subnetId']
 
         if subnetId is None:
-            return {"status": "error", "message": "Unable to find the subnetId for the AZ: " + str(str(region) + azs[0]), "payload": None}
+            return {"status": "error", "message": "Unable to find the subnetId for the AZ: " + str(str(region) + azs[0]), "payload": {"instancesCreated": instancesCreated}}
 
         # Launch all the instances into the single AZ provided
         try:
@@ -229,7 +232,7 @@ def launchInstancesAws(client, imageId, instanceType, numInstances, experimentTy
                         subnetId = subnet['subnetId']
 
                 if subnetId is None:
-                    return {"status": "error", "message": "Unable to find the subnetId for the AZ: " + str(str(region) + az), "payload": None}
+                    return {"status": "error", "message": "Unable to find the subnetId for the AZ: " + str(str(region) + az), "payload": {"instancesCreated": instancesCreated}}
                 try:
                     placementStrategy['AvailabilityZone'] = str(region) + azs[0] # AZ and optional placement group
                     response = client.run_instances(ImageId=imageId, MinCount=numPerAz, MaxCount=numPerAz, KeyName=keyName, UserData=userData, InstanceType=instanceType, Monitoring={"Enabled": False}, SubnetId=subnetId, DisableApiTermination=False, InstanceInitiatedShutdownBehavior="stop", SecurityGroupIds=[createdNetworkResources['privateSecurityGroup']], Placement=placementStrategy)
@@ -250,7 +253,7 @@ def launchInstancesAws(client, imageId, instanceType, numInstances, experimentTy
                         subnetId = subnet['subnetId']
 
                 if subnetId is None:
-                    return {"status": "error", "message": "Unable to find the subnetId for the AZ: " + str(str(region) + az), "payload": None}
+                    return {"status": "error", "message": "Unable to find the subnetId for the AZ: " + str(str(region) + az), "payload": {"instancesCreated": instancesCreated}}
                 try:
                     response = client.run_instances(ImageId=imageId, MinCount=1, MaxCount=1, KeyName=keyName, UserData=userData, InstanceType=instanceType, Monitoring={"Enabled": False}, SubnetId=subnetId, DisableApiTermination=False, InstanceInitiatedShutdownBehavior="stop", SecurityGroupIds=[createdNetworkResources['privateSecurityGroup']], Placement={"AvailabilityZone": str(region) + az})
                     
@@ -268,7 +271,7 @@ def launchInstancesAws(client, imageId, instanceType, numInstances, experimentTy
 
         response = client.create_tags(Resources=instancesCreated['instances'], Tags=[{'Key': 'Name', 'Value': str(name) + "-Instance"}])
     else:
-        return {"status": "error", "message": "Invalid experiment type specified: " + str(experimentType), "payload": {"instancesCreated": None}}
+        return {"status": "error", "message": "Invalid experiment type specified: " + str(experimentType), "payload": {"instancesCreated": {"instancesCreated": instancesCreated}}}
 
     return {"status": "success", "message": "All the instances have been launched successfully.", "payload": {"instancesCreated": instancesCreated}}
 
@@ -276,7 +279,7 @@ def deleteInstancesAws(client, name):
     resourcesToDelete = None
 
     # Load the resources to delete from the file written out by the create function
-    with open("instancesCreated-" + str(name) + ".json") as outputFile:
+    with open(thisDir + "/instancesCreated-" + str(name) + ".json") as outputFile:
         resourcesToDelete = json.load(outputFile)
 
     # Delete the Bastion Host
@@ -306,7 +309,7 @@ def deleteInstancesAws(client, name):
 
 def loadNetworkResources(name):
     try:
-        with open("networkResourcesCreated-" + str(name) + ".json") as outputFile:
+        with open(thisDir + "/networkResourcesCreated-" + str(name) + ".json") as outputFile:
             networkResourcesCreated = json.load(outputFile)
             return {"status": "success", "message": "Successfully loaded the network resources", "payload": networkResourcesCreated}
     except Exception:
@@ -314,10 +317,10 @@ def loadNetworkResources(name):
 
 def dumpResourcesCreatedToFile(instancesCreated, name):
     try:
-        with open("instancesCreated-" + str(name) + ".json", "w") as outputFile:
+        with open(thisDir + "/instancesCreated-" + str(name) + ".json", "w") as outputFile:
             json.dump(instancesCreated, outputFile, sort_keys=True, indent=4, separators=(',', ': '))
     except Exception:
-        return {"status" : "error", "message": "Unable to load the network resources created for the experiment: " + str(name), "payload": None}
+        return {"status" : "error", "message": "Unable to save the instances created for the experiment: " + str(name), "payload": None}
 
 
 main()

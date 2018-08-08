@@ -32,6 +32,6 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 currentBytes=1
 
 while [ "${currentBytes}" -le "${maxBytes}" ]; do
-	${DIR}/run.sh --resultName "${resultName}-${currentBytes}b" --msgBytes "${currentBytes}" $@
+	${DIR}/run.sh --resultName "${resultName}-sizes-${currentBytes}b" --msgBytes "${currentBytes}" $@
 	currentBytes=$((currentBytes * 2))
 done

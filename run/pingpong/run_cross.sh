@@ -39,7 +39,7 @@ for src in `cat ${hostfile}`; do
         if [ "${dstIndex}" -gt "${srcIndex}" ]; then
             srcLetter=${letters:srcIndex:1}
             dstLetter=${letters:dstIndex:1}
-            ${DIR}/run.sh --resultName "${resultName}-${srcLetter}-${dstLetter}" --hosts "${src},${dst}" $@
+            ${DIR}/run.sh --resultName "${resultName}-cross-${srcLetter}-${dstLetter}" --hosts "${src},${dst}" $@
         fi
 
         dstIndex=$((dstIndex+1))

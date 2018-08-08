@@ -2,8 +2,8 @@
 
 DIR="$(dirname "${BASH_SOURCE[0]}")"
 
-#setupDir=${DIR}/../setup
-setupDir=${DIR}/.
+setupDir=${DIR}/../setup
+#setupDir=${DIR}/.
 utilDir=${DIR}/../util
 
 # cluster grouping, bare metal

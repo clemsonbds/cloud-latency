@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DIR="$(dirname "${BASH_SOURCE[0]}")"
-settingsFile=${DIR}/../settings.ini
+settingsFile=${DIR}/../assets/settings.ini
 
 if [ -z "$1" ]; then
 	echo "usage: $0 <key>"

@@ -6,6 +6,8 @@ import traceback
 import time
 import os
 
+thisDir = os.path.realpath(__file__).rsplit('/', 1)[0]
+
 def main():
     parser = argparse.ArgumentParser(description='Creates a VPC network with a 10.0.0.0/16 CIDR that contains a public (10.0.1.0/24) and private subnet for each Availability Zone in the Region (10.0.2.0/24 - 10.0.X.0/24) and a bastion host within the public subnet.')
     parser.add_argument('--create', action='store_true', help='Specifies that the script should create resources.')
@@ -139,7 +141,7 @@ def main():
                     sys.exit(0)
                 else:
                     print("The resources have been successfully deleted.")
-                    os.system("rm -rf networkResourcesCreated-" + str(args['name']) + ".json")
+                    os.system("rm -f " + thisDir + "/networkResourcesCreated-" + str(args['name']) + ".json")
                     sys.exit(0)
 
 
@@ -374,7 +376,7 @@ def deleteAwsResources(client, name):
     resourcesToDelete = None
 
     # Load the resources to delete from the file written out by the create function
-    with open("networkResourcesCreated-" + str(name) + ".json") as outputFile:
+    with open(thisDir + "/networkResourcesCreated-" + str(name) + ".json") as outputFile:
         resourcesToDelete = json.load(outputFile)
 
     # Delete the Bastion Host
@@ -498,7 +500,7 @@ def deleteGcpResources(service, name):
     pass
 
 def dumpResourcesCreatedToFile(resourcesCreated, name):
-    with open("networkResourcesCreated-" + str(name) + ".json", "w") as outputFile:
+    with open(thisDir + "/networkResourcesCreated-" + str(name) + ".json", "w") as outputFile:
         json.dump(resourcesCreated, outputFile, sort_keys=True, indent=4, separators=(',', ': '))
 
 main()

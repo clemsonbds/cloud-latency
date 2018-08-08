@@ -3,8 +3,8 @@
 DIR="$(dirname "${BASH_SOURCE[0]}")"
 utilDir=${DIR}/../util
 
-instanceKey="${DIR}/ssh/CloudLatencyExpInstance.private"
-sshConfig="${DIR}/ssh/config"
+instanceKey="${DIR}/../assets/ssh/CloudLatencyExpInstance.private"
+sshConfig="${DIR}/../assets/ssh/config"
 
 # upload the key and config file so bastion can ssh to instances
 echo -e "\nConfiguring SSH between bastion and instances."

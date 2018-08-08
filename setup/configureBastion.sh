@@ -23,3 +23,4 @@ ${utilDir}/sshBastion.sh "ln -s /nfs/repos/project ~/project"
 
 # hand off to bastion local configuration script
 ${utilDir}/sshBastion.sh "~/project/setup/bastion/configure.sh"
+${utilDir}/sshBastion.sh "~/project/setup/bastion/prepareBenchmarks.sh"

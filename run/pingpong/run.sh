@@ -72,5 +72,4 @@ fi
 
 outFile="${resultDir}/pingpong-${resultName}.raw"
 
-echo ${outFile}
-#mpirun ${mpiParams} ${executable} -i ${iters} -s ${skip} -b ${msgBytes} > ${outFile}
+mpirun ${mpiParams} ${executable} -i ${iters} -s ${skip} -b ${msgBytes} 1> ${outFile}

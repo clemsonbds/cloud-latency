@@ -283,7 +283,7 @@ def deleteInstancesAws(client, name):
         resourcesToDelete = json.load(outputFile)
 
     # Delete the Bastion Host
-    if 'instances' in resourcesToDelete:
+    if 'instances' in resourcesToDelete and len(resourcesToDelete['instances']) > 0:
         try:
             print("Deleting the Instances.")
             response = client.terminate_instances(InstanceIds=resourcesToDelete['instances'])

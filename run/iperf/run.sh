@@ -23,7 +23,7 @@ case $key in
     shift # past value
     ;;
 --seconds)
-    iters="$2"
+    seconds="$2"
     shift
     shift
     ;;

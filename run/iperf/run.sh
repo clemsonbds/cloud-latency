@@ -56,5 +56,5 @@ fi
 
 outFile="${resultDir}/iperf-${resultName}.json"
 
-ssh ${server} "iperf3 -s -1 > /dev/null" &
-ssh ${client} "iperf3 -c ${server} -t ${seconds} -J" 1> ${outFile}
+ssh -f ${server} "sh -c 'nohup iperf3 -s -1 > /dev/null 2>&1 &'" # start in background and move on
+ssh ${client} "iperf3 -c ${server} -t ${seconds} -J" > ${outFile}

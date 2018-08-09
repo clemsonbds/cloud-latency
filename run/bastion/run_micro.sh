@@ -4,14 +4,10 @@ DIR="$(dirname "${BASH_SOURCE[0]}")"
 benchDir=${DIR}/..
 
 resultDir=/nfs/results/micro
-expType=
-
 pingpongIters=10000
 iperfSeconds=60
 allreduceIters=5
 pingpongMaxBytes=8192
-
-mkdir -p ${resultDir}
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
@@ -42,7 +38,7 @@ if [ -z "${expType}" ]; then
 	exit
 fi
 
-cd ..
+mkdir -p ${resultDir}
 
 case $expType in
 cluster-metal)

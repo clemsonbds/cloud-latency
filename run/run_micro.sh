@@ -3,21 +3,11 @@
 DIR="$(dirname "${BASH_SOURCE[0]}")"
 
 setupDir=${DIR}/../setup
-#setupDir=${DIR}/.
 utilDir=${DIR}/../util
 
-groupTypes=
-groupTypes+="cluster "
-groupTypes+="spread "
-groupTypes+="multi-az "
-
-instanceTypes=
-#instanceTypes+="metal "
-instanceTypes+="vm "
-
 # cluster grouping, bare metal
-for group in ${groupTypes}; do
-	for instance in ${instanceTypes}; do
+for group in cluster spread multi-az; do
+	for instance in metal vm; do
 		expType="${group}-${instance}"
 		${setupDir}/stopInstances.sh
 		${setupDir}/startInstances.sh ${expType}

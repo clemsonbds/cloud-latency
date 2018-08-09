@@ -47,36 +47,36 @@ cd ..
 case $expType in
 cluster-bare)
 	${benchDir}/pingpong/run.sh --resultName ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
-	${benchDir}/iperf/run.sh ${expType}
+	${benchDir}/iperf/run.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
 	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
 cluster-hv)
 	${benchDir}/pingpong/run.sh --resultName ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
-	${benchDir}/iperf/run.sh ${expType}
+	${benchDir}/iperf/run.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
 	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
 spread-bare)
 	${benchDir}/pingpong/run_sizes.sh --resultName ${expType} --resultDir ${resultDir} --iters ${pingpongIters} --maxBytes ${pingpongMaxBytes}
 	${benchDir}/pingpong/run.sh --resultName ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
-	${benchDir}/iperf/run.sh ${expType}
+	${benchDir}/iperf/run.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
 	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
 spread-hv)
 	${benchDir}/pingpong/run_sizes.sh --resultName ${expType} --resultDir ${resultDir} --iters ${pingpongIters} --maxBytes ${pingpongMaxBytes}
 	${benchDir}/pingpong/run.sh --resultName ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
-	${benchDir}/iperf/run.sh ${expType}
+	${benchDir}/iperf/run.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
 	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
 multi-az-bare)
 	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
-	${benchDir}/iperf/run_cross.sh ${expType}
+	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
 	${benchDir}/pingpong/run.sh --resultName ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
-	${benchDir}/iperf/run.sh ${expType}
+	${benchDir}/iperf/run.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
 	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
 multi-az-hv)
 	${benchDir}/pingpong/run.sh --resultName ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
-	${benchDir}/iperf/run.sh ${expType}
+	${benchDir}/iperf/run.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
 	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
 *) # unknown

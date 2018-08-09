@@ -17,3 +17,5 @@ for grouping in cluster spread multi-az; do
 		${utilDir}/sshBastion.sh "~/project/run/bastion/run_micro.sh --expType ${expType} $@"
 	done
 done
+
+${setupDir}/stopInstances.sh

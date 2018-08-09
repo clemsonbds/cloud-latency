@@ -56,5 +56,5 @@ fi
 
 outFile="${resultDir}/iperf-${resultName}.json"
 
-ssh ${server} "iperf3 -s -1" &
+ssh ${server} "iperf3 -s -1 > /dev/null" &
 ssh ${client} "iperf3 -c ${server} -t ${seconds} -J $@" 1> ${outFile}

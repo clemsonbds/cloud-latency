@@ -17,12 +17,12 @@ done
 # force all instances to mount NFS
 echo -e "\nMounting NFS share on instances."
 for instanceIP in `cat /nfs/instances`; do
-	ssh ${instanceIP} "sudo mkdir -p /nfs"
-	ssh ${instanceIP} "sudo chmod 777 /nfs"
-	ssh ${instanceIP} "sudo mount -t nfs ${bastionLocalIP}:/nfs /nfs"
+	ssh -q ${instanceIP} "sudo mkdir -p /nfs"
+	ssh -q ${instanceIP} "sudo chmod 777 /nfs"
+	ssh -q ${instanceIP} "sudo mount -t nfs ${bastionLocalIP}:/nfs /nfs"
 done
 
 # force all instances to run their config scripts
 for instanceIP in `cat /nfs/instances`; do
-	ssh ${instanceIP} "/nfs/repos/project/setup/instance/configure.sh"
+	ssh -q ${instanceIP} "/nfs/repos/project/setup/instance/configure.sh"
 done

@@ -6,4 +6,4 @@ bastionIP=`${DIR}/getBastionIP.sh`
 bastionKey="~/.ssh/CloudLatencyExpBastion.private"
 bastionUser=`${DIR}/getSetting.sh bastionUser`
 
-scp -i ${bastionKey} $1 ${bastionUser}@${bastionIP}:$2
+scp -q -i ${bastionKey} $1 ${bastionUser}@${bastionIP}:$2

@@ -77,4 +77,4 @@ fi
 outFile="${resultDir}/pingpong-${resultName}.raw"
 
 echo Running pingpong between ${src} and ${dst}.
-mpirun ${mpiParams} ${executable} -i ${iters} -s ${skip} -b ${msgBytes} 1> ${outFile}
+mpirun ${mpiParams} ${executable} -t -i ${iters} -s ${skip} -b ${msgBytes} 1> ${outFile}

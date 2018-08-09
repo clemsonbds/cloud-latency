@@ -11,41 +11,41 @@ shift
 extraArgs=$*
 
 case $profile in 
-cluster-bare)
+cluster-metal)
 	expType="single-az"
 	placementGroup="cluster"
 	instanceType="i3.metal"
 	azs="a"
 	;;
-cluster-hv)
+cluster-vm)
 	expType="single-az"
 	placementGroup="cluster"
 	instanceType="i3.16xlarge"
 	azs="a"
 	;;
-spread-bare)
+spread-metal)
 	expType="single-az"
 	placementGroup="spread"
 	instanceType="i3.metal"
 	azs="a"
 	;;
-spread-hv)
+spread-vm)
 	expType="single-az"
 	placementGroup="spread"
 	instanceType="i3.16xlarge"
 	azs="a"
 	;;
-multi-az-bare)
+multi-az-metal)
 	expType="multi-az"
 	instanceType="i3.metal"
-	azs="a,b,c,d,e,f"
-	numInstances="6"
+	azs="a,b,d,e,f"
+	numInstances="5"
 	;;
-multi-az-hv)
+multi-az-vm)
 	expType="multi-az"
 	instanceType="i3.16xlarge"
-	azs="a,b,c,d,e,f"
-	numInstances="6"
+	azs="a,b,d,e,f"
+	numInstances="5"
 	;;
 default)
 	expType="single-az"
@@ -57,7 +57,7 @@ default)
 	;;
 esac
 
-instanceType="c4.large"
+#instanceType="c4.large"
 region=`${utilDir}/getSetting.sh region`
 expName=`${utilDir}/getSetting.sh expName`
 options="--create --name ${expName} --region ${region} --keyName CloudLatencyExpInstance --azs ${azs} --experimentType ${expType}"

@@ -6,10 +6,19 @@ setupDir=${DIR}/../setup
 #setupDir=${DIR}/.
 utilDir=${DIR}/../util
 
+groupTypes=
+groupTypes+="cluster "
+groupTypes+="spread "
+groupTypes+="multi-az "
+
+instanceTypes=
+#instanceTypes+="metal "
+instanceTypes+="vm "
+
 # cluster grouping, bare metal
-for grouping in cluster spread multi-az; do
-	for instance_type in bare hv; do
-		expType="${grouping}-${instance_type}"
+for group in ${groupTypes}; do
+	for instance in ${instanceTypes}; do
+		expType="${group}-${instance}"
 		${setupDir}/stopInstances.sh
 		${setupDir}/startInstances.sh ${expType}
 

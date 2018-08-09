@@ -62,8 +62,12 @@ skip=1000
 
 if [ ! -z "${hosts}" ]; then
     mpiParams+=" --host ${hosts}"
+    src=`echo ${hosts} | awk -F "," '{print $1}'`
+    dst=`echo ${hosts} | awk -F "," '{print $1}'`
 else
     mpiParams+=" --hostfile ${hostfile}"
+    src=`head -n1 ${hostfile}`
+    dst=`head -n2 ${hostfile} | tail -n1`
 fi
 
 if [ ! -z "${rankfile}"]; then
@@ -72,4 +76,5 @@ fi
 
 outFile="${resultDir}/pingpong-${resultName}.raw"
 
+echo Running pingpong between ${src} and ${dst}.
 mpirun ${mpiParams} ${executable} -i ${iters} -s ${skip} -b ${msgBytes} 1> ${outFile}

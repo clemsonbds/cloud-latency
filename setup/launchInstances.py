@@ -209,61 +209,52 @@ def launchInstancesAws(client, imageId, instanceType, numInstances, experimentTy
         # Launch a certain number of instances into each AZ specified, will attempt to launch them evenly throughout the AZs depending on the number of instances and number of AZs specified
         numAzs = len(azs)
 
-        numPerAz = 0
-        extraForAz = 0
-
-        if (numInstances % int(numAzs)) == 0:
+        if (numInstances % numAzs) == 0:
             print("The number of instances is evenly divisible by the number of AZs specified, all AZs will get the same number of instances.")
-            numPerAz = numInstances / int(numAzs)
         elif numInstances < numAzs:
             print("There were more AZs specified then the requested number of instances, some AZs may not get instances.")
-            numPerAz = 1
         else:
             print("The number of instances is not evenly divisible by the number of AZs specified, some AZs may have more instances then others.")
-            numPerAz = numInstances / int(numAzs)
 
-        launchedInstanceCount = 0
+        # build a dict mapping each az to the number of instances
+        azDistribution = {}
+
+        # initialize all to zero
+        for az in azs:
+            azDistribution[az] = 0
+
+        # distribute them round robin
+        for index in range(numInstances):
+            az = azs[index % numAzs] # choose the next az
+            azDistribution[az] += 1
+
         print("Launching the instances.")
-        for az in azs:
-            if launchedInstanceCount < numInstances:
-                subnetId = None
-                for subnet in createdNetworkResources['privateSubnets']:
-                    if subnet['az'] == str(region) + az:
-                        subnetId = subnet['subnetId']
 
-                if subnetId is None:
-                    return {"status": "error", "message": "Unable to find the subnetId for the AZ: " + str(str(region) + az), "payload": {"instancesCreated": instancesCreated}}
-                try:
-                    placementStrategy['AvailabilityZone'] = str(region) + azs[0] # AZ and optional placement group
-                    response = client.run_instances(ImageId=imageId, MinCount=numPerAz, MaxCount=numPerAz, KeyName=keyName, UserData=userData, InstanceType=instanceType, Monitoring={"Enabled": False}, SubnetId=subnetId, DisableApiTermination=False, InstanceInitiatedShutdownBehavior="stop", SecurityGroupIds=[createdNetworkResources['privateSecurityGroup']], Placement=placementStrategy)
-                    
-                    # Get the instanceId from the response
-                    for instance in response['Instances']:
-                        instancesCreated['instances'].append(instance['InstanceId'])
-                    launchedInstanceCount += numPerAz
-                except Exception:
-                    return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"instancesCreated": instancesCreated}}
+        for az, numThisAz in azDistribution.items():
 
-        # Handle the extra instances that won't evenly split across AZs
-        for az in azs:
-            if launchedInstanceCount < numInstances:
-                subnetId = None
-                for subnet in createdNetworkResources['privateSubnets']:
-                    if subnet['az'] == str(region) + az:
-                        subnetId = subnet['subnetId']
+            if numThisAz == 0:
+                continue
 
-                if subnetId is None:
-                    return {"status": "error", "message": "Unable to find the subnetId for the AZ: " + str(str(region) + az), "payload": {"instancesCreated": instancesCreated}}
-                try:
-                    response = client.run_instances(ImageId=imageId, MinCount=1, MaxCount=1, KeyName=keyName, UserData=userData, InstanceType=instanceType, Monitoring={"Enabled": False}, SubnetId=subnetId, DisableApiTermination=False, InstanceInitiatedShutdownBehavior="stop", SecurityGroupIds=[createdNetworkResources['privateSecurityGroup']], Placement={"AvailabilityZone": str(region) + az})
-                    
-                    # Get the instanceId from the response
-                    for instance in response['Instances']:
-                        instancesCreated['instances'].append(instance['InstanceId'])
-                    
-                    launchedInstanceCount += 1
-                except Exception:
-                    return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"instancesCreated": instancesCreated}}
+            placementStrategy['AvailabilityZone'] = str(region) + az # AZ and optional placement group
+
+            subnetId = None
+            for subnet in createdNetworkResources['privateSubnets']:
+                if subnet['az'] == placementStrategy['AvailabilityZone']:
+                    subnetId = subnet['subnetId']
+
+            if subnetId is None:
+                return {"status": "error", "message": "Unable to find the subnetId for the AZ: " + str(str(region) + az), "payload": {"instancesCreated": instancesCreated}}
+
+            try:
+                response = client.run_instances(ImageId=imageId, MinCount=numThisAz, MaxCount=numThisAz, KeyName=keyName, UserData=userData, InstanceType=instanceType, Monitoring={"Enabled": False}, SubnetId=subnetId, DisableApiTermination=False, InstanceInitiatedShutdownBehavior="stop", SecurityGroupIds=[createdNetworkResources['privateSecurityGroup']], Placement=placementStrategy)
+                
+                # Get the instanceId from the response
+                for instance in response['Instances']:
+                    instancesCreated['instances'].append(instance['InstanceId'])
+
+            except Exception:
+                return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"instancesCreated": instancesCreated}}
+
         # Wait until the instance is in the Running state
         print("Waiting for the Instances to be ready.")
         waiter = client.get_waiter('instance_running')

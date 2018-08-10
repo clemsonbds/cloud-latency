@@ -1,0 +1,47 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(ggplot2)
+library(reshape2)
+datapath <- "~/data/cloud-latency/results/parsed/micro"
+
+df_pp_cluster_metal <- read.csv(paste(datapath, "/pingpong-cluster-metal.csv", sep=""), header = T)
+df_pp_spread_metal  <- read.csv(paste(datapath, "/pingpong-spread-metal.csv", sep=""), header = T)
+df_pp_multiaz_metal <- read.csv(paste(datapath, "/pingpong-multi-az-metal.csv", sep=""), header = T)
+```
+
+Pingpong latency time series
+
+```{r}
+df1 = df_pp_cluster_metal
+df2 = df_pp_spread_metal
+df3 = df_pp_multiaz_metal
+
+df <- data.frame(df1, df2, df3, count = c(1:length(df1)))
+df.m = melt(df, id.vars="ts", measure.vars=c("latency","latency.1","latency.2"))
+
+# plot out the melted dataframe using ggplot
+ggplot(df.m, aes(ts, value, colour = variable)) + geom_point() + ylim(-3,3)
+
+
+plot(df1$ts/1000000, df1$latency, xlab="time (seconds)", ylab="latency (microseconds)", main="Pingpong latency between nodes in same Placement Group")
+plot(df2$ts/1000000, df2$latency, xlab="time (seconds)", ylab="latency (microseconds)", main="Pingpong latency between nodes in same Availability Zone")
+plot(df3$ts/1000000, df3$latency, xlab="time (seconds)", ylab="latency (microseconds)", main="Pingpong latency between nodes in diff. Availability Zones")
+```
+
+Pingpong latency vs clustering
+
+```{r}
+boxplot(df_pp_cluster_metal$latency, df_pp_spread_metal$latency, df_pp_multiaz_metal$latency, xlab="latency (microseconds)", names = c("Same PG", "Same AZ", "Diff AZ"), horizontal=T, outline=F)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file).

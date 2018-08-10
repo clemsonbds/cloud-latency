@@ -57,7 +57,7 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
 executable="/nfs/repos/benchmarks/pingpong/pingpong"
-mpiParams="-np 2"
+mpiParams="-np 2 --map-by node"
 skip=1000
 
 if [ ! -z "${hosts}" ]; then

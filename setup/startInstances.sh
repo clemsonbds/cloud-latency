@@ -14,8 +14,7 @@ case $profile in
 cluster-metal)
 	expType="single-az"
 	placementGroup="cluster"
-#	instanceType="i3.metal"
-	instanceType="i3.16xlarge"
+	instanceType="i3.metal"
 	azs="a"
 	;;
 cluster-vm)
@@ -27,8 +26,7 @@ cluster-vm)
 spread-metal)
 	expType="single-az"
 	placementGroup="spread"
-#	instanceType="i3.metal"
-	instanceType="i3.16xlarge"
+	instanceType="i3.metal"
 	azs="a"
 	;;
 spread-vm)
@@ -39,8 +37,7 @@ spread-vm)
 	;;
 multi-az-metal)
 	expType="multi-az"
-#	instanceType="i3.metal"
-	instanceType="i3.16xlarge"
+	instanceType="i3.metal"
 	azs="a,b,d,e,f"
 	numInstances="5"
 	;;

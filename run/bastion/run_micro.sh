@@ -4,7 +4,8 @@ DIR="$(dirname "${BASH_SOURCE[0]}")"
 benchDir=${DIR}/..
 
 resultDir=/nfs/results/micro
-pingpongIters=10000
+pingpongIters=1000000
+pingpongSeconds=10
 iperfSeconds=60
 allreduceIters=5
 pingpongMaxBytes=8192
@@ -40,38 +41,44 @@ fi
 
 mkdir -p ${resultDir}
 
+if [ -z "${pingpongSeconds}" ]; then
+	pingpongDuration="--iters ${pingpongIters}"
+else
+	pingpongDuration="--seconds ${pingpongSeconds}"
+fi
+
 case $expType in
 cluster-metal)
-	${benchDir}/pingpong/run.sh --resultName ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
+	${benchDir}/pingpong/run.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration}
 	${benchDir}/iperf/run.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
 	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
 cluster-vm)
-	${benchDir}/pingpong/run.sh --resultName ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
+	${benchDir}/pingpong/run.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration}
 	${benchDir}/iperf/run.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
 	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
 spread-metal)
-	${benchDir}/pingpong/run_sizes.sh --resultName ${expType} --resultDir ${resultDir} --iters ${pingpongIters} --maxBytes ${pingpongMaxBytes}
-	${benchDir}/pingpong/run.sh --resultName ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
+	${benchDir}/pingpong/run_sizes.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} --maxBytes ${pingpongMaxBytes}
+	${benchDir}/pingpong/run.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration}
 	${benchDir}/iperf/run.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
 	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
 spread-vm)
-	${benchDir}/pingpong/run_sizes.sh --resultName ${expType} --resultDir ${resultDir} --iters ${pingpongIters} --maxBytes ${pingpongMaxBytes}
-	${benchDir}/pingpong/run.sh --resultName ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
+	${benchDir}/pingpong/run_sizes.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} --maxBytes ${pingpongMaxBytes}
+	${benchDir}/pingpong/run.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration}
 	${benchDir}/iperf/run.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
 	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
 multi-az-metal)
-	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
+	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration}
 	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
-	${benchDir}/pingpong/run.sh --resultName ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
+	${benchDir}/pingpong/run.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration}
 	${benchDir}/iperf/run.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
 	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
 multi-az-vm)
-	${benchDir}/pingpong/run.sh --resultName ${expType} --resultDir ${resultDir} --iters ${pingpongIters}
+	${benchDir}/pingpong/run.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration}
 	${benchDir}/iperf/run.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
 	${benchDir}/intel/run.sh ${expType} allreduce
 	;;

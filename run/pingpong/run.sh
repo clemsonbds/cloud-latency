@@ -27,6 +27,11 @@ case $key in
     shift
     shift
     ;;
+--seconds)
+    seconds="$2"
+    shift
+    shift
+    ;;
 --msgBytes)
     msgBytes="$2"
     shift
@@ -77,4 +82,4 @@ fi
 outFile="${resultDir}/pingpong-${resultName}.raw"
 
 echo Running pingpong between ${src} and ${dst}.
-mpirun ${mpiParams} ${executable} -t -i ${iters} -s ${skip} -b ${msgBytes} 1> ${outFile}
+mpirun ${mpiParams} ${executable} -t -i ${iters} -s ${skip} -b ${msgBytes} -d ${seconds} 1> ${outFile}

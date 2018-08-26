@@ -80,6 +80,13 @@ if [ ! -z "${rankfile}"]; then
 fi
 
 outFile="${resultDir}/pingpong-${resultName}.raw"
+ppArgs="-t -i -s ${skip} -b ${msgBytes}"
+
+if [ -z "${seconds}" ]; then
+    ppArgs+=" -i ${iters}"
+else
+    ppArgs+=" -d ${seconds}"
+fi
 
 echo Running pingpong between ${src} and ${dst}.
-mpirun ${mpiParams} ${executable} -t -i ${iters} -s ${skip} -b ${msgBytes} -d ${seconds} 1> ${outFile}
+mpirun ${mpiParams} ${executable} ${ppArgs} 1> ${outFile}

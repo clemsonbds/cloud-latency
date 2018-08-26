@@ -4,8 +4,8 @@ DIR="$(dirname "${BASH_SOURCE[0]}")"
 benchDir=${DIR}/..
 
 resultDir=/nfs/results/micro
-pingpongIters=1000000
-pingpongSeconds=10
+pingpongIters=100000
+pingpongSeconds=
 iperfSeconds=60
 allreduceIters=5
 pingpongMaxBytes=8192

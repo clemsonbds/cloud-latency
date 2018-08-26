@@ -80,7 +80,7 @@ if [ ! -z "${rankfile}"]; then
 fi
 
 outFile="${resultDir}/pingpong-${resultName}.raw"
-ppArgs="-t -i -s ${skip} -b ${msgBytes}"
+ppArgs="-t -s ${skip} -b ${msgBytes}"
 
 if [ -z "${seconds}" ]; then
     ppArgs+=" -i ${iters}"

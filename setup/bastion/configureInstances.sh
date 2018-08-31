@@ -24,5 +24,8 @@ done
 
 # force all instances to run their config scripts
 for instanceIP in `cat /nfs/instances`; do
-	ssh -q ${instanceIP} "/nfs/repos/project/setup/instance/configure.sh"
+	ssh -q ${instanceIP} "/nfs/repos/project/setup/instance/configure.sh" &
 done
+
+# wait for them all to be done
+wait

@@ -16,24 +16,28 @@ cluster-metal)
 	placementGroup="cluster"
 	instanceType="i3.metal"
 	azs="a"
+	numInstances="7"
 	;;
 cluster-vm)
 	expType="single-az"
 	placementGroup="cluster"
 	instanceType="i3.16xlarge"
 	azs="a"
+	numInstances="7"
 	;;
 spread-metal)
 	expType="single-az"
 	placementGroup="spread"
 	instanceType="i3.metal"
 	azs="a"
+	numInstances="7"
 	;;
 spread-vm)
 	expType="single-az"
 	placementGroup="spread"
 	instanceType="i3.16xlarge"
 	azs="a"
+	numInstances="7"
 	;;
 multi-az-metal)
 	expType="multi-az"

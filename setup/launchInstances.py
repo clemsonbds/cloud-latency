@@ -6,6 +6,9 @@ import traceback
 import time
 import os
 
+# Set the delay time and the max attempts for the waiter
+delayTime = 30
+waitAttempts = 40
 thisDir = os.path.realpath(__file__).rsplit('/', 1)[0]
 
 def main():
@@ -199,7 +202,7 @@ def launchInstancesAws(client, imageId, instanceType, numInstances, experimentTy
             # Wait until the instance is in the Running state
             print("Waiting for the Instances to become ready.")
             waiter = client.get_waiter('instance_running')
-            waiter.wait(InstanceIds=instancesCreated['instances'])
+            waiter.wait(InstanceIds=instancesCreated['instances'], WaiterConfig={'Delay': delayTime, 'MaxAttempts': waitAttempts})
 
             response = client.create_tags(Resources=instancesCreated['instances'], Tags=[{'Key': 'Name', 'Value': str(name) + "-Instance"}])
         except Exception:
@@ -258,7 +261,7 @@ def launchInstancesAws(client, imageId, instanceType, numInstances, experimentTy
         # Wait until the instance is in the Running state
         print("Waiting for the Instances to be ready.")
         waiter = client.get_waiter('instance_running')
-        waiter.wait(InstanceIds=instancesCreated['instances'])
+        waiter.wait(InstanceIds=instancesCreated['instances'], WaiterConfig={'Delay': delayTime, 'MaxAttempts': waitAttempts})
 
         response = client.create_tags(Resources=instancesCreated['instances'], Tags=[{'Key': 'Name', 'Value': str(name) + "-Instance"}])
     else:
@@ -282,7 +285,7 @@ def deleteInstancesAws(client, name):
             # Wait until the instance is in the Terminate state
             print("Waiting for the Instances to terminate.")
             waiter = client.get_waiter('instance_terminated')
-            waiter.wait(InstanceIds=resourcesToDelete['instances'])
+            waiter.wait(InstanceIds=resourcesToDelete['instances'], WaiterConfig={'Delay': delayTime, 'MaxAttempts': waitAttempts})
             del resourcesToDelete['instances']
         except Exception as e:
             return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesToDelete": resourcesToDelete}}

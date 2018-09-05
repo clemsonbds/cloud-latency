@@ -6,6 +6,9 @@ import traceback
 import time
 import os
 
+# Set the delay time and the max attempts for the waiter
+delayTime = 30
+waitAttempts = 40
 thisDir = os.path.realpath(__file__).rsplit('/', 1)[0]
 
 def main():
@@ -320,7 +323,7 @@ def createAwsResources(client, name, region, keyName, imageId, instanceType, nat
         # Wait until the instance is in the Running state
         print("Waiting for the NAT Instance to become ready.")
         waiter = client.get_waiter('instance_running')
-        waiter.wait(InstanceIds=[resourcesCreated['natInstance']])
+        waiter.wait(InstanceIds=[resourcesCreated['natInstance']], WaiterConfig={'Delay': delayTime, 'MaxAttempts': waitAttempts})
 
         response = client.create_tags(Resources=[resourcesCreated['natInstance']], Tags=[{'Key': 'Name', 'Value': str(name) + "-NatInstance"}])
     except Exception as e:
@@ -361,7 +364,7 @@ def createAwsResources(client, name, region, keyName, imageId, instanceType, nat
         # Wait until the instance is in the Running state
         print("Waiting for the Bastion Host to become ready.")
         waiter = client.get_waiter('instance_running')
-        waiter.wait(InstanceIds=[resourcesCreated['bastionHost']])
+        waiter.wait(InstanceIds=[resourcesCreated['bastionHost']], WaiterConfig={'Delay': delayTime, 'MaxAttempts': waitAttempts})
 
         response = client.create_tags(Resources=[resourcesCreated['bastionHost']], Tags=[{'Key': 'Name', 'Value': str(name) + "-BastionHost"}])
     except Exception as e:
@@ -388,7 +391,7 @@ def deleteAwsResources(client, name):
             # Wait until the instance is in the Terminate state
             print("Waiting for the Bastion Host to terminate.")
             waiter = client.get_waiter('instance_terminated')
-            waiter.wait(InstanceIds=[resourcesToDelete['bastionHost']])
+            waiter.wait(InstanceIds=[resourcesToDelete['bastionHost']], WaiterConfig={'Delay': delayTime, 'MaxAttempts': waitAttempts})
             del resourcesToDelete['bastionHost']
         except Exception as e:
             return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesToDelete": resourcesToDelete}}
@@ -401,7 +404,7 @@ def deleteAwsResources(client, name):
             # Wait until the instance is in the Terminate state
             print("Waiting for the NAT Instance to terminate.")
             waiter = client.get_waiter('instance_terminated')
-            waiter.wait(InstanceIds=[resourcesToDelete['natInstance']])
+            waiter.wait(InstanceIds=[resourcesToDelete['natInstance']], WaiterConfig={'Delay': delayTime, 'MaxAttempts': waitAttempts})
             del resourcesToDelete['natInstance']
         except Exception as e:
             return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesToDelete": resourcesToDelete}}

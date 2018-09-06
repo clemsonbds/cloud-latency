@@ -8,38 +8,216 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
 
 ```{r}
+install.packages('data.table')
+install.packages('gridExtra')
+```
+
+```{r}
 library(ggplot2)
 library(reshape2)
-datapath <- "~/data/cloud-latency/results/parsed/micro"
+library(data.table)
+datapath <- "../data/results/parsed/micro"
 
 df_pp_cluster_metal <- read.csv(paste(datapath, "/pingpong-cluster-metal.csv", sep=""), header = T)
 df_pp_spread_metal  <- read.csv(paste(datapath, "/pingpong-spread-metal.csv", sep=""), header = T)
 df_pp_multiaz_metal <- read.csv(paste(datapath, "/pingpong-multi-az-metal.csv", sep=""), header = T)
+
+df_pp_cluster_vm <- read.csv(paste(datapath, "/pingpong-cluster-vm.csv", sep=""), header = T)
+df_pp_spread_vm  <- read.csv(paste(datapath, "/pingpong-spread-vm.csv", sep=""), header = T)
+df_pp_multiaz_vm <- read.csv(paste(datapath, "/pingpong-multi-az-vm.csv", sep=""), header = T)
+
+df_ip_cluster_metal <- read.csv(paste(datapath, "/iperf-cluster-metal.csv", sep=""), header = T)
+df_ip_spread_metal  <- read.csv(paste(datapath, "/iperf-spread-metal.csv", sep=""), header = T)
+df_ip_multiaz_metal <- read.csv(paste(datapath, "/iperf-multi-az-metal.csv", sep=""), header = T)
+
+df_pp_multiaz_cross_ab <- read.csv(paste(datapath, "/pingpong-multi-az-metal-cross-a-b.csv", sep=""), header = T)
+df_pp_multiaz_cross_ac <- read.csv(paste(datapath, "/pingpong-multi-az-metal-cross-a-c.csv", sep=""), header = T)
+df_pp_multiaz_cross_ad <- read.csv(paste(datapath, "/pingpong-multi-az-metal-cross-a-d.csv", sep=""), header = T)
+df_pp_multiaz_cross_ae <- read.csv(paste(datapath, "/pingpong-multi-az-metal-cross-a-e.csv", sep=""), header = T)
+df_pp_multiaz_cross_bc <- read.csv(paste(datapath, "/pingpong-multi-az-metal-cross-b-c.csv", sep=""), header = T)
+df_pp_multiaz_cross_bd <- read.csv(paste(datapath, "/pingpong-multi-az-metal-cross-b-d.csv", sep=""), header = T)
+df_pp_multiaz_cross_be <- read.csv(paste(datapath, "/pingpong-multi-az-metal-cross-b-e.csv", sep=""), header = T)
+df_pp_multiaz_cross_cd <- read.csv(paste(datapath, "/pingpong-multi-az-metal-cross-c-d.csv", sep=""), header = T)
+df_pp_multiaz_cross_ce <- read.csv(paste(datapath, "/pingpong-multi-az-metal-cross-c-e.csv", sep=""), header = T)
+df_pp_multiaz_cross_de <- read.csv(paste(datapath, "/pingpong-multi-az-metal-cross-d-e.csv", sep=""), header = T)
+
+df_pp_multiaz_cross_aa <- read.csv(paste(datapath, "/pingpong-spread-metal.csv", sep=""), header = T)
+df_pp_multiaz_cross_bb <- df_pp_multiaz_cross_aa
+df_pp_multiaz_cross_cc <- df_pp_multiaz_cross_aa
+df_pp_multiaz_cross_dd <- df_pp_multiaz_cross_aa
+df_pp_multiaz_cross_ee <- df_pp_multiaz_cross_aa
+
+df_ip_multiaz_cross_ab <- read.csv(paste(datapath, "/iperf-multi-az-metal-cross-a-b.csv", sep=""), header = T)
+df_ip_multiaz_cross_ac <- read.csv(paste(datapath, "/iperf-multi-az-metal-cross-a-c.csv", sep=""), header = T)
+df_ip_multiaz_cross_ad <- read.csv(paste(datapath, "/iperf-multi-az-metal-cross-a-d.csv", sep=""), header = T)
+df_ip_multiaz_cross_ae <- read.csv(paste(datapath, "/iperf-multi-az-metal-cross-a-e.csv", sep=""), header = T)
+df_ip_multiaz_cross_bc <- read.csv(paste(datapath, "/iperf-multi-az-metal-cross-b-c.csv", sep=""), header = T)
+df_ip_multiaz_cross_bd <- read.csv(paste(datapath, "/iperf-multi-az-metal-cross-b-d.csv", sep=""), header = T)
+df_ip_multiaz_cross_be <- read.csv(paste(datapath, "/iperf-multi-az-metal-cross-b-e.csv", sep=""), header = T)
+df_ip_multiaz_cross_cd <- read.csv(paste(datapath, "/iperf-multi-az-metal-cross-c-d.csv", sep=""), header = T)
+df_ip_multiaz_cross_ce <- read.csv(paste(datapath, "/iperf-multi-az-metal-cross-c-e.csv", sep=""), header = T)
+df_ip_multiaz_cross_de <- read.csv(paste(datapath, "/iperf-multi-az-metal-cross-d-e.csv", sep=""), header = T)
+
+```
+
+Pingpong latency heat map
+
+```{r}
+m.aa = mean(df_pp_multiaz_cross_aa$latency)
+m.ab = mean(df_pp_multiaz_cross_ab$latency)
+m.ac = mean(df_pp_multiaz_cross_ac$latency)
+m.ad = mean(df_pp_multiaz_cross_ad$latency)
+m.ae = mean(df_pp_multiaz_cross_ae$latency)
+m.bb = mean(df_pp_multiaz_cross_bb$latency)
+m.bc = mean(df_pp_multiaz_cross_bc$latency)
+m.bd = mean(df_pp_multiaz_cross_bd$latency)
+m.be = mean(df_pp_multiaz_cross_be$latency)
+m.cc = mean(df_pp_multiaz_cross_cc$latency)
+m.cd = mean(df_pp_multiaz_cross_cd$latency)
+m.ce = mean(df_pp_multiaz_cross_ce$latency)
+m.dd = mean(df_pp_multiaz_cross_dd$latency)
+m.de = mean(df_pp_multiaz_cross_de$latency)
+m.ee = mean(df_pp_multiaz_cross_ee$latency)
+
+df <- data.frame(az = c('a','b','c','d','e'),
+                 a  = c(m.aa, m.ab, m.ac, m.ad, m.ae),
+                 b  = c(m.ab, m.bb, m.bc, m.bd, m.be),
+                 c  = c(m.ac, m.bc, m.cc, m.cd, m.ce),
+                 d  = c(m.ad, m.bd, m.cd, m.dd, m.de),
+                 e  = c(m.ae, m.be, m.ce, m.de, m.ee)
+)
+
+df.m <- melt(df)
+ggplot(data = df.m, aes(x=az, y=variable, fill=value)) + 
+  geom_tile() +
+  scale_fill_continuous(guide = guide_legend(), breaks = c(200,300,400,500,600,700,800,900,1000,1100,1200)) +
+  labs(title="Heat map of mean latency between N. Virginia AZs", x="Zone", y="Zone", fill="latency (us)")
+```
+
+```{r}
+m.ab = mean(df_ip_multiaz_cross_ab$bps)
+m.ac = mean(df_ip_multiaz_cross_ac$bps)
+m.ad = mean(df_ip_multiaz_cross_ad$bps)
+m.ae = mean(df_ip_multiaz_cross_ae$bps)
+m.bc = mean(df_ip_multiaz_cross_bc$bps)
+m.bd = mean(df_ip_multiaz_cross_bd$bps)
+m.be = mean(df_ip_multiaz_cross_be$bps)
+m.cd = mean(df_ip_multiaz_cross_cd$bps)
+m.ce = mean(df_ip_multiaz_cross_ce$bps)
+m.de = mean(df_ip_multiaz_cross_de$bps)
+
+df <- data.frame(az = c('a','b','c','d','e'),
+                 a  = c(   0, m.ab, m.ac, m.ad, m.ae),
+                 b  = c(m.ab,    0, m.bc, m.bd, m.be),
+                 c  = c(m.ac, m.bc,    0, m.cd, m.ce),
+                 d  = c(m.ad, m.bd, m.cd,    0, m.de),
+                 e  = c(m.ae, m.be, m.ce, m.de,    0)
+)
+
+df.m <- melt(df)
+df.m$value <- df.m$value/1000000000
+ggplot(data = df.m, aes(x=az, y=variable, fill=value)) + 
+  geom_tile() +
+  labs(title="Heat map of mean throughput between N.Virginia Availability Zones", x="Zone", y="Zone", fill="GB/s")
 ```
 
 Pingpong latency time series
 
 ```{r}
-df1 = df_pp_cluster_metal
-df2 = df_pp_spread_metal
-df3 = df_pp_multiaz_metal
+df.cluster.metal = df_pp_cluster_metal
+df.cluster.metal$ts = df.cluster.metal$ts/1000000
+df.spread.metal = df_pp_spread_metal
+df.spread.metal$ts = df.spread.metal$ts/1000000
+df.multiaz.metal = df_pp_multiaz_metal
+df.multiaz.metal$ts = df.multiaz.metal$ts/1000000
 
-df <- data.frame(df1, df2, df3, count = c(1:length(df1)))
-df.m = melt(df, id.vars="ts", measure.vars=c("latency","latency.1","latency.2"))
+df.cluster.vm = df_pp_cluster_vm
+df.cluster.vm$ts = df.cluster.vm$ts/1000000
+df.spread.vm = df_pp_spread_vm
+df.spread.vm$ts = df.spread.vm$ts/1000000
+df.multiaz.vm = df_pp_multiaz_vm
+df.multiaz.vm$ts = df.multiaz.vm$ts/1000000
+
+plot(df.cluster.metal$ts, df.cluster.metal$latency, xlab="time (seconds)", ylab="latency (microseconds)", main="Pingpong latency between nodes in same Placement Group")
+plot(df.spread.metal$ts, df.spread.metal$latency, xlab="time (seconds)", ylab="latency (microseconds)", main="Pingpong latency between nodes in same Availability Zone")
+plot(df.multiaz.metal$ts, df.multiaz.metal$latency, xlab="time (seconds)", ylab="latency (microseconds)", main="Pingpong latency between nodes in diff. Availability Zones")
+
+
+df.metal <- data.frame(df.cluster.metal, df.spread.metal, df.multiaz.metal, count = c(1:length(df.cluster.metal$ts)))
+setnames(df.metal, old = c('latency', 'latency.1', 'latency.2'), new = c('cluster', 'spread', 'multi-az'))
+df.metal.m = melt(df.metal, id.vars="ts", measure.vars=c('cluster', 'spread', 'multi-az'))
+
+df.vm <- data.frame(df.spread.vm, df.cluster.vm, df.multiaz.vm, count = c(1:length(df.cluster.vm$ts)))
+setnames(df.vm, old = c('latency', 'latency.1', 'latency.2'), new = c('spread', 'cluster', 'multi-az'))
+df.vm.m = melt(df.vm, id.vars="ts", measure.vars=c('spread', 'cluster', 'multi-az'))
 
 # plot out the melted dataframe using ggplot
-ggplot(df.m, aes(ts, value, colour = variable)) + geom_point() + ylim(-3,3)
+require(gridExtra)
+plot1 <- ggplot(df.vm.m,
+  aes(ts, value, colour = variable)) + 
+  geom_point(shape=23) + ylim(0,1000) +
+  labs(title="Pingpong time series (nitro VM)", y="latency (microseconds)", x="time (seconds)") +
+  theme(legend.position = c(0.2, 0.9), legend.title=element_blank())
+plot2 <- ggplot(df.metal.m,
+  aes(ts, value, colour = variable)) + 
+  geom_point(shape=23) + ylim(0,1000) +
+  labs(title="Pingpong time series (bare metal)", x="time (seconds)") +
+  theme(legend.position = c(0.2, 0.9), legend.title=element_blank(), axis.title.y=element_blank())
+grid.arrange(plot1, plot2, ncol=2)
+```
 
+iPerf throughput time series
 
-plot(df1$ts/1000000, df1$latency, xlab="time (seconds)", ylab="latency (microseconds)", main="Pingpong latency between nodes in same Placement Group")
-plot(df2$ts/1000000, df2$latency, xlab="time (seconds)", ylab="latency (microseconds)", main="Pingpong latency between nodes in same Availability Zone")
-plot(df3$ts/1000000, df3$latency, xlab="time (seconds)", ylab="latency (microseconds)", main="Pingpong latency between nodes in diff. Availability Zones")
+```{r}
+df1 = df_ip_cluster_metal
+df2 = df_ip_spread_metal
+df3 = df_ip_multiaz_metal
+
+plot(df1$ts/1000000, df1$bps/1000000, xlab="time (seconds)", ylab="throughput (Mb/s)", main="Throughput between nodes in same Placement Group")
+plot(df2$ts/1000000, df2$bps/1000000, xlab="time (seconds)", ylab="throughput (Mb/s)", main="Throughput between nodes in same Availability Zone")
+plot(df3$ts/1000000, df3$bps/1000000, xlab="time (seconds)", ylab="throughput (Mb/s)", main="Throughput between nodes in diff. Availability Zones")
+
+df <- data.frame(df1, df2, df3, count = c(1:length(df1)))
+setnames(df, old = c('bps', 'bps.1', 'bps.2'), new = c('cluster', 'spread', 'multi-az'))
+df.m = melt(df, id.vars="ts", measure.vars=c('cluster', 'spread', 'multi-az'))
+
+# plot out the melted dataframe using ggplot
+ggplot(df.m, aes(ts, value, group = variable, colour = variable)) + geom_line(aes(linetype=variable, color=variable)) +# geom_point() +
+  labs(title="Throughput time series (metal)", y="throughput (Mb/s)", x="time (seconds)")
 ```
 
 Pingpong latency vs clustering
 
 ```{r}
-boxplot(df_pp_cluster_metal$latency, df_pp_spread_metal$latency, df_pp_multiaz_metal$latency, xlab="latency (microseconds)", names = c("Same PG", "Same AZ", "Diff AZ"), horizontal=T, outline=F)
+
+df.cluster.metal = df_pp_cluster_metal$latency
+df.cluster.metal[df.cluster.metal > 2000] <- median(df.cluster.metal)
+df.spread.metal = df_pp_spread_metal$latency
+df.spread.metal[df.spread.metal > 2000] <- median(df.spread.metal)
+df.multiaz.metal = df_pp_multiaz_metal$latency
+df.multiaz.metal[df.multiaz.metal > 2000] <- median(df.multiaz.metal)
+
+df.cluster.vm = df_pp_cluster_vm$latency
+df.cluster.vm[df.cluster.vm > 2000] <- median(df.cluster.vm)
+df.spread.vm = df_pp_spread_vm$latency
+df.spread.vm[df.spread.vm > 2000] <- median(df.spread.vm)
+df.multiaz.vm = df_pp_multiaz_vm$latency
+df.multiaz.vm[df.multiaz.vm > 2000] <- median(df.multiaz.vm)
+
+dlen = length(df.cluster.vm)
+
+df <- data.frame(
+  x = c(c(df.cluster.vm, df.cluster.metal), c(df.spread.vm, df.spread.metal), c(df.multiaz.vm, df.multiaz.metal)),
+  y = rep(c("cluster", "spread", "multi-az"), each = dlen*2),
+  z = rep(rep(c("vm", "metal"), each=dlen), 3),
+  stringsAsFactors = TRUE
+)
+
+ggplot(df, aes(y, x, fill=factor(z))) +
+  geom_boxplot() + 
+  labs(y="latency (microseconds)", x="placement strategy", title="Latency distribution by node type and placement strategy", fill="node type")
+
+#boxplot(df1$latency, df2$latency, df3$latency, xlab="latency (microseconds)", names = c("Same PG", "Same AZ", "Diff AZ"), horizontal=T, outline=F)
 ```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.

@@ -5,9 +5,9 @@ benchDir=${DIR}/..
 
 resultDir=/nfs/results/micro
 resultDir+="/`date '+%Y-%m-%d_%H:%M:%S'`"
-pingpongIters=100000
+pingpongIters=10000
 pingpongSeconds=
-iperfSeconds=60
+iperfSeconds=10
 allreduceIters=5
 pingpongMaxBytes=8192
 

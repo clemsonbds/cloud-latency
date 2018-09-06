@@ -68,7 +68,7 @@ skip=1000
 if [ ! -z "${hosts}" ]; then
     mpiParams+=" --host ${hosts}"
     src=`echo ${hosts} | awk -F "," '{print $1}'`
-    dst=`echo ${hosts} | awk -F "," '{print $1}'`
+    dst=`echo ${hosts} | awk -F "," '{print $2}'`
 else
     mpiParams+=" --hostfile ${hostfile}"
     src=`head -n1 ${hostfile}`

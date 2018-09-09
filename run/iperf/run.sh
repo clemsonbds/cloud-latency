@@ -54,7 +54,7 @@ else
 	client=`head -n 2 ${hostfile} | tail -n 1`
 fi
 
-timestamp="/`date '+%Y-%m-%d_%H:%M:%S'`"
+timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 outFile="${resultDir}/iperf-${resultName}.${timestamp}.json"
 
 echo Running iperf between ${server} and ${client}.

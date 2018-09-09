@@ -79,7 +79,7 @@ if [ ! -z "${rankfile}"]; then
     mpiParams+=" --rankfile ${rankfile}"
 fi
 
-timestamp="/`date '+%Y-%m-%d_%H:%M:%S'`"
+timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 outFile="${resultDir}/pingpong-${resultName}.${timestamp}.raw"
 
 ppArgs="-t -s ${skip} -b ${msgBytes}"

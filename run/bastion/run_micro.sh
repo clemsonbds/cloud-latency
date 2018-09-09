@@ -4,7 +4,6 @@ DIR="$(dirname "${BASH_SOURCE[0]}")"
 benchDir=${DIR}/..
 
 resultDir=/nfs/results/micro
-resultDir+="/`date '+%Y-%m-%d_%H:%M:%S'`"
 pingpongIters=10000
 pingpongSeconds=
 iperfSeconds=10

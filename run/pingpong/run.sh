@@ -79,7 +79,9 @@ if [ ! -z "${rankfile}"]; then
     mpiParams+=" --rankfile ${rankfile}"
 fi
 
-outFile="${resultDir}/pingpong-${resultName}.raw"
+timestamp="/`date '+%Y-%m-%d_%H:%M:%S'`"
+outFile="${resultDir}/pingpong-${resultName}.${timestamp}.raw"
+
 ppArgs="-t -s ${skip} -b ${msgBytes}"
 
 if [ -z "${seconds}" ]; then

@@ -54,7 +54,8 @@ else
 	client=`head -n 2 ${hostfile} | tail -n 1`
 fi
 
-outFile="${resultDir}/iperf-${resultName}.json"
+timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
+outFile="${resultDir}/iperf-${resultName}.${timestamp}.json"
 
 echo Running iperf between ${server} and ${client}.
 ssh -q -f ${server} "sh -c 'nohup iperf3 -s -1 > /dev/null 2>&1 &'" # start in background and move on

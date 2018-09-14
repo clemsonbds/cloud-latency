@@ -68,7 +68,7 @@ skip=1000
 if [ ! -z "${hosts}" ]; then
     mpiParams+=" --host ${hosts}"
     src=`echo ${hosts} | awk -F "," '{print $1}'`
-    dst=`echo ${hosts} | awk -F "," '{print $1}'`
+    dst=`echo ${hosts} | awk -F "," '{print $2}'`
 else
     mpiParams+=" --hostfile ${hostfile}"
     src=`head -n1 ${hostfile}`
@@ -79,7 +79,9 @@ if [ ! -z "${rankfile}"]; then
     mpiParams+=" --rankfile ${rankfile}"
 fi
 
-outFile="${resultDir}/pingpong-${resultName}.raw"
+timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
+outFile="${resultDir}/pingpong-${resultName}.${timestamp}.raw"
+
 ppArgs="-t -s ${skip} -b ${msgBytes}"
 
 if [ -z "${seconds}" ]; then

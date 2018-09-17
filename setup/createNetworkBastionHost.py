@@ -17,11 +17,11 @@ def main():
     parser.add_argument('--create', action='store_true', help='Specifies that the script should create resources.')
     parser.add_argument('--delete', action='store_true', help='Specifies that the script should delete resources.')
     parser.add_argument('--name', help='Specifies the name of the experiment, this will be used when creating tags for the resources. This name must be lowercase and shorter then 63 characters.', required=True)
-    parser.add_argument('--region', help='Specifies the name of the region where the resources will be created. Defaults to us-east-1 for AWS and us-central1 for GCP', default=None)
+    parser.add_argument('--region', help='Specifies the name of the region where the resources will be created. Defaults to us-east-1 for AWS and us-east1 for GCP', default=None)
     parser.add_argument('--profile', help='Specifies the name of the AWS credentials profile that you want to use, if not specified the default one is used.', default="default")
     parser.add_argument('--cloudProvider', help='Specifies the name of the experiment, this will be used when creating tags for the resources.', default="aws", choices=["aws", "gcp"])
     parser.add_argument('--keyName', help='Specifies the name of the SSH key that will be utilized to launch the bastion host.')
-    parser.add_argument('--imageId', help='Specifies the Image that will be used to launch the bastion host. This defaults to AWS Linux in N. Virginia for AWS and to Debian 9 in Central Iowa for GCP.', default=None)
+    parser.add_argument('--imageId', help='Specifies the Image that will be used to launch the bastion host. This defaults to AWS Linux in N. Virginia for AWS and to Debian 9 in South Carolina for GCP.', default=None)
     parser.add_argument('--instanceType', help='Specifies the Instance Type that will be used to launch the bastion host. This defaults to t2.micro for AWS and to g1-small for GCP.', default=None)
     parser.add_argument('--projectId', help='Only required for GCP. Specifies the project that will be used to run the experiment in GCP.', default=None)
     args = vars(parser.parse_args())
@@ -125,8 +125,7 @@ def main():
 
             # Get the default region if not specified via commandline
             if args['region'] is None:
-                # Amazon Linux 2 AMI in N. Virginia
-                region = "us-central1"
+                region = "us-east1"
             else:
                 region = args['region']
 
@@ -242,8 +241,7 @@ def main():
 
                 # Get the default region if not specified via commandline
                 if args['region'] is None:
-                    # Amazon Linux 2 AMI in N. Virginia
-                    region = "us-central1"
+                    region = "us-east1"
                 else:
                     region = args['region']
 

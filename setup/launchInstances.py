@@ -17,11 +17,11 @@ def main():
     parser.add_argument('--create', action='store_true', help='Specifies that the script should create resources.')
     parser.add_argument('--delete', action='store_true', help='Specifies that the script should delete resources.')
     parser.add_argument('--name', help='Specifies the name of the experiment, this will be used when creating tags for the resources.', required=True)
-    parser.add_argument('--region', help='Specifies the name of the region where the resources will be created. Defaults to us-east-1 for AWS and us-central1 for GCP', default=None)
+    parser.add_argument('--region', help='Specifies the name of the region where the resources will be created. Defaults to us-east-1 for AWS and us-east1 for GCP', default=None)
     parser.add_argument('--profile', help='Specifies the name of the AWS credentials profile that you want to use, if not specified the default one is used.', default="default")
     parser.add_argument('--cloudProvider', help='Specifies the name of the experiment, this will be used when creating tags for the resources.', default="aws", choices=["aws", "gcp"])
     parser.add_argument('--keyName', help='Specifies the name of the SSH key that will be utilized to launch the bastion host.')
-    parser.add_argument('--imageId', help='Specifies the Image that will be used to launch the bastion host. This defaults to AWS Linux in N. Virginia for AWS and to Debian 8 in Central Iowa for GCP.', default=None)
+    parser.add_argument('--imageId', help='Specifies the Image that will be used to launch the bastion host. This defaults to AWS Linux in N. Virginia for AWS and to Debian 8 in South Carolina for GCP.', default=None)
     parser.add_argument('--instanceType', help='Specifies the Instance Type that will be used to launch the bastion host. This defaults to t2.micro for AWS and to g1-small for GCP.', default=None)
     parser.add_argument('--numInstances', help='Specifies the number of instances to launch. Must be an integer greater than 1. The default is 2 instances.', type=int, default=2)
     parser.add_argument('--experimentType', help='Specifies the type of experiment to launch. Options are multi-az and single-az.  Multi-az launches the instances in multiple AZs, and single-az launches all the instances in a single AZ. The default is single-az.', default='single-az', choices=['multi-az', 'single-az'])
@@ -83,8 +83,7 @@ def main():
 
             # Get the default region if not specified via commandline
             if args['region'] is None:
-                # Amazon Linux 2 AMI in N. Virginia
-                region = "us-central1"
+                region = "us-east1"
             else:
                 region = args['region']
 
@@ -233,8 +232,7 @@ def main():
 
             # Get the default region if not specified via commandline
             if args['region'] is None:
-                # Amazon Linux 2 AMI in N. Virginia
-                region = "us-central1"
+                region = "us-east1"
             else:
                 region = args['region']
 

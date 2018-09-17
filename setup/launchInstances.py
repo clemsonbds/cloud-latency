@@ -7,8 +7,8 @@ import time
 import os
 
 # Set the delay time and the max attempts for the waiter
-delayTime = 30
-waitAttempts = 40
+delayTime = 5
+waitAttempts = 240
 thisDir = os.path.realpath(__file__).rsplit('/', 1)[0]
 
 def main():

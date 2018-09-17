@@ -48,34 +48,42 @@ else
 fi
 
 case $expType in
-cluster-metal)
+gcp-single-az-vm)
+	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration}
+	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
+	;;
+gcp-multi-az-vm)
+	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration}
+	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
+	;;
+aws-cluster-metal)
 	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration}
 #	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
 #	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
-cluster-vm)
+aws-cluster-vm)
 	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration}
 #	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
 #	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
-spread-metal)
+aws-spread-metal)
 #	${benchDir}/pingpong/run_sizes.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} --maxBytes ${pingpongMaxBytes}
 	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration}
 #	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
 #	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
-spread-vm)
+aws-spread-vm)
 #	${benchDir}/pingpong/run_sizes.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} --maxBytes ${pingpongMaxBytes}
 	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration}
 #	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
 #	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
-multi-az-metal)
+aws-multi-az-metal)
 	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration}
 #	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
 #	${benchDir}/intel/run.sh ${expType} allreduce
 	;;
-multi-az-vm)
+aws-multi-az-vm)
 	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration}
 #	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds}
 #	${benchDir}/intel/run.sh ${expType} allreduce

@@ -953,7 +953,17 @@ def deleteAwsResources(client, name):
 
 def deleteGcpResources(service, name, region, projectId):
     resourcesToDelete = None
-    zone = str(region) + "-a"
+
+    # Get the first available zone since not all GCP regions have an "a" zone
+    zone = ""
+    try:
+        request = service.regions().get(project=projectId, region=region)
+        response = request.execute()
+        for az in response['zones']:
+            zone = az.split("/zones/")[1]
+            break
+    except Exception as e:
+        return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesToDelete": resourcesToDelete}}
 
     # Load the resources to delete from the file written out by the create function
     with open(thisDir + "/networkResourcesCreated-" + str(name) + ".json") as outputFile:

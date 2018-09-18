@@ -3,13 +3,15 @@
 DIR="$(dirname "${BASH_SOURCE[0]}")"
 utilDir=${DIR}/../util
 
-region=`${utilDir}/getSetting.sh region`
-expName=`${utilDir}/getSetting.sh expName`
+platform=${1:-"aws"}
+
+region=`${utilDir}/getSetting.sh region ${platform}`
+expName=`${utilDir}/getSetting.sh expName ${platform}`
 
 echo "Starting Bastion host cloud resources."
-./createNetworkBastionHost.py --create --name ${expName} --region ${region} --keyName JasonAnderson
+./createNetworkBastionHost.py --create --cloudProvider ${platform} --name ${expName} --region ${region} --keyName JasonAnderson
 
-bastionIP=`${utilDir}/getBastionIP.sh`
+bastionIP=`${utilDir}/getBastionIP.sh ${platform}`
 
 # wait for bastion to accept SSH
 canSSH=
@@ -19,4 +21,4 @@ while [ -z "${canSSH}" ]; do
 	canSSH=`nmap ${bastionIP} -PN -p ssh | grep open`
 done
 
-${DIR}/configureBastion.sh
+${DIR}/configureBastion.sh ${platform}

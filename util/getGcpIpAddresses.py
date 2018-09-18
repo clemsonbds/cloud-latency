@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import os
@@ -25,10 +25,10 @@ if nodeType == "bastion":
     try:
         for zone in response['items']:
             if "instances" in response['items'][zone]:
-                print response['items'][zone]['instances'][0]['networkInterfaces'][0]['accessConfigs'][0]['natIP']
+                print(response['items'][zone]['instances'][0]['networkInterfaces'][0]['accessConfigs'][0]['natIP'])
                 sys.exit(0)
     except Exception:
-        print "No Bastion IP Found"
+        print("No Bastion IP Found")
         sys.exit(0)
 
 elif nodeType == "internal":
@@ -38,16 +38,16 @@ elif nodeType == "internal":
         foundInstance = False
         for zone in response['items']:
             if "instances" in response['items'][zone]:
-                print response['items'][zone]['instances'][0]['networkInterfaces'][0]['networkIP']
+                print(response['items'][zone]['instances'][0]['networkInterfaces'][0]['networkIP'])
                 foundInstance = True
         if not foundInstance:
-            print "No Internal IPs Were Found"
+            print("No Internal IPs Were Found")
             sys.exit(0)
         else:
             sys.exit(0)
     except Exception:
-        print "No Internal IPs Found"
+        print("No Internal IPs Found")
         sys.exit(0)
 else:
-    print "Invalid Instance Type"
+    print("Invalid Instance Type")
     sys.exit(0)

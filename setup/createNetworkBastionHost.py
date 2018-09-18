@@ -515,9 +515,18 @@ def createAwsResources(client, name, region, keyName, imageId, instanceType, nat
 
 def createGcpResources(service, name, region, keyName, imageId, instanceType, natImage, projectId):
     baseLink = "https://www.googleapis.com/compute/v1/projects/" + str(projectId) + "/"
-    zone = str(region) + "-a"
-
     resourcesCreated = {}
+
+    # Get the first available zone since not all GCP regions have an "a" zone
+    zone = ""
+    try:
+        request = service.regions().get(project=projectId, region=region)
+        response = request.execute()
+        for az in response['zones']:
+            zone = az.split("/zones/")[1]
+            break
+    except Exception as e:
+        return {"status": "error", "message": ''.join(traceback.format_exc()), "payload": {"resourcesCreated": resourcesCreated}}
 
     # First we need to create the VPC
     try:

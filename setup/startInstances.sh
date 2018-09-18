@@ -14,16 +14,16 @@ case $profile in
 gcp-single-az-vm)
 	platform="gcp"
 	expType="single-az"
-	instanceType="???"
+	instanceType="n1-highmem-64"
 	numInstances="2"
-	azs="a"
+	azs="b"
 	;;
 gcp-multi-az-vm)
 	platform="gcp"
-	expType="single-az"
-	instanceType="???"
+	expType="multi-az"
+	instanceType="n1-highmem-64"
 	numInstances="2"
-	azs="a,b,c"
+	azs="b,d"
 	;;
 aws-cluster-metal)
 	platform="aws"
@@ -79,9 +79,11 @@ esac
 
 #instanceType="c4.large"
 
-expName=`${utilDir}/getSetting.sh expName ${platform}`
+expName=`${utilDir}/getSetting.sh expName ${platform} | awk '{print tolower($0)}'`
 region=`${utilDir}/getSetting.sh region ${platform}`
-options="--create --name ${expName} --cloudProvider ${platform}  --region ${region} --keyName CloudLatencyExpInstance --azs ${azs} --experimentType ${expType}"
+keyName=`${utilDir}/getSetting.sh instanceKey ${platform}`
+
+options="--create --name ${expName} --cloudProvider ${platform}  --region ${region} --keyName ${keyName} --azs ${azs} --experimentType ${expType}"
 
 # platform-specific options
 if [ "${platform}" == "aws" ]; then
@@ -91,7 +93,7 @@ if [ "${platform}" == "aws" ]; then
 fi
 
 if [ "${platform}" == "gcp" ]; then
-	projectID=`${utilDir}/getSetting.sh gcpProjectID`
+	projectID=`${utilDir}/getSetting.sh projectID ${platform}`
 	options+=" --projectId ${projectID}"
 fi
 

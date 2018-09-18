@@ -437,7 +437,7 @@ def launchInstancesGcp(service, imageId, instanceType, numInstances, experimentT
                 uniquePart = str(uuid.uuid4().get_hex().lower()[0:4])
                 uniqueName = str(name) + "-" + str(uniquePart)
 
-                instance_body = createInstanceRequestBody(uniqueName, region, zone, instanceType, userData, ['priv'], imageId, projectId, subnetId)
+                instance_body = createInstanceRequestBody(uniqueName, region, zone, instanceType, userData, ['priv'], imageId, projectId, subnetId, name)
                 instance = service.instances().insert(project=projectId, zone=zone, body=instance_body)
                 request = instance.execute()
                 instancesCreated['instances'][zone].append(uniqueName)
@@ -502,7 +502,7 @@ def launchInstancesGcp(service, imageId, instanceType, numInstances, experimentT
                     uniquePart = str(uuid.uuid4().get_hex().lower()[0:4])
                     uniqueName = str(name) + "-" + str(uniquePart)
 
-                    instance_body = createInstanceRequestBody(uniqueName, region, zone, instanceType, userData, ['priv'], imageId, projectId, subnetId)
+                    instance_body = createInstanceRequestBody(uniqueName, region, zone, instanceType, userData, ['priv'], imageId, projectId, subnetId, name)
                     instance = service.instances().insert(project=projectId, zone=zone, body=instance_body)
                     request = instance.execute()
                     instancesCreated['instances'][zone].append(uniqueName)
@@ -595,7 +595,7 @@ def deleteInstancesGcp(service, name, projectId, region):
     return {"status": "success", "message": "Successfully deleted the instances.", "payload": {"resourcesToDelete": resourcesToDelete}}
 
 
-def createInstanceRequestBody(name, region, zone, instanceType, userData, tags, imageId, projectId, subnet):
+def createInstanceRequestBody(name, region, zone, instanceType, userData, tags, imageId, projectId, subnet, experimentName):
     instance_body = {
                 "name": name,
                 "zone": zone,
@@ -634,7 +634,7 @@ def createInstanceRequestBody(name, region, zone, instanceType, userData, tags, 
                 "description": "",
                 "labels": {
                     "instance-type": "internal",
-                    "experiment-name": str(name).split("-")[1]
+                    "experiment-name": str(experimentName)
                 },
                 "scheduling": {
                     "preemptible": "false",

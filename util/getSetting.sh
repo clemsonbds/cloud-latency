@@ -9,10 +9,12 @@ if [ -z "$1" ]; then
 fi
 
 key=$1
-platform=${2:-"aws"}
+platform=$2
 
-# find platform-specific key first
-pair=`grep -i ${platform}-${key} ${settingsFile}`
+# find platform-specific key first, might override general setting
+if [ ! -z "${platform}" ]; then
+	pair=`grep -i ${platform}-${key} ${settingsFile}`
+fi
 
 # if not found, try the general key
 if [ -z "${pair}" ]; then

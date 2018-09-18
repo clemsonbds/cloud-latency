@@ -6,7 +6,7 @@ from googleapiclient import discovery
 from googleapiclient.errors import HttpError
 
 # Checking this variable because I have two GCP accounts and GCP doesn't allow for multiple profiles so I'm remapping here
-if os.environ['GOOGLE_APPLICATION_CREDS'] != "":
+if 'GOOGLE_APPLICATION_CREDS' in os.environ:
     # Overwrite the default GCP account so that the correct account is utilized.
     credsPath = os.environ['GOOGLE_APPLICATION_CREDS']
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credsPath

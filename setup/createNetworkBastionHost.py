@@ -146,11 +146,11 @@ def main():
             credsPath = None
             try:
                 # Checking this variable because I have two GCP accounts and GCP doesn't allow for multiple profiles so I'm remapping here
-                if os.environ['GOOGLE_APPLICATION_CREDS'] != "":
+                if 'GOOGLE_APPLICATION_CREDS' in os.environ:
                     # Overwrite the default GCP account so that the correct account is utilized.
                     credsPath = os.environ['GOOGLE_APPLICATION_CREDS']
                     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credsPath
-                elif os.environ['GOOGLE_APPLICATION_CREDENTIALS'] == "":
+                elif 'GOOGLE_APPLICATION_CREDENTIALS' not in os.environ:
                     print("Unable to locate credentials for GCP in the current environment. This application looks for the GOOGLE_APPLICATION_CREDENTIALS environment variable and utilizes that key for making requests. You can generate this key if you do not have one by logging into the GCP console -> IAM and admin -> Credentials -> Service accounts -> Create Service Account. You will need to set a name for the new Service Account, Select the Owner Role, and Check the Furnish a new private key box. Download the generated file and save it to a secure location on your local machine. Then set the value of the GOOGLE_APPLICATION_CREDENTIALS environment variable to the full path to the downloaded Credentials file and then run this script again.")
                     sys.exit(0)
             except Exception:
@@ -256,11 +256,11 @@ def main():
                 credsPath = None
                 try:
                     # Checking this variable because I have two GCP accounts and GCP doesn't allow for multiple profiles so I'm remapping here
-                    if os.environ['GOOGLE_APPLICATION_CREDS'] != "":
+                    if 'GOOGLE_APPLICATION_CREDS' in os.environ:
                         # Overwrite the default GCP account so that the correct account is utilized.
                         credsPath = os.environ['GOOGLE_APPLICATION_CREDS']
                         os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credsPath
-                    elif os.environ['GOOGLE_APPLICATION_CREDENTIALS'] == "":
+                    elif 'GOOGLE_APPLICATION_CREDENTIALS' not in os.environ:
                         print("Unable to locate credentials for GCP in the current environment. This application looks for the GOOGLE_APPLICATION_CREDENTIALS environment variable and utilizes that key for making requests. You can generate this key if you do not have one by logging into the GCP console -> IAM and admin -> Credentials -> Service accounts -> Create Service Account. You will need to set a name for the new Service Account, Select the Owner Role, and Check the Furnish a new private key box. Download the generated file and save it to a secure location on your local machine. Then set the value of the GOOGLE_APPLICATION_CREDENTIALS environment variable to the full path to the downloaded Credentials file and then run this script again.")
                         sys.exit(0)
                 except Exception:

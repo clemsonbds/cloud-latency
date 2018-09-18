@@ -5,7 +5,7 @@ DIR="$(dirname "${BASH_SOURCE[0]}")"
 setupDir=${DIR}/../setup
 utilDir=${DIR}/../util
 
-platform=$1
+platform=${1:-"aws"}
 shift
 
 # extra arguments will be passed to the call to run_micro.sh on bastion

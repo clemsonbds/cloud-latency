@@ -31,13 +31,13 @@ for i in `seq 1 ${numIterations}`; do
 	for groupType in ${groupTypes}; do
 		for instanceType in ${instanceTypes}; do
 			expType="${platform}-${groupType}-${instanceType}"
-			${setupDir}/stopInstances.sh
+			${setupDir}/stopInstances.sh ${platform}
 			${setupDir}/startInstances.sh ${expType}
 
 			echo -e "\nRunning benchmarks for experiment configuration '${expType}'.\n"
-			${utilDir}/sshBastion.sh "~/project/run/bastion/run_micro.sh --expType ${expType} $@"
+			${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_micro.sh --expType ${expType} $@"
 		done
 	done
 done
 
-${setupDir}/stopInstances.sh
+${setupDir}/stopInstances.sh ${platform}

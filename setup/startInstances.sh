@@ -108,4 +108,4 @@ fi
 echo "Starting experiment '$profile' cloud resources."
 ${DIR}/launchInstances.py ${options}
 
-${DIR}/configureInstances.sh ${profile}
+${DIR}/configureInstances.sh ${platform}

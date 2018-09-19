@@ -38,8 +38,9 @@ elif nodeType == "internal":
         foundInstance = False
         for zone in response['items']:
             if "instances" in response['items'][zone]:
-                print(response['items'][zone]['instances'][0]['networkInterfaces'][0]['networkIP'])
-                foundInstance = True
+                for instance in response['items'][zone]['instances']:
+                    print(instance['networkInterfaces'][0]['networkIP'])
+                    foundInstance = True
         if not foundInstance:
             print("No Internal IPs Were Found")
             sys.exit(0)
@@ -47,6 +48,8 @@ elif nodeType == "internal":
             sys.exit(0)
     except Exception:
         print("No Internal IPs Found")
+        import traceback
+        print(traceback.format_exc())        
         sys.exit(0)
 else:
     print("Invalid Instance Type")

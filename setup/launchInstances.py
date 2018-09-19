@@ -502,7 +502,7 @@ def launchInstancesGcp(service, imageId, instanceType, numInstances, experimentT
                     uniquePart = str(uuid.uuid4().get_hex().lower()[0:4])
                     uniqueName = str(name) + "-" + str(uniquePart)
 
-                    instance_body = createInstanceRequestBody(uniqueName, region, zone, instanceType, userData, ['priv'], imageId, projectId, subnetId, name)
+                    instance_body = createInstanceRequestBody(uniqueName, region, zone, instanceType, userData, ['priv', 'natroute'], imageId, projectId, subnetId, name)
                     instance = service.instances().insert(project=projectId, zone=zone, body=instance_body)
                     request = instance.execute()
                     instancesCreated['instances'][zone].append(uniqueName)

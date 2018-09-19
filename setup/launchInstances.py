@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import argparse
 import sys
 import json
@@ -434,7 +434,7 @@ def launchInstancesGcp(service, imageId, instanceType, numInstances, experimentT
         while numInstancesCreated < numInstances:
             try:
                 import uuid
-                uniquePart = str(uuid.uuid4().get_hex().lower()[0:4])
+                uniquePart = str(uuid.uuid4()).lower()[0:8]
                 uniqueName = str(name) + "-" + str(uniquePart)
 
                 instance_body = createInstanceRequestBody(uniqueName, region, zone, instanceType, userData, ['priv'], imageId, projectId, subnetId, name)

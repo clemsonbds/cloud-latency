@@ -9,6 +9,7 @@ rm -rf ${baseDir}
 # mpi pingpong
 benchDir=${baseDir}/pingpong
 git clone https://github.com/Rakurai/mpi-pingpong.git ${benchDir}
+sed -i 's|/opt/local/include|/opt/local/include -std=gnu99|' ${benchDir}/Makefile
 (cd ${benchDir} && make)
 
 # intel MPI

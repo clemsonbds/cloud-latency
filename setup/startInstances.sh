@@ -10,20 +10,20 @@ profile=${1:-"default"}
 shift
 extraArgs=$*
 
-case $profile in 
+case $profile in
 gcp-single-az-vm)
 	platform="gcp"
 	expType="single-az"
 	instanceType="n1-highmem-64"
-	numInstances="2"
+	numInstances="7"
 	azs="b"
 	;;
 gcp-multi-az-vm)
 	platform="gcp"
 	expType="multi-az"
 	instanceType="n1-highmem-64"
-	numInstances="2"
-	azs="b,d"
+	numInstances="3"
+	azs="b,c,d"
 	;;
 aws-cluster-metal)
 	platform="aws"

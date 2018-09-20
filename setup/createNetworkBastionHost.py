@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import argparse
 import sys
 import json
@@ -640,7 +640,7 @@ def createGcpResources(service, name, region, keyName, imageId, instanceType, na
             "direction": "INGRESS",
             "priority": 900,
             "targetTags": ['pub-i'],
-            "allowed": [{"IPProtocol": "tcp", "ports": ["0-65535"]}],
+            "allowed": [{"IPProtocol": "tcp", "ports": ["0-65535"]}, {"IPProtocol": "udp", "ports": ["0-65535"]}],
             "sourceRanges": '10.0.0.0/16'
         }
 

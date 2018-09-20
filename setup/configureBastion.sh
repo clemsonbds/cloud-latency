@@ -13,6 +13,7 @@ echo -e "\nConfiguring SSH between bastion and instances."
 ${utilDir}/scpBastion.sh ${provider} ${instanceKey} .ssh/instanceKey.private
 ${utilDir}/sshBastion.sh ${provider} "chmod 600 .ssh/instanceKey.private"
 ${utilDir}/scpBastion.sh ${provider} ${sshConfig} .ssh/config
+${utilDir}/sshBastion.sh ${provider} "chmod 600 .ssh/config"
 
 # force bastion to checkout repository
 echo -e "\nChecking out repository on bastion."

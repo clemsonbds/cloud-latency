@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import argparse
 import sys
 import json
@@ -437,7 +437,7 @@ def launchInstancesGcp(service, imageId, instanceType, numInstances, experimentT
                 uniquePart = str(uuid.uuid4()).lower()[0:8]
                 uniqueName = str(name) + "-" + str(uniquePart)
 
-                instance_body = createInstanceRequestBody(uniqueName, region, zone, instanceType, userData, ['priv'], imageId, projectId, subnetId, name)
+                instance_body = createInstanceRequestBody(uniqueName, region, zone, instanceType, userData, ['priv', 'natroute'], imageId, projectId, subnetId, name)
                 instance = service.instances().insert(project=projectId, zone=zone, body=instance_body)
                 request = instance.execute()
                 instancesCreated['instances'][zone].append(uniqueName)

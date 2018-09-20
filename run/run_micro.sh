@@ -17,7 +17,7 @@ aws)
 	instanceTypes="vm metal"
 	;;
 gcp)
-	numIterations=1
+	numIterations=10
 	groupTypes="single-az multi-az"
 	instanceTypes="vm"
 	;;

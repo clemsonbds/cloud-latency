@@ -24,6 +24,10 @@ ${utilDir}/sshBastion.sh ${provider} "sudo chmod 777 /nfs"
 ${utilDir}/sshBastion.sh ${provider} "git clone ${repo} /nfs/repos/project"
 ${utilDir}/sshBastion.sh ${provider} "ln -s /nfs/repos/project ~/project"
 
+# Write out the script to identify the CPU Family for the instance
+${utilDir}/generateCpuIdentityScript.sh ${provider}
+${utilDir}/sshBastion.sh ${provider} "sudo chmod 777 /nfs/getCpuIdentity.sh"
+
 # hand off to bastion local configuration script
 ${utilDir}/sshBastion.sh ${provider} "~/project/setup/bastion/configure.sh"
 ${utilDir}/sshBastion.sh ${provider} "~/project/setup/bastion/prepareBenchmarks.sh"

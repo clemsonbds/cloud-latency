@@ -2,6 +2,7 @@
 
 resultName=none
 hostfile="/nfs/instances"
+cpuIdFile="/nfs/getCpuIdentity.sh"
 
 DIR="$(dirname "${BASH_SOURCE[0]}")"
 
@@ -38,8 +39,10 @@ for src in `cat ${hostfile}`; do
     for dst in `cat ${hostfile}`; do
         if [ "${dstIndex}" -gt "${srcIndex}" ]; then
             srcLetter=${letters:srcIndex:1}
+            srcCpuFamily=`ssh -q ${src} ${cpuIdFile} | tail -1`
             dstLetter=${letters:dstIndex:1}
-            ${DIR}/run.sh --resultName "${resultName}-cross-${srcLetter}-${dstLetter}" --hosts "${src},${dst}" $@
+            dstCpuFamily=`ssh -q ${dst} ${cpuIdFile} | tail -1`
+            ${DIR}/run.sh --resultName "${resultName}-cross-${srcCpuFamily}-${srcLetter}-${dstCpuFamily}-${dstLetter}" --hosts "${src},${dst}" $@
         fi
 
         dstIndex=$((dstIndex+1))

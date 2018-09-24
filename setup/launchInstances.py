@@ -599,7 +599,7 @@ def createInstanceRequestBody(name, region, zone, instanceType, userData, tags, 
     instance_body = {
                 "name": name,
                 "zone": zone,
-                "minCpuPlatform": "Automatic",
+                "minCpuPlatform": "Intel Broadwell",
                 "machineType": '/zones/' + zone + '/machineTypes/' + str(instanceType),
                 "metadata": {
                     "items": [

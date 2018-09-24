@@ -1,8 +1,7 @@
-#! /usr/bin/env bash
+#!/bin/bash
 
 provider=${1:-"aws"}
 
-# Write out the script to identify the CPU Architecture of the machine
 if [ "${provider}" == "aws" ]; then
 		echo "#!/usr/bin/env bash
 sudo yum install -y cpuid
@@ -43,3 +42,5 @@ case \"\$output\" in
 esac
 echo \"Could not determine CPU Type\"" > /nfs/getCpuIdentity.sh
 fi
+
+sudo chmod 777 /nfs/getCpuIdentity.sh

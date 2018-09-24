@@ -28,7 +28,9 @@ echo -e "\nMounting NFS share on instances."
 for instanceIP in `cat /nfs/instances`; do
 	ssh -q ${instanceIP} "sudo mkdir -p /nfs"
 	ssh -q ${instanceIP} "sudo chmod 777 /nfs"
-	ssh -q ${instanceIP} "sudo firewall-cmd --permanent --zone=public --add-service=nfs,mountd,rpc-bind"
+	ssh -q ${instanceIP} "sudo firewall-cmd --permanent --zone=public --add-service=nfs"
+	ssh -q ${instanceIP} "sudo firewall-cmd --permanent --zone=public --add-service=mountd"
+	ssh -q ${instanceIP} "sudo firewall-cmd --permanent --zone=public --add-service=rpc-bind"
     ssh -q ${instanceIP} "sudo firewall-cmd --reload"
 	ssh -q ${instanceIP} "sudo mount -t nfs ${bastionLocalIP}:/nfs /nfs"
 done

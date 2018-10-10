@@ -23,4 +23,11 @@ if [ -z "${pair}" ]; then
 fi
 
 # if we found more than one, return the first
-echo "${pair}" | head -n1 | cut -d'=' -f2
+value=`echo "${pair}" | head -n1 | cut -d'=' -f2`
+
+if [ -z "${value}" ]; then
+	echo "Error: no value matching key '${key}'"
+else
+	echo "${value}"
+fi
+

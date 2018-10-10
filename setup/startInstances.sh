@@ -81,7 +81,7 @@ esac
 
 expName=`${utilDir}/getSetting.sh expName ${platform} | awk '{print tolower($0)}'`
 region=`${utilDir}/getSetting.sh region ${platform}`
-keyName=`${utilDir}/getSetting.sh instanceKey ${platform}`
+keyName=`${utilDir}/getSetting.sh instanceKeyPair ${platform}`
 
 options="--create --name ${expName} --cloudProvider ${platform}  --region ${region} --keyName ${keyName} --azs ${azs} --experimentType ${expType}"
 

@@ -7,7 +7,7 @@ src=$2
 dst=$3
 
 bastionIP=`${DIR}/getBastionIP.sh ${platform}`
-bastionKey=`${DIR}/getSetting.sh bastionKey ${platform}`
+bastionKey=`${DIR}/getSetting.sh bastionPrivateKey ${platform}`
 bastionUser=`${DIR}/getSetting.sh bastionUser ${platform}`
 
 scp -q -i ${bastionKey} ${src} ${bastionUser}@${bastionIP}:${dst}

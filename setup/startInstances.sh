@@ -6,6 +6,7 @@ utilDir=${DIR}/../util
 # just a set of shortcuts to start an experiment
 
 profile=${1:-"default"}
+creds=${2:-"default"}
 
 shift
 extraArgs=$*
@@ -83,7 +84,7 @@ expName=`${utilDir}/getSetting.sh expName ${platform} | awk '{print tolower($0)}
 region=`${utilDir}/getSetting.sh region ${platform}`
 keyName=`${utilDir}/getSetting.sh instanceKeyPair ${platform}`
 
-options="--create --name ${expName} --cloudProvider ${platform}  --region ${region} --keyName ${keyName} --azs ${azs} --experimentType ${expType}"
+options="--create --name ${expName} --cloudProvider ${platform}  --region ${region} --keyName ${keyName} --azs ${azs} --experimentType ${expType} --profile ${creds}"
 
 # platform-specific options
 if [ "${platform}" == "aws" ]; then

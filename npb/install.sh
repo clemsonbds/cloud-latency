@@ -17,7 +17,7 @@ mv ${NPB_PKG}/NPB3.3-MPI ${NPB_DIR}
 rm -rf ${NPB_PKG}
 cd ${NPB_DIR}
 
-ln -s `pwd`/make.def config/make.def # compile environment
-ln -s `pwd`suite.def config/suite.def # which tests to build
+ln -s ${DIR}/make.def config/make.def # compile environment
+ln -s ${DIR}/suite.def config/suite.def # which tests to build
 
 # now run build.sh to build and install MPI tests

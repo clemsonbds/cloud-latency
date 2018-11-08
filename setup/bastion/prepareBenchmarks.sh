@@ -20,7 +20,7 @@ sed -i 's|MPI_HOME=|MPI_HOME=/usr/lib64/openmpi|' ${benchDir}/src/make_ompi
 (cd ${benchDir}/src && make -f make_ompi)
 
 # NPB
-benchDir=${baseDir}/intel-mpi
+benchDir="~/project/npb"
 cd $benchDir
 ./install.sh
 ./build.sh

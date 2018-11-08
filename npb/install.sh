@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIR="$(dirname "${BASH_SOURCE[0]}")"
+DIR=`pwd`
 BUILD_DIR=/tmp/build
 NPB_VER=3.3.1
 NPB_PKG=NPB${NPB_VER}

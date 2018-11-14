@@ -34,6 +34,6 @@ currentBytes=1
 while [ "${currentBytes}" -le "${maxBytes}" ]; do
     srcNodeClass=`ssh -q ${src} ${cpuIdFile} | tail -1`
     dstNodeClass=`ssh -q ${dst} ${cpuIdFile} | tail -1`
-	${DIR}/run.sh --resultName "$byte-${currentBytes}.{resultName}.${srcNodeClass}.${dstNodeClass}" --msgBytes "${currentBytes}" $@
+	${DIR}/run.sh --resultName "byte-${currentBytes}.{resultName}.${srcNodeClass}.${dstNodeClass}" --msgBytes "${currentBytes}" $@
 	currentBytes=$((currentBytes * 2))
 done

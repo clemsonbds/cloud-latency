@@ -38,7 +38,7 @@ for src in `cat ${hostfile}`; do
         if [ "${dstIndex}" -gt "${srcIndex}" ]; then
             srcNodeClass=`ssh -q ${src} ${cpuIdFile} | tail -1`
             dstNodeClass=`ssh -q ${dst} ${cpuIdFile} | tail -1`
-            ${DIR}/run.sh --resultName "$cross.{resultName}.${srcNodeClass}.${dstNodeClass}" --hosts "${src},${dst}" $@
+            ${DIR}/run.sh --resultName "cross.${resultName}.${srcNodeClass}.${dstNodeClass}" --hosts "${src},${dst}" $@
         fi
 
         dstIndex=$((dstIndex+1))

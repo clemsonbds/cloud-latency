@@ -30,18 +30,15 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
-letters="abcdefghijklmnopqrstuvwxyz"
-
 srcIndex=0
 for src in `cat ${hostfile}`; do
+
     dstIndex=0
     for dst in `cat ${hostfile}`; do
         if [ "${dstIndex}" -gt "${srcIndex}" ]; then
-            srcLetter=${letters:srcIndex:1}
-            srcCpuFamily=`ssh -q ${src} ${cpuIdFile} | tail -1`
-            dstLetter=${letters:dstIndex:1}
-            dstCpuFamily=`ssh -q ${dst} ${cpuIdFile} | tail -1`
-            ${DIR}/run.sh --resultName "${resultName}-cross-${srcCpuFamily}-${srcLetter}-${dstCpuFamily}-${dstLetter}" --hosts "${src},${dst}" $@
+            srcNodeClass=`ssh -q ${src} ${cpuIdFile} | tail -1`
+            dstNodeClass=`ssh -q ${dst} ${cpuIdFile} | tail -1`
+            ${DIR}/run.sh --resultName "$cross.{resultName}.${srcNodeClass}.${dstNodeClass}" --hosts "${src},${dst}" $@
         fi
 
         dstIndex=$((dstIndex+1))

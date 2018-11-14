@@ -80,7 +80,7 @@ if [ ! -z "${rankfile}"]; then
 fi
 
 timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
-outFile="${resultDir}/pingpong-${resultName}.${timestamp}.raw"
+outFile="${resultDir}/pingpong.${resultName}.${timestamp}.raw"
 
 ppArgs="-t -s ${skip} -b ${msgBytes}"
 

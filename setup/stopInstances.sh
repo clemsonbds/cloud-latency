@@ -4,7 +4,7 @@ DIR="$(dirname "${BASH_SOURCE[0]}")"
 utilDir=${DIR}/../util
 
 platform=${1:-"aws"}
-creds=${2:-"default}
+creds=${2:-"default"}
 
 # tear down any resources for this experiment
 

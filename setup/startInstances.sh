@@ -12,21 +12,21 @@ shift
 extraArgs=$*
 
 case $profile in
-gcp-single-az-vm)
+gcp.vm.single-az)
 	platform="gcp"
 	expType="single-az"
 	instanceType="n1-highmem-64"
 	numInstances="7"
 	azs="b"
 	;;
-gcp-multi-az-vm)
+gcp.vm.multi-az)
 	platform="gcp"
 	expType="multi-az"
 	instanceType="n1-highmem-64"
 	numInstances="3"
 	azs="b,c,d"
 	;;
-aws-cluster-metal)
+aws.metal.cluster)
 	platform="aws"
 	expType="single-az"
 	placementGroup="cluster"
@@ -34,7 +34,7 @@ aws-cluster-metal)
 	azs="a"
 	numInstances="7"
 	;;
-aws-cluster-vm)
+aws.vm.cluster)
 	platform="aws"
 	expType="single-az"
 	placementGroup="cluster"
@@ -42,7 +42,7 @@ aws-cluster-vm)
 	azs="a"
 	numInstances="7"
 	;;
-aws-spread-metal)
+aws.metal.spread)
 	platform="aws"
 	expType="single-az"
 	placementGroup="spread"
@@ -50,7 +50,7 @@ aws-spread-metal)
 	azs="a"
 	numInstances="7"
 	;;
-aws-spread-vm)
+aws.vm.spread)
 	platform="aws"
 	expType="single-az"
 	placementGroup="spread"
@@ -58,14 +58,14 @@ aws-spread-vm)
 	azs="a"
 	numInstances="7"
 	;;
-aws-multi-az-metal)
+aws.metal.multi-az)
 	platform="aws"
 	expType="multi-az"
 	instanceType="i3.metal"
 	azs="a,b,d,e,f"
 	numInstances="5"
 	;;
-aws-multi-az-vm)
+aws.vm.multi-az)
 	platform="aws"
 	expType="multi-az"
 	instanceType="i3.16xlarge"

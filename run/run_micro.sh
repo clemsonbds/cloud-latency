@@ -30,7 +30,7 @@ esac
 for i in `seq 1 ${numIterations}`; do
 	for groupType in ${groupTypes}; do
 		for instanceType in ${instanceTypes}; do
-			expType="${platform}-${groupType}-${instanceType}"
+			expType="${platform}.${instanceType}.${groupType}"
 			${setupDir}/stopInstances.sh ${platform}
 			${setupDir}/startInstances.sh ${expType}
 

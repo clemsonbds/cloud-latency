@@ -9,7 +9,7 @@ outDir=${resultDir}/parsed/micro
 mkdir -p ${outDir}
 
 # file naming convention:
-# measurement     .experiment    .cloud    .nodeType  .configuration       .srcNodeClass.dstNodeClass.timestamp.ext
+# measurement     .experiment    .cloud    .nodeType  .configuration       .srcNodeClass.dstNodeClass.timestamp  .ext
 # [pingpong|iperf].[cross|byte-#].[aws|gcp].[vm|metal].[multi-az|single-az].srcNodeClass.dstNodeClass.[timestamp].[raw|json]
 # 1                2              3         4          5                    6            7            8           9
 # get configuration names from files

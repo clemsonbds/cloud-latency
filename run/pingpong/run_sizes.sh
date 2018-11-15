@@ -1,6 +1,8 @@
 #!/bin/bash
 
 resultName=none
+hostfile="/nfs/instances"
+cpuIdFile="/nfs/getCpuIdentity.sh"
 maxBytes=1024
 
 DIR="$(dirname "${BASH_SOURCE[0]}")"
@@ -31,9 +33,12 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 currentBytes=1
 
+src=`sed -n 1p ${hostfile}`
+dst=`sed -n 2p ${hostfile}`
+srcNodeClass=`ssh -q ${src} ${cpuIdFile} | tail -1`
+dstNodeClass=`ssh -q ${dst} ${cpuIdFile} | tail -1`
+
 while [ "${currentBytes}" -le "${maxBytes}" ]; do
-    srcNodeClass=`ssh -q ${src} ${cpuIdFile} | tail -1`
-    dstNodeClass=`ssh -q ${dst} ${cpuIdFile} | tail -1`
 	${DIR}/run.sh --resultName "byte-${currentBytes}.{resultName}.${srcNodeClass}.${dstNodeClass}" --msgBytes "${currentBytes}" $@
 	currentBytes=$((currentBytes * 2))
 done

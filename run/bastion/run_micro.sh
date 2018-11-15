@@ -8,7 +8,7 @@ pingpongIters=10000
 pingpongSeconds=
 iperfSeconds=10
 allreduceIters=5
-pingpongMaxBytes=8192
+pingpongMaxBytes=65536
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]

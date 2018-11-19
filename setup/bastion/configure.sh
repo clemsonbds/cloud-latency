@@ -7,6 +7,7 @@ sudo yum update -y -q
 sudo yum install -y -q nmap # testing SSH to instances
 sudo yum install -y -q nfs-utils rpcbind # NFS server
 sudo yum install -y -q openmpi openmpi-devel # MPI benchmarks
+sudo yum install -y -q gcc-c++ wget # LAMMPS
 echo 'export PATH=$PATH:/usr/lib64/openmpi/bin' >> ~/.bashrc
 
 # create NFS

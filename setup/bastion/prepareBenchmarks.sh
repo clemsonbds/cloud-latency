@@ -19,6 +19,12 @@ cp ${benchDir}/src/make_mpich ${benchDir}/src/make_ompi
 sed -i 's|MPI_HOME=|MPI_HOME=/usr/lib64/openmpi|' ${benchDir}/src/make_ompi
 (cd ${benchDir}/src && make -f make_ompi)
 
+# LAMMPS
+benchDir="/nfs/repos/project/lammps"
+cd ${benchDir}
+./install.sh
+./build.sh
+
 # NPB
 benchDir="/home/ec2-user/project/npb"
 cd $benchDir

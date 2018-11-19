@@ -9,7 +9,7 @@ while [[ $# -gt 0 ]]
 do
 key="$1"
 
-case $key in
+case ${key} in
 --resultDir)
     resultDir="$2"
     shift # past argument
@@ -44,9 +44,9 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-mpiParams="-np 128 --map-by node"
+mpiParams="-np 128 --map-by node --mca plm_rsh_no_tree_spawn 1"
 
-if [ ! -z "${hosts}" ]; then
+if [[ ! -z "${hosts}" ]]; then
     mpiParams+=" --host ${hosts}"
     src=`echo ${hosts} | awk -F "," '{print $1}'`
     dst=`echo ${hosts} | awk -F "," '{print $2}'`
@@ -56,15 +56,15 @@ else
     dst=`head -n2 ${hostfile} | tail -n1`
 fi
 
-if [ ! -z "${rankfile}"]; then
+if [[ ! -z "${rankfile}" ]]; then
     mpiParams+=" --rankfile ${rankfile}"
 fi
 
 timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 outFile="${resultDir}/lammps.${resultName}.${timestamp}.raw"
 
-executable=""
-benchArgs=""
+executable="/nfs/repos/benchmarks/lammps/micelle/lmp_mpi"
+benchArgs="-in in.micelle"
 
 echo Running LAMMPS benchmark.
 mpirun ${mpiParams} ${executable} ${benchArgs} 1> ${outFile}

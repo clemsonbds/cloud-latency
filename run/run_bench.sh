@@ -8,15 +8,13 @@ utilDir=${DIR}/../util
 platform=${1:-"aws"}
 shift
 
-# extra arguments will be passed to the call to run_micro.sh on bastion
+# extra arguments will be passed to the call to run_bench.sh on bastion
 
 case ${platform} in
 aws)
-	numIterations=3
-#	groupTypes="cluster" # spread multi-az"
-	groupTypes="cluster"
+	numIterations=1
+	groupTypes="cluster spread multi-az"
 	instanceTypes="vm metal"
-#	instanceTypes="metal"
 	;;
 gcp)
 	numIterations=10
@@ -37,7 +35,7 @@ for i in `seq 1 ${numIterations}`; do
 			${setupDir}/startInstances.sh ${expType}
 
 			echo -e "\nRunning benchmarks for experiment configuration '${expType}'.\n"
-			${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_micro.sh --expType ${expType} $@"
+			${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_bench.sh --expType ${expType} $@"
 		done
 	done
 done

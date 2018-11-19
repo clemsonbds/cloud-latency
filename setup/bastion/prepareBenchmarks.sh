@@ -27,6 +27,6 @@ cd ${benchDir}
 
 # NPB
 benchDir="/home/ec2-user/project/npb"
-cd $benchDir
+cd ${benchDir}
 ./install.sh
 ./build.sh

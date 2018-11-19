@@ -44,7 +44,7 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-mpiParams="-np 128 --map-by node"
+mpiParams="--map-by node"
 
 if [ ! -z "${hosts}" ]; then
     mpiParams+=" --host ${hosts}"
@@ -61,10 +61,30 @@ if [ ! -z "${rankfile}"]; then
 fi
 
 timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
-outFile="${resultDir}/npb.${resultName}.${timestamp}.raw"
-
-executable=""
-benchArgs=""
 
 echo Running NPB benchmark.
 mpirun ${mpiParams} ${executable} ${benchArgs} 1> ${outFile}
+
+#hostfile="/nfs/files/scripts/env/mpi_hosts"
+#rankfile="/nfs/files/scripts/env/mpi_ranks_bynode" # fill each node in order, change rankfile to distribute
+#mpi_params="--mca btl ^tcp --rankfile ${rankfile}"
+out_params="2>/dev/null"
+
+BIN_DIR=/nfs/npb_bin
+
+for exec in ${BIN_DIR}/*; do
+    test=`echo $exec|tr '.' ' '|awk '{print $1}'`
+    size=`echo $exec|tr '.' ' '|awk '{print $2}'`
+    procs=`echo $exec|tr '.' ' '|awk '{print $3}'`
+
+    echo $test $size $procs
+
+#    outfile=${outpath}.${exec}.raw
+    outFile="${resultDir}/npb.${test}.${resultName}.${timestamp}.raw"
+    touch ${outfile} # avoid 'file not found'
+
+#    while [ `grep "Time in seconds" ${outfile} | wc -l` -lt ${iters} ]; do
+    # for iter in `seq 1 ${iters}`; do
+        timeout 60 mpirun --np ${procs} ${mpi_params} ${BIN_DIR}/${exec} ${out_params} >> ${outfile}
+#    done
+done

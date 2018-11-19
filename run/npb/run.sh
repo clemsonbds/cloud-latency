@@ -73,6 +73,7 @@ outParams="2>/dev/null"
 BIN_DIR=/nfs/npb_bin
 
 for exec in ${BIN_DIR}/*; do
+    exec=`basename $exec`
     test=`echo $exec|tr '.' ' '|awk '{print $1}'`
     size=`echo $exec|tr '.' ' '|awk '{print $2}'`
     procs=`echo $exec|tr '.' ' '|awk '{print $3}'`

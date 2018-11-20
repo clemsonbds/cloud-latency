@@ -78,6 +78,12 @@ for exec in ${BIN_DIR}/*; do
     size=`echo $exec|tr '.' ' '|awk '{print $2}'`
     procs=`echo $exec|tr '.' ' '|awk '{print $3}'`
 
+    # special case for DT
+    if [ "$test" = "dt" ]; then
+        procs=128
+        benchParams="BH"
+    fi
+
     echo $test $size $procs
 
 #    outfile=${outpath}.${exec}.raw
@@ -86,6 +92,7 @@ for exec in ${BIN_DIR}/*; do
 
 #    while [ `grep "Time in seconds" ${outfile} | wc -l` -lt ${iters} ]; do
     # for iter in `seq 1 ${iters}`; do
-        timeout 60 mpirun --np ${procs} ${mpiParams} ${BIN_DIR}/${exec} ${outParams} >> ${outFile}
+        echo "mpirun --np ${procs} ${mpiParams} ${BIN_DIR}/${exec} ${benchParams} > ${outFile}"
+        mpirun --np ${procs} ${mpiParams} ${BIN_DIR}/${exec} ${benchParams} > ${outFile}
 #    done
 done

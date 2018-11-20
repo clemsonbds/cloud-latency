@@ -16,7 +16,8 @@ gcp.vm.single-az)
 	platform="gcp"
 	expType="single-az"
 	instanceType="n1-highmem-64"
-	numInstances="7"
+#	numInstances="7"
+	numInstances="4"
 	azs="b"
 	;;
 gcp.vm.multi-az)
@@ -32,7 +33,8 @@ aws.metal.cluster)
 	placementGroup="cluster"
 	instanceType="i3.metal"
 	azs="a"
-	numInstances="7"
+#	numInstances="7"
+	numInstances="4"
 	;;
 aws.vm.cluster)
 	platform="aws"
@@ -40,7 +42,8 @@ aws.vm.cluster)
 	placementGroup="cluster"
 	instanceType="i3.16xlarge"
 	azs="a"
-	numInstances="7"
+#	numInstances="7"
+	numInstances="4"
 	;;
 aws.metal.spread)
 	platform="aws"
@@ -48,7 +51,8 @@ aws.metal.spread)
 	placementGroup="spread"
 	instanceType="i3.metal"
 	azs="a"
-	numInstances="7"
+#	numInstances="7"
+	numInstances="4"
 	;;
 aws.vm.spread)
 	platform="aws"
@@ -56,21 +60,24 @@ aws.vm.spread)
 	placementGroup="spread"
 	instanceType="i3.16xlarge"
 	azs="a"
-	numInstances="7"
+#	numInstances="7"
+	numInstances="4"
 	;;
 aws.metal.multi-az)
 	platform="aws"
 	expType="multi-az"
 	instanceType="i3.metal"
 	azs="a,b,d,e,f"
-	numInstances="5"
+#	numInstances="5"
+	numInstances="4"
 	;;
 aws.vm.multi-az)
 	platform="aws"
 	expType="multi-az"
 	instanceType="i3.16xlarge"
 	azs="a,b,d,e,f"
-	numInstances="5"
+#	numInstances="5"
+	numInstances="4"
 	;;
 *)
 	echo "Unknown experiment profile '${profile}'."

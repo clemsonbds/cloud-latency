@@ -11,5 +11,5 @@ mkdir -p ${INSTALL_DIR}
 rm -f ${INSTALL_DIR}/*
 
 cp lmp_mpi ../examples/micelle
-sed -i 's|60000|400000|' ../examples/micelle/in.micelle
+sed -i 's|60000|200000|' ../examples/micelle/in.micelle
 cp -R ../examples/micelle ${INSTALL_DIR}

@@ -12,16 +12,14 @@ shift
 
 case ${platform} in
 aws)
-	numItersPerSet=1
-	numItersPerProvision=2
-	groupTypes="cluster spread multi-az"
-#	groupTypes="cluster"
+	numIterations=3
+#	groupTypes="cluster" # spread multi-az"
+	groupTypes="cluster"
 	instanceTypes="vm metal"
 #	instanceTypes="metal"
 	;;
 gcp)
-	numItersPerSet=10
-	numItersPerProvision=2
+	numIterations=10
 	groupTypes="single-az multi-az"
 	instanceTypes="vm"
 	;;
@@ -31,7 +29,7 @@ gcp)
 	;;
 esac
 
-for i in `seq 1 ${numItersPerSet}`; do
+for i in `seq 1 ${numIterations}`; do
 	for groupType in ${groupTypes}; do
 		for instanceType in ${instanceTypes}; do
 			expType="${platform}.${instanceType}.${groupType}"
@@ -39,10 +37,7 @@ for i in `seq 1 ${numItersPerSet}`; do
 			${setupDir}/startInstances.sh ${expType}
 
 			echo -e "\nRunning benchmarks for experiment configuration '${expType}'.\n"
-
-			for j in `seq 1 ${numItersPerProvision}`; do
-				${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_micro.sh --expType ${expType} $@"
-			done
+			${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_micro.sh --expType ${expType} $@"
 		done
 	done
 done

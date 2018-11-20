@@ -35,6 +35,10 @@ case ${key} in
     shift
     shift
     ;;
+--trash)
+    trash="T"
+    shift
+    ;;
 *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
@@ -70,4 +74,8 @@ echo Running LAMMPS benchmark.
 curDir=`pwd`
 cd /nfs/repos/benchmarks/lammps/micelle/
 mpirun ${mpiParams} ${executable} ${benchArgs} 1> ${outFile}
+
+# throw away?
+[ -z "$trash" ] || rm -f ${outFile}
+
 cd ${curDir}

@@ -8,7 +8,7 @@ make yes-molecule
 make mpi
 
 mkdir -p ${INSTALL_DIR}
-rm -f ${INSTALL_DIR}/*
+rm -rf ${INSTALL_DIR}/*
 
 cp lmp_mpi ../examples/micelle
 sed -i 's|60000|200000|' ../examples/micelle/in.micelle

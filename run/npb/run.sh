@@ -35,6 +35,10 @@ case $key in
     shift
     shift
     ;;
+--trash)
+    trash="T"
+    shift
+    ;;
 *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
@@ -92,7 +96,10 @@ for exec in ${BIN_DIR}/*; do
 
 #    while [ `grep "Time in seconds" ${outfile} | wc -l` -lt ${iters} ]; do
     # for iter in `seq 1 ${iters}`; do
-        echo "mpirun --np ${procs} ${mpiParams} ${BIN_DIR}/${exec} ${benchParams} > ${outFile}"
+#        echo "mpirun --np ${procs} ${mpiParams} ${BIN_DIR}/${exec} ${benchParams} > ${outFile}"
         mpirun --np ${procs} ${mpiParams} ${BIN_DIR}/${exec} ${benchParams} > ${outFile}
+
+    # throw away?
+    [ -z "$trash" ] || rm -f ${outFile}
 #    done
 done

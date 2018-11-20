@@ -64,7 +64,10 @@ timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 outFile="${resultDir}/lammps.${resultName}.${timestamp}.raw"
 
 executable="/nfs/repos/benchmarks/lammps/micelle/lmp_mpi"
-benchArgs="-in in.micelle"
+benchArgs="-in /nfs/repos/benchmarks/lammps/micelle/in.micelle"
 
 echo Running LAMMPS benchmark.
+curDir=`pwd`
+cd /nfs/repos/benchmarks/lammps/micelle/
 mpirun ${mpiParams} ${executable} ${benchArgs} 1> ${outFile}
+cd ${curDir}

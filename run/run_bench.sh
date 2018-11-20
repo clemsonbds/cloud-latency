@@ -12,12 +12,12 @@ shift
 
 case ${platform} in
 aws)
-	numItersPerSet=1
-	numItersPerProvision=1
-#	groupTypes="cluster spread multi-az"
-	groupTypes="cluster"
-#	instanceTypes="vm metal"
-	instanceTypes="vm"
+	numItersPerSet=6
+	numItersPerProvision=5
+	groupTypes="cluster spread multi-az"
+#	groupTypes="cluster"
+	instanceTypes="vm metal"
+#	instanceTypes="vm"
 	;;
 gcp)
 	numItersPerSet=10
@@ -32,6 +32,8 @@ gcp)
 esac
 
 for i in `seq 1 ${numItersPerSet}`; do
+	echo Starting outer iteration ${i}.
+
 	for groupType in ${groupTypes}; do
 		for instanceType in ${instanceTypes}; do
 			expType="${platform}.${instanceType}.${groupType}"
@@ -43,6 +45,8 @@ for i in `seq 1 ${numItersPerSet}`; do
 
 			for j in `seq 0 ${numItersPerProvision}`; do
 				[ "$j" -eq "1" ] && trash=""
+
+				echo Starting inner iteration ${j}.
 
 				${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_bench.sh --expType ${expType} ${trash} $@"
 			done

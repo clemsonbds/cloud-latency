@@ -67,7 +67,7 @@ fi
 timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 
 echo Running NPB benchmark.
-mpirun ${mpiParams} ${executable} ${benchArgs} 1> ${outFile}
+#mpirun ${mpiParams} ${executable} ${benchArgs} 1> ${outFile}
 
 #hostfile="/nfs/files/scripts/env/mpi_hosts"
 #rankfile="/nfs/files/scripts/env/mpi_ranks_bynode" # fill each node in order, change rankfile to distribute

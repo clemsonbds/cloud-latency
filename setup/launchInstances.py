@@ -303,9 +303,19 @@ def launchInstancesAws(client, imageId, instanceType, numInstances, experimentTy
 
     # Create a Placement Group that we can utilize for launching instances into
     if placementGroup is not None:
+        placementStrategy['GroupName'] = str(name) + "-PlacementGroup" # hold for launching instances below
+
+        # delete placement group if it exists already, do it the dumb way
+        try:
+            client.delete_placement_group(GroupName=placementStrategy['GroupName'])
+            time.sleep(5)
+        except Exception as e:
+            pass
+
+        # if placement group still exists it must be in use, fail below anyway on creation
+
         try:
             print("Creating the Placement Group.")
-            placementStrategy['GroupName'] = str(name) + "-PlacementGroup" # hold for launching instances below
             response = client.create_placement_group(GroupName=placementStrategy['GroupName'], Strategy=placementGroup)
             instancesCreated['placementGroup'] = placementStrategy['GroupName']
         except Exception as e:

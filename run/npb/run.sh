@@ -48,7 +48,7 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-mpiParams="--map-by node"
+mpiParams="--map-by node --mca plm_rsh_no_tree_spawn 1"
 
 if [ ! -z "${hosts}" ]; then
     mpiParams+=" --host ${hosts}"
@@ -60,7 +60,7 @@ else
     dst=`head -n2 ${hostfile} | tail -n1`
 fi
 
-if [ ! -z "${rankfile}"]; then
+if [ ! -z "${rankfile}" ]; then
     mpiParams+=" --rankfile ${rankfile}"
 fi
 

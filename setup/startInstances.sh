@@ -24,8 +24,8 @@ gcp.vm.multi-az)
 	platform="gcp"
 	expType="multi-az"
 	instanceType="n1-highmem-64"
-	numInstances="3"
-	azs="b,c,d"
+	numInstances="4"
+	azs="b,c,a,f"
 	;;
 aws.metal.cluster)
 	platform="aws"

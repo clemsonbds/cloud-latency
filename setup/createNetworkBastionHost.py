@@ -17,7 +17,7 @@ def main():
     parser.add_argument('--create', action='store_true', help='Specifies that the script should create resources.')
     parser.add_argument('--delete', action='store_true', help='Specifies that the script should delete resources.')
     parser.add_argument('--name', help='Specifies the name of the experiment, this will be used when creating tags for the resources. This name must be lowercase and shorter then 63 characters.', required=True)
-    parser.add_argument('--region', help='Specifies the name of the region where the resources will be created. Defaults to us-east-1 for AWS and us-east1 for GCP', default=None)
+    parser.add_argument('--region', help='Specifies the name of the region where the resources will be created. Defaults to us-east-1 for AWS and us-central1 for GCP', default=None)
     parser.add_argument('--profile', help='Specifies the name of the AWS credentials profile that you want to use, if not specified the default one is used.', default="default")
     parser.add_argument('--cloudProvider', help='Specifies the name of the experiment, this will be used when creating tags for the resources.', default="aws", choices=["aws", "gcp"])
     parser.add_argument('--keyName', help='Specifies the name of the SSH key that will be utilized to launch the bastion host.')
@@ -125,7 +125,7 @@ def main():
 
             # Get the default region if not specified via commandline
             if args['region'] is None:
-                region = "us-east1"
+                region = "us-central1"
             else:
                 region = args['region']
 
@@ -241,7 +241,7 @@ def main():
 
                 # Get the default region if not specified via commandline
                 if args['region'] is None:
-                    region = "us-east1"
+                    region = "us-central1"
                 else:
                     region = args['region']
 

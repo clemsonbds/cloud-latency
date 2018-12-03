@@ -88,7 +88,7 @@ endif
 ifeq ($(origin CXX),default)
 CC=mpicxx
 endif
-override CPPFLAGS += -I.
+override CPPFLAGS += -I. -I/usr/include/openmpi-x86_64/
 override CFLAGS = -g -Wall -Wextra -pedantic -Wno-long-long
 CXXFLAGS = -g -Wall -Wextra -pedantic -Wno-long-long
 ifdef WITH_OPENMP
@@ -96,7 +96,7 @@ override CFLAGS += -qopenmp
 override CXXFLAGS += -qopenmp
 endif
 
-CC=mpicxx
+CC=mpicc
 CXX=mpicxx
 
 all: $(BINARY)

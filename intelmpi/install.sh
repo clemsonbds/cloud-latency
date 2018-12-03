@@ -1,6 +1,6 @@
 #!/bin/bash
 
-installDir=${1:-.}
+installDir=${1:-"./intelmpi"}
 
 git clone https://github.com/intel/mpi-benchmarks.git ${installDir}
 

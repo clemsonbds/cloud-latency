@@ -1,3 +1,5 @@
 #!/bin/bash
 
-cd IMB && make IMB-MPI1
+installDir=$1
+
+make --directory=${installDir} IMB-MPI1

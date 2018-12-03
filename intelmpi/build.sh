@@ -1,5 +1,5 @@
 #!/bin/bash
 
-installDir=$1
+installDir=${1:-.}
 
 make --directory=${installDir} IMB-MPI1

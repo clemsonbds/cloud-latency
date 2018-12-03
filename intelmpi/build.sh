@@ -1,3 +1,3 @@
 #!/bin/bash
 
-make IMB-MPI1
+cd IMB && make IMB-MPI1

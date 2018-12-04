@@ -14,11 +14,11 @@ for instanceIP in `cat /nfs/instances`; do
 	done
 done
 
-# make sure the instances have nfs-utils installed, might as well do yum update here too
-echo -e "\nInstalling packages on instances for NFS filesystem."
-for instanceIP in `cat /nfs/instances`; do
-	ssh -q ${instanceIP} "sudo yum update -y -q; sudo yum install -y -q nfs-utils" &
-done
+# make sure the instances have nfs-utils installed, might as well do yum update here too -- done in Image
+#echo -e "\nInstalling packages on instances for NFS filesystem."
+#for instanceIP in `cat /nfs/instances`; do
+#	ssh -q ${instanceIP} "sudo yum update -y -q; sudo yum install -y -q nfs-utils" &
+#done
 
 # wait for them all to be done
 wait
@@ -26,12 +26,12 @@ wait
 # force all instances to mount NFS
 echo -e "\nMounting NFS share on instances."
 for instanceIP in `cat /nfs/instances`; do
-	ssh -q ${instanceIP} "sudo mkdir -p /nfs"
-	ssh -q ${instanceIP} "sudo chmod 777 /nfs"
-	ssh -q ${instanceIP} "sudo firewall-cmd --permanent --zone=public --add-service=nfs"
-	ssh -q ${instanceIP} "sudo firewall-cmd --permanent --zone=public --add-service=mountd"
-	ssh -q ${instanceIP} "sudo firewall-cmd --permanent --zone=public --add-service=rpc-bind"
-    ssh -q ${instanceIP} "sudo firewall-cmd --reload"
+#	ssh -q ${instanceIP} "sudo mkdir -p /nfs"
+#	ssh -q ${instanceIP} "sudo chmod 777 /nfs"
+#	ssh -q ${instanceIP} "sudo firewall-cmd --permanent --zone=public --add-service=nfs"
+#	ssh -q ${instanceIP} "sudo firewall-cmd --permanent --zone=public --add-service=mountd"
+#	ssh -q ${instanceIP} "sudo firewall-cmd --permanent --zone=public --add-service=rpc-bind"
+#   ssh -q ${instanceIP} "sudo firewall-cmd --reload"
 	ssh -q ${instanceIP} "sudo mount -t nfs ${bastionLocalIP}:/nfs /nfs"
 done
 

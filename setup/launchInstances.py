@@ -162,7 +162,9 @@ def main():
             # Get the default AMI for the bastion host if not specified via commandline
             if args['imageId'] is None:
                 # Amazon Linux 2 AMI in N. Virginia
-                imageId = "ami-b70554c8"
+                # Non preconfigured image
+                # imageId = "ami-b70554c8"
+                imageId = "ami-0b7ddf0a5d96aa736"
             else:
                 imageId = args['imageId']
 

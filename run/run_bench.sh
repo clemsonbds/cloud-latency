@@ -20,8 +20,8 @@ aws)
 #	instanceTypes="vm"
 	;;
 gcp)
-	numItersPerSet=10
-	numItersPerProvision=1
+	numItersPerSet=6
+	numItersPerProvision=5
 	groupTypes="single-az multi-az"
 	instanceTypes="vm"
 	;;

@@ -14,9 +14,9 @@ sed -i 's|/opt/local/include|/opt/local/include -std=gnu99|' ${benchDir}/Makefil
 
 # intel MPI
 benchDir="/nfs/repos/project/intelmpi"
-cd ${benchDir}
-./install.sh
-./build.sh
+installDir="${baseDir}/intelmpi"
+${benchDir}/install.sh ${installDir}
+${benchDir}/build.sh ${installDir}
 
 # LAMMPS
 benchDir="/nfs/repos/project/lammps"

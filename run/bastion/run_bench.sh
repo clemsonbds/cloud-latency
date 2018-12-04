@@ -40,34 +40,42 @@ case $expType in
 gcp.vm.single-az)
 	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
 	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
+	${benchDir}/intel/run.sh --resultName ${expType} --resultDir ${resultDir} $@
 	;;
 gcp.vm.multi-az)
 	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
 	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
+	${benchDir}/intel/run.sh --resultName ${expType} --resultDir ${resultDir} $@
 	;;
 aws.metal.cluster)
 	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
 	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
+	${benchDir}/intel/run.sh --resultName ${expType} --resultDir ${resultDir} $@
 	;;
 aws.vm.cluster)
 	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
 	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
+	${benchDir}/intel/run.sh --resultName ${expType} --resultDir ${resultDir} $@
 	;;
 aws.metal.spread)
 	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
 	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
+	${benchDir}/intel/run.sh --resultName ${expType} --resultDir ${resultDir} $@
 	;;
 aws.vm.spread)
 	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
 	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
+	${benchDir}/intel/run.sh --resultName ${expType} --resultDir ${resultDir} $@
 	;;
 aws.metal.multi-az)
 	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
 	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
+	${benchDir}/intel/run.sh --resultName ${expType} --resultDir ${resultDir} $@
 	;;
 aws.vm.multi-az)
 	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
 	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
+	${benchDir}/intel/run.sh --resultName ${expType} --resultDir ${resultDir} $@
 	;;
 *) # unknown
 	echo "Unknown experiment type '${expType}'."

@@ -37,6 +37,10 @@ case $key in
     shift
     shift
     ;;
+--trash)
+    trash="T"
+    shift
+    ;;
 *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
@@ -60,3 +64,6 @@ outFile="${resultDir}/iperf.${resultName}.${timestamp}.json"
 echo Running iperf between ${server} and ${client}.
 ssh -q -f ${server} "sh -c 'nohup iperf3 -s -1 > /dev/null 2>&1 &'" # start in background and move on
 ssh -q ${client} "iperf3 -c ${server} -t ${seconds} -J" > ${outFile}
+
+# throw away?
+[ -z "$trash" ] || rm -f ${outFile}

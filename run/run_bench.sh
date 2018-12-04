@@ -12,11 +12,11 @@ shift
 
 case ${platform} in
 aws)
-	numItersPerSet=6
-	numItersPerProvision=5
+	numItersPerSet=5
+	numItersPerProvision=1
 	groupTypes="cluster spread multi-az"
-#	groupTypes="cluster"
-	instanceTypes="vm metal"
+#	groupTypes="spread"
+	instanceTypes="vm vmc5 metal"
 #	instanceTypes="vm"
 	;;
 gcp)

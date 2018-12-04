@@ -69,7 +69,7 @@ executable="/nfs/repos/benchmarks/intelmpi/IMB-MPI1"
 benchArgs=
 
 echo Running Intel-MPI benchmark.
-mpirun ${mpiParams} ${executable} ${benchArgs} 1> ${outFile}
+mpirun ${mpiParams} ${executable} ${benchArgs}  1> ${outFile}
 
 # throw away?
 [ -z "$trash" ] || rm -f ${outFile}

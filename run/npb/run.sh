@@ -54,7 +54,7 @@ if [ ! -z "${hosts}" ]; then
     mpiParams+=" --host ${hosts}"
     src=`echo ${hosts} | awk -F "," '{print $1}'`
     dst=`echo ${hosts} | awk -F "," '{print $2}'`
-else
+elif [ ! -z "${hostfile}" ]; then
     mpiParams+=" --hostfile ${hostfile}"
     src=`head -n1 ${hostfile}`
     dst=`head -n2 ${hostfile} | tail -n1`
@@ -91,7 +91,7 @@ for exec in ${BIN_DIR}/*; do
     echo $test $size $procs
 
 #    outfile=${outpath}.${exec}.raw
-    outFile="${resultDir}/npb.${test}.${resultName}.${timestamp}.raw"
+    outFile="${resultDir}/npb-${test}-${size}.${resultName}.${timestamp}.raw"
 #    touch ${outfile} # avoid 'file not found'
 
 #    while [ `grep "Time in seconds" ${outfile} | wc -l` -lt ${iters} ]; do

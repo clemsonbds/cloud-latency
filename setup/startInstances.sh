@@ -33,7 +33,6 @@ aws.metal.cluster)
 	placementGroup="cluster"
 	instanceType="i3.metal"
 	azs="a"
-#	numInstances="7"
 	numInstances="4"
 	;;
 aws.vm.cluster)
@@ -42,7 +41,14 @@ aws.vm.cluster)
 	placementGroup="cluster"
 	instanceType="i3.16xlarge"
 	azs="a"
-#	numInstances="7"
+	numInstances="4"
+	;;
+aws.vmc5.cluster)
+	platform="aws"
+	expType="single-az"
+	placementGroup="cluster"
+	instanceType="c5n.18xlarge"
+	azs="a"
 	numInstances="4"
 	;;
 aws.metal.spread)
@@ -51,7 +57,6 @@ aws.metal.spread)
 	placementGroup="spread"
 	instanceType="i3.metal"
 	azs="a"
-#	numInstances="7"
 	numInstances="4"
 	;;
 aws.vm.spread)
@@ -60,23 +65,35 @@ aws.vm.spread)
 	placementGroup="spread"
 	instanceType="i3.16xlarge"
 	azs="a"
-#	numInstances="7"
+	numInstances="4"
+	;;
+aws.vmc5.spread)
+	platform="aws"
+	expType="single-az"
+	placementGroup="spread"
+	instanceType="c5n.18xlarge"
+	azs="a"
 	numInstances="4"
 	;;
 aws.metal.multi-az)
 	platform="aws"
 	expType="multi-az"
 	instanceType="i3.metal"
-	azs="a,b,d,e,f"
-#	numInstances="5"
+	azs="a,b,d,e"
 	numInstances="4"
 	;;
 aws.vm.multi-az)
 	platform="aws"
 	expType="multi-az"
 	instanceType="i3.16xlarge"
-	azs="a,b,d,e,f"
-#	numInstances="5"
+	azs="a,b,d,e"
+	numInstances="4"
+	;;
+aws.vmc5.multi-az)
+	platform="aws"
+	expType="multi-az"
+	instanceType="c5n.18xlarge"
+	azs="a,b,d,e"
 	numInstances="4"
 	;;
 *)

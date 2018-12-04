@@ -52,6 +52,10 @@ case $key in
     shift
     shift
     ;;
+--trash)
+    trash="T"
+    shift
+    ;;
 *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
@@ -92,3 +96,6 @@ fi
 
 echo Running pingpong between ${src} and ${dst}.
 mpirun ${mpiParams} ${executable} ${ppArgs} 1> ${outFile}
+
+# throw away?
+[ -z "$trash" ] || rm -f ${outFile}

@@ -228,7 +228,8 @@ def main():
             # Get the default AMI for the bastion host if not specified via commandline
             if args['imageId'] is None:
                 # Image to use for launching the instances to benchmark CentOS 7
-                imageId = "projects/centos-cloud/global/images/centos-7-v20180815"
+                # imageId = "projects/centos-cloud/global/images/centos-7-v20180815"
+                imageId = "projects/gcp-performance/global/images/latency-experiment-image"
             else:
                 imageId = args['imageId']
 

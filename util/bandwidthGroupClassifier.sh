@@ -10,7 +10,7 @@ runDir=${DIR}/../run
 
 hostfile=$1
 
-if [ -z "${classes}" ]; then
+if [ -z "${hostfile}" ]; then
 	echo "usage: $0 <hostfile> [classifier args]"
 	exit
 fi

@@ -30,7 +30,7 @@ measureArgs+=" --resultDir ${resultDir}"
 measureArgs+=" --seconds ${seconds}"
 measureArgs+=" --nodeClassifier ${nodeClassifier}"
 
-${runDir}/iperf/run_cross.sh ${measureArgs}
+${runDir}/iperf/run_cross.sh ${measureArgs} > /dev/null
 
 # break into two hostfiles
 # put them in same dir as hostfile

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+utilDir=/nfs/repos/project/util
+
 resultDir=.
 resultName=none
 hostfile="/nfs/instances"

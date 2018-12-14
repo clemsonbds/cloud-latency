@@ -2,7 +2,6 @@
 
 resultName=none
 hostfile="/nfs/instances"
-cpuIdFile="/nfs/getCpuIdentity.sh"
 
 DIR="$(dirname "${BASH_SOURCE[0]}")"
 
@@ -36,9 +35,7 @@ for src in `cat ${hostfile}`; do
     dstIndex=0
     for dst in `cat ${hostfile}`; do
         if [ "${dstIndex}" -gt "${srcIndex}" ]; then
-            srcNodeClass=`ssh -q ${src} ${cpuIdFile} | tail -1`
-            dstNodeClass=`ssh -q ${dst} ${cpuIdFile} | tail -1`
-            ${DIR}/run.sh --resultName "cross.${resultName}.${srcNodeClass}.${dstNodeClass}" --hosts "${src},${dst}" $@
+            ${DIR}/run.sh --resultName "cross.${resultName}" --hosts "${src},${dst}" $@
         fi
 
         dstIndex=$((dstIndex+1))

@@ -1,8 +1,9 @@
 #!/bin/bash
 
-resultDir=.
+resultDir=`pwd`
 resultName=none
 hostfile="/nfs/instances"
+groupClass=none
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
@@ -35,8 +36,22 @@ case $key in
     shift
     shift
     ;;
+--nodeClassifier)
+    nodeClassifier="$2"
+    shift
+    shift
+    ;;
+--groupClass)
+    groupClass="$2"
+    shift
+    shift
+    ;;
 --trash)
     trash="T"
+    shift
+    ;;
+--ep_only)
+    ep_only="T"
     shift
     ;;
 *)    # unknown option
@@ -48,22 +63,19 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-mpiParams="--map-by node --mca plm_rsh_no_tree_spawn 1"
-
-if [ ! -z "${hosts}" ]; then
-    mpiParams+=" --host ${hosts}"
-    src=`echo ${hosts} | awk -F "," '{print $1}'`
-    dst=`echo ${hosts} | awk -F "," '{print $2}'`
-elif [ ! -z "${hostfile}" ]; then
-    mpiParams+=" --hostfile ${hostfile}"
-    src=`head -n1 ${hostfile}`
-    dst=`head -n2 ${hostfile} | tail -n1`
+if [ -z "${hosts}" ]; then
+    hosts=`${utilDir}/hostfileToHosts.sh ${hostfile}`
 fi
+
+# MPI run parameters
+mpiParams="--host ${hosts} --map-by node --mca plm_rsh_no_tree_spawn 1"
 
 if [ ! -z "${rankfile}" ]; then
     mpiParams+=" --rankfile ${rankfile}"
 fi
 
+# output file name pieces
+nodeClasses=`${utilDir}/classifyNodes.sh ${hosts} ${nodeClassifier}`
 timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 
 echo Running NPB benchmark.
@@ -82,24 +94,26 @@ for exec in ${BIN_DIR}/*; do
     size=`echo $exec|tr '.' ' '|awk '{print $2}'`
     procs=`echo $exec|tr '.' ' '|awk '{print $3}'`
 
+    if [ "$test" != "ep" ] && [ -z "$ep_only" ]; then
+        continue
+    fi
+
     # special case for DT
-    if [ "$test" = "dt" ]; then
+    elif [ "$test" == "dt" ]; then
         procs=128
         benchParams="BH"
     fi
 
     echo $test $size $procs
 
-#    outfile=${outpath}.${exec}.raw
-    outFile="${resultDir}/npb-${test}-${size}.${resultName}.${timestamp}.raw"
-#    touch ${outfile} # avoid 'file not found'
+    outFile="${resultDir}/npb-${test}-${size}.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
+#    touch ${outFile} # avoid 'file not found'
 
 #    while [ `grep "Time in seconds" ${outfile} | wc -l` -lt ${iters} ]; do
     # for iter in `seq 1 ${iters}`; do
 #        echo "mpirun --np ${procs} ${mpiParams} ${BIN_DIR}/${exec} ${benchParams} > ${outFile}"
-        timeout 120 mpirun --np ${procs} ${mpiParams} ${BIN_DIR}/${exec} ${benchParams} > ${outFile}
+        timeout 300 mpirun --np ${procs} ${mpiParams} ${BIN_DIR}/${exec} ${benchParams} > ${outFile}
 
     # throw away?
     [ -z "$trash" ] || rm -f ${outFile}
-#    done
 done

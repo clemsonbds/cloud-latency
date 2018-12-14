@@ -3,6 +3,7 @@
 resultDir=.
 resultName=none
 hostfile="/nfs/instances"
+groupClass=none
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
@@ -35,6 +36,16 @@ case ${key} in
     shift
     shift
     ;;
+--nodeClassifier)
+    nodeClassifier="$2"
+    shift
+    shift
+    ;;
+--groupClass)
+    groupClass="$2"
+    shift
+    shift
+    ;;
 --trash)
     trash="T"
     shift
@@ -48,13 +59,13 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-if [[ ! -z "${hosts}" ]]; then
-	nhosts=`echo ${hosts} | awk -F, '{ print NF; exit }'`
-    mpiParams+="-np ${nhosts} --host ${hosts}"
-elif [[ ! -z "${hostfile}" ]]; then
-	nhosts=`cat ${hostfile} | sed '/^\s*$/d' | wc -l`
-    mpiParams+="-np ${nhosts} --hostfile ${hostfile}"
+if [ -z "${hosts}" ]; then
+    hosts=`${utilDir}/hostfileToHosts.sh ${hostfile} 2`
 fi
+
+nhosts=`echo ${hosts} | awk -F, '{ print NF; exit }'`
+
+mpiParams+="-np ${nhosts} --host ${hosts}"
 
 if [[ ! -z "${rankfile}" ]]; then
     mpiParams+=" --rankfile ${rankfile}"
@@ -62,11 +73,12 @@ fi
 
 mpiParams+=" --map-by node --mca plm_rsh_no_tree_spawn 1"
 
-timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
-outFile="${resultDir}/impi.${resultName}.${timestamp}.raw"
-
 executable="/nfs/repos/benchmarks/intelmpi/IMB-MPI1"
 benchArgs=
+
+nodeClasses=`${utilDir}/classifyNodes.sh ${hosts} ${nodeClassifier}`
+timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
+outFile="${resultDir}/impi.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
 
 echo Running Intel-MPI benchmark.
 mpirun ${mpiParams} ${executable} ${benchArgs}  1> ${outFile}

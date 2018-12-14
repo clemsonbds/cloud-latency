@@ -9,64 +9,126 @@ import glob
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
-def distance(a, b):
+def dist(a, b):
 	return abs(a-b)
 
-# mean of a list of dicts
-def mean(l, key):
-	return sum([s[key] for s in l]) / float(len(l))
+def sort(items, key):
+	items.sort(key=lambda i: i[key])
+
+def chunk(items, K):
+	n = int((len(items) + 1) / K)
+	return [items[i:i + n] for i in range(0, len(items), n)]
+
+def centroid_median(c, key):
+	sort(c, key) # sort the list
+	c[0], c[int(len(c)/2)] = c[int(len(c)/2)], c[0] # swap median to the beginning
+
+def centroid_mean(c, key):
+	m = mean(c, key)
+	closest_i = 0 # index of current centroid
+
+	for i in range(1, len(c)):
+		if dist(c[i][key], m) < dist(c[closest_i][key], m):
+			closest_i = i
+
+	c[0], c[i] = c[i], c[0] # swap closest with current centroid
 
 # super simple 1-dimension kmeans clustering
-def kmeans(samples, k, compare_key, max_iter=10):
-	import random
+def kmeans(items, K, key, max_iter=10):
 
-	# find the range of the samples for initial centroids
-	mn = min([s[compare_key] for s in samples])
-	mx = max([s[compare_key] for s in samples])
+	clusters = chunk(items, K)
+	moved = True
 
-	# k random centroids from within the range to get started
-	centroids = []
-	for _ in range(k):
-		centroids.append(random.uniform(mn, mx))
-
-	clusters = [samples[i::k] for i in range(k)]
+	# centroids are the first item of each list
 
 	# start moving them around!
-	for _ in range(max_iter):
+	while moved == True:
+		pp.pprint(clusters)
+
+		# stage 1, compute centroids
+		for c in clusters:
+			centroid_mean(c, key)
+
+		pp.pprint(clusters)
 
 		# track whether a move was made this iteration
 		moved = False
 
 		# stage 1, move values as needed based on distance
-		for i in range(k):
-			for sample in list(clusters[i]): # iterate over a copy so we can remove safely
-				min_dist = float('inf')
-				min_j = 0
+		for current in clusters:
+			for item in list(current[1:]): # iterate over a copy so we can remove safely
+				closest = current
 
-				# find the centroid with the minimum distance
-				for j in range(k):
-					dist = distance(sample[compare_key], centroids[j])
-
-					if dist < min_dist:
-						min_dist = dist
-						min_j = j
+				# find the centroid with the minimum distance to the sample
+				for other in clusters:
+					if dist(item[key], other[0][key]) < dist(item[key], current[0][key]):
+						closest = other
 
 				# move sample to that cluster
-				if min_j != i:
+				if closest != current:
 					moved = True
-					clusters[i].remove(sample)
-					clusters[min_j].append(sample)
+					current.remove(item)
+					closest.append(item)
 
-		# if no moves were made, we're done
-		if moved == False:
-			break
-
-		# stage 2, compute new centroids
-		for i in range(k):
-			centroids[i] = mean(clusters[i], compare_key)
+	pp.pprint(clusters)
 
 	# all done
 	return clusters
+
+def ssd(items, key):
+	m = mean(items, key)
+	return sum([(i[key]-m) ** 2 for i in items])
+
+def jenks(items, K, key, target_GVF, max_iter=10):
+	sort(items, key)
+	classes = chunk(items, K)
+
+#	sdam = ssd(items, key)
+	ssds = [ssd(cls, key) for cls in classes]
+
+	while True:
+#		sdcm = sum(ssds)
+#		gvf = (sdam - sdcm) / sdam
+#		pp.pprint(classes)
+#		print(gvf)
+
+		mx = 0
+		mn = 0
+
+		for i in range(K):
+			if ssds[i] > ssds[mx]:
+				mx = i
+			if ssds[i] < ssds[mn]:
+				mn = i
+
+		if mx == mn:
+			break
+
+		# calculate new ssd values before changing
+		if mx > mn:
+			ssd_mx = ssd(classes[mx][1:], key)
+			ssd_mn = ssd(classes[mn]+classes[mx][:1], key)
+		else:
+			ssd_mx = ssd(classes[mx][:-1], key)
+			ssd_mn = ssd(classes[mn]+classes[mx][:-1], key)
+
+		# if it makes gvf worse, quit now
+		if ssd_mx + ssd_mn >= ssds[mx] + ssds[mn]:
+			break
+
+		# otherwise go ahead
+		if mx > mn:
+			classes[mn].append(classes[mx].pop(0))
+		else:
+			classes[mn].append(0, classes[mx].pop()) # sort below anyway
+
+		# update the ssds
+		ssds[mx] = ssd_mx
+		ssds[mn] = ssd_mn
+
+		sort(classes[mn], key)
+
+	return classes
 
 def parse_samples(fn_list):
 	for fn in fn_list:
@@ -77,6 +139,10 @@ def parse_samples(fn_list):
 						sample['start']['connected'][0]['remote_host']),
 				'bps':sample['end']['sum_received']['bits_per_second']
 			}
+
+# mean of a list of dicts
+def mean(l, key):
+	return sum([s[key] for s in l]) / float(len(l))
 
 # check that a pairing between host1 and host2 exists in pairs, order ignored
 def pairing_exists(host1, host2, pairs):
@@ -120,6 +186,8 @@ def main():
 	args = vars(parser.parse_args())
 
 	# sanity checking on input
+	K = args['K']
+
 	if args['classes']:
 		classes = args['classes'].split(',')
 
@@ -141,7 +209,10 @@ def main():
 	# parse the samples for host pairs and receive rate
 	samples = list(parse_samples(filenames))
 
-	sample_clusters = kmeans(samples, args['K'], 'bps')
+	K = min(K, len(samples))
+
+#	sample_clusters = kmeans(samples, K, 'bps')
+	sample_clusters = jenks(samples, K, 'bps', 1)
 	sample_clusters.sort(key=lambda c: mean(c, 'bps'))
 
 	pair_clusters = [[s['pair'] for s in c] for c in sample_clusters]

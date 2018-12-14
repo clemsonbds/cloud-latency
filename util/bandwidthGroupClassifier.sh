@@ -32,6 +32,10 @@ measureArgs+=" --resultDir ${resultDir}"
 measureArgs+=" --seconds ${seconds}"
 measureArgs+=" --nodeClassifier ${nodeClassifier}"
 
+nhosts=`wc -l ${hostfile}`
+echo "Running cross-sectional bandwidth study of ${nhosts} hosts, with parameters:"
+echo "${measureArgs}"
+
 ${runDir}/iperf/run_cross.sh ${measureArgs} > /dev/null
 
 # break into two hostfiles
@@ -42,9 +46,14 @@ classifierArgs+=" --sample_dir ${resultDir}"
 classifierArgs+=" --output_dir ${outDir}"
 classifierArgs+=" --filter_by ${resultName}"
 classifierArgs+=" --classes ${classes}"
-classifierArgs+=" --order ${order}"
+classifierArgs+=" --${order}"
+
+echo "Classifying bandwidth results with parameters:"
+echo "${classifierArgs}"
 
 ${utilDir}/iperfCrossClassifier.py ${classifierArgs}
+
+echo "Done."
 
 #dominant=
 #max_n=0

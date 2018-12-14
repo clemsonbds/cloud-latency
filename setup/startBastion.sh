@@ -12,7 +12,7 @@ projectID=`${utilDir}/getSetting.sh projectID ${platform}`
 keyName=`${utilDir}/getSetting.sh bastionKeyPair ${platform}`
 
 echo "Starting Bastion host cloud resources."
-./createNetworkBastionHost.py --create --cloudProvider ${platform} --name ${expName} --region ${region} --keyName ${keyName} --projectId ${projectID} --profile ${creds}
+${DIR}/createNetworkBastionHost.py --create --cloudProvider ${platform} --name ${expName} --region ${region} --keyName ${keyName} --projectId ${projectID} --profile ${creds}
 
 bastionIP=`${utilDir}/getBastionIP.sh ${platform}`
 

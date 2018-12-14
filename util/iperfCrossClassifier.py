@@ -178,13 +178,13 @@ def write_hostfile(hosts, fn):
 def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--sample_dir', required=True)
-	parser.add_argument('--filter_by')
+	parser.add_argument('--filter_by', help='a pattern to include in input files')
+	parser.add_argument('--output_dir', help='in addition to stdout, write hostfiles named <class>.hosts')
 	parser.add_argument('--descending', action='store_true', help='use if the first class name should match largest cluster median value')
-	parser.add_argument('--stdout', action='store_true', help='describe clusters to stdout rather than write hostfiles')
 
-	group = parser.add_mutually_exclusive_group(required=True)
-	group.add_argument('--output_dir')
-	group.add_argument('--quiet', action='store_true', help='reduces stdout stream to one class per line (in order provided), comma separated values')
+	group = parser.add_mutually_exclusive_group(required=False)
+	group.add_argument('--verbose', action='store_true', help='clusters and values will be described, rather than minimal CSV')
+	group.add_argument('--quiet', action='store_true', help='suppress stdout')
 
 	group = parser.add_mutually_exclusive_group(required=True)
 	group.add_argument('--K', type=int)
@@ -236,14 +236,27 @@ def main():
 #			if host in host_clusters[i+1]:
 #				host_clusters[i+1].remove(host)
 
-	# write output files
-	for i in range(len(host_clusters)):
-		if args['stdout']:
-			if args['quiet']:
-				print(','.join(host_clusters[i]))
-			else:
-				print(classes[i], " - ", host_clusters[i])
-		else:
+	# write output
+	if args['verbose']:
+		print("Classified samples:")
+	
+		for i in range(len(host_clusters)):
+			print(classes[i], ":")
+
+			for sample in sample_clusters[i]:
+				print(sample)
+
+		print("\nFully connected hosts:")
+
+		for i in range(len(host_clusters)):
+			print(classes[i], " - ", host_clusters[i])
+
+	elif not args['quiet']:
+		for i in range(len(host_clusters)):
+			print(','.join(host_clusters[i]))
+
+	if args['output_dir']:
+		for i in range(len(host_clusters)):
 			fn = classes[i]+".hosts"
 
 			with open(args['output_dir']+'/'+fn, 'w') as f:

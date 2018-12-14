@@ -1,9 +1,12 @@
 #!/bin/bash
 
+utilDir=/nfs/repos/project/util
+
 resultDir=.
 resultName=none
 seconds=10
 hostfile="/nfs/instances"
+groupClass=none
 msgBytes=1
 
 POSITIONAL=()
@@ -37,6 +40,16 @@ case $key in
     shift
     shift
     ;;
+--nodeClassifier)
+    nodeClassifier="$2"
+    shift
+    shift
+    ;;
+--groupClass)
+    groupClass="$2"
+    shift
+    shift
+    ;;
 --trash)
     trash="T"
     shift
@@ -50,20 +63,25 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-if [ ! -z "${hosts}" ]; then
-	server=`echo ${hosts} | tr ',' ' ' | awk '{print $1}'`
-	client=`echo ${hosts} | tr ',' ' ' | awk '{print $2}'`
-else
-	server=`head -n 1 ${hostfile}`
-	client=`head -n 2 ${hostfile} | tail -n 1`
+if [ -z "${hosts}" ]; then
+    hosts=`${utilDir}/hostfileToHosts.sh ${hostfile} 2`
 fi
 
+executable="iperf3"
+
+nodeClasses=`${utilDir}/classifyNodes.sh ${hosts} ${nodeClassifier}`
 timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
-outFile="${resultDir}/iperf.${resultName}.${timestamp}.json"
+outFile="${resultDir}/iperf.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.json"
+
+server=`echo ${hosts} | cut -d, -f1`
+serverParams="-s -1"
+
+client=`echo ${hosts} | cut -d, -f2`
+clientParams="-c ${server} -t ${seconds} -J"
 
 echo Running iperf between ${server} and ${client}.
-ssh -q -f ${server} "sh -c 'nohup iperf3 -s -1 > /dev/null 2>&1 &'" # start in background and move on
-ssh -q ${client} "iperf3 -c ${server} -t ${seconds} -J" > ${outFile}
+ssh -q -f ${server} "sh -c 'nohup ${executable} ${serverParams} > /dev/null 2>&1 &'" # start in background and move on
+ssh -q ${client} "${executable} ${clientParams}" > ${outFile}
 
 # throw away?
 [ -z "$trash" ] || rm -f ${outFile}

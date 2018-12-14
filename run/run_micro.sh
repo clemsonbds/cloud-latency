@@ -14,16 +14,19 @@ case ${platform} in
 aws)
 	numItersPerSet=5
 	numItersPerProvision=1
-#	groupTypes="cluster" # spread multi-az"
-	groupTypes="cluster"
-	instanceTypes="vm vmc5 metal"
-#	instanceTypes="metal"
+	groupTypes+=" cluster"
+#	groupTypes+=" spread"
+#	groupTypes+=" multi-az"
+	instanceTypes+=" vm"
+#	instanceTypes+=" vmc5"
+#	instanceTypes+=" metal"
 	;;
 gcp)
 	numItersPerSet=10
 	numItersPerProvision=1
-	groupTypes="single-az multi-az"
-	instanceTypes="vm"
+	groupTypes+=" single-az"
+	groupTypes+=" multi-az"
+	instanceTypes+="vm"
 	;;
 *) # unknown
 	echo "Unknown platform '${platform}', valid types are 'aws' and 'gcp'."
@@ -54,4 +57,4 @@ for i in `seq 1 ${numItersPerSet}`; do
 	done
 done
 
-${setupDir}/stopInstances.sh ${platform}
+#${setupDir}/stopInstances.sh ${platform}

@@ -1,8 +1,11 @@
 #!/bin/bash
 
-resultDir=.
+utilDir=/nfs/repos/project/util
+
+resultDir=`pwd`
 resultName=none
 hostfile="/nfs/instances"
+groupClass=none
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
@@ -35,6 +38,16 @@ case ${key} in
     shift
     shift
     ;;
+--nodeClassifier)
+    nodeClassifier="$2"
+    shift
+    shift
+    ;;
+--groupClass)
+    groupClass="$2"
+    shift
+    shift
+    ;;
 --trash)
     trash="T"
     shift
@@ -48,27 +61,22 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-mpiParams="-np 128 --map-by node --mca plm_rsh_no_tree_spawn 1"
-
-if [[ ! -z "${hosts}" ]]; then
-    mpiParams+=" --host ${hosts}"
-    src=`echo ${hosts} | awk -F "," '{print $1}'`
-    dst=`echo ${hosts} | awk -F "," '{print $2}'`
-else
-    mpiParams+=" --hostfile ${hostfile}"
-    src=`head -n1 ${hostfile}`
-    dst=`head -n2 ${hostfile} | tail -n1`
+if [ -z "${hosts}" ]; then
+    hosts=`${utilDir}/hostfileToHosts.sh ${hostfile}`
 fi
+
+mpiParams="-np 128 --host ${hosts} --map-by node --mca plm_rsh_no_tree_spawn 1"
 
 if [[ ! -z "${rankfile}" ]]; then
     mpiParams+=" --rankfile ${rankfile}"
 fi
 
-timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
-outFile="${resultDir}/lammps.${resultName}.${timestamp}.raw"
-
 executable="/nfs/repos/benchmarks/lammps/micelle/lmp_mpi"
 benchArgs="-in /nfs/repos/benchmarks/lammps/micelle/in.micelle"
+
+nodeClasses=`${utilDir}/classifyNodes.sh ${hosts} ${nodeClassifier}`
+timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
+outFile="${resultDir}/lammps.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
 
 echo Running LAMMPS benchmark.
 curDir=`pwd`

@@ -9,21 +9,28 @@ platform=${1:-"aws"}
 shift
 
 # extra arguments will be passed to the call to run_bench.sh on bastion
+nodeClassifier="/nfs/getCpuIdentity.sh"
 
 case ${platform} in
 aws)
 	numItersPerSet=5
 	numItersPerProvision=1
-	groupTypes="cluster spread multi-az"
-#	groupTypes="spread"
-	instanceTypes="vm vmc5 metal"
-#	instanceTypes="vm"
+	groupTypes+=" cluster"
+#	groupTypes+=" spread"
+#	groupTypes+=" multi-az"
+	instanceTypes+=" vm"
+#	instanceTypes+=" vmc5"
+#	instanceTypes+=" metal"
 	;;
 gcp)
 	numItersPerSet=6
 	numItersPerProvision=5
-	groupTypes="single-az multi-az"
-	instanceTypes="vm"
+	groupTypes+=" single-az"
+	groupTypes+=" multi-az"
+	instanceTypes+=" vm"
+	groupClassifier="/nfs/repos/project/util/bandwidthGroupClassifier.sh"
+	groupClasses="10Gb,16Gb"
+	groupReqHosts=4
 	;;
 *) # unknown
 	echo "Unknown platform '${platform}', valid types are 'aws' and 'gcp'."
@@ -32,26 +39,56 @@ gcp)
 esac
 
 for i in `seq 1 ${numItersPerSet}`; do
-	echo Starting outer iteration ${i}.
+for groupType in ${groupTypes}; do
+for instanceType in ${instanceTypes}; do
 
-	for groupType in ${groupTypes}; do
-		for instanceType in ${instanceTypes}; do
-			expType="${platform}.${instanceType}.${groupType}"
-			${setupDir}/stopInstances.sh ${platform}
-			${setupDir}/startInstances.sh ${expType}
+	completed=
+	while [ -z "${completed}" ]; do
+		expType="${platform}.${instanceType}.${groupType}"
 
-			echo -e "\nRunning benchmarks for experiment configuration '${expType}'.\n"
-			trash="--trash"
+		runParams="--expType ${expType}"
 
-			for j in `seq 0 ${numItersPerProvision}`; do
-				[ "$j" -eq "1" ] && trash=""
+		${setupDir}/stopInstances.sh ${platform}
+		${setupDir}/startInstances.sh ${expType}
 
-				echo Starting inner iteration ${j}.
+		[ ! -z "${nodeClassifier}" ] && runParams+=" --nodeClassifier ${nodeClassifier}"
 
-				${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_bench.sh --expType ${expType} ${trash} $@"
-			done
+		if [ ! -z "${groupClassifier}" ]; then
+			hostfile="/nfs/instances"
+			groupClass=`${utilDir}/classifyGroup.sh ${platform} ${hostfile} ${groupClassifier} ${groupClasses}`
+			runParams+=" --groupClass ${groupClass}"
+
+			hostfile="/nfs/${groupClass}.hosts"
+
+			nhosts=`${utilDir}/sshBastion.sh ${platform} "cat ${hostfile} | wc -l"
+
+			if [ "${nhosts}" < "${groupReqHosts}" ]; then
+				echo Unable to acquire enough hosts in the same class, reprovisioning.
+				continue
+			fi
+
+			${utilDir}/sshBastion.sh ${platform} "head -n ${groupReqHosts} ${hostfile} > temp.hosts; mv temp.hosts ${hostfile}"
+		fi
+
+		echo -e "\nRunning benchmarks for experiment configuration '${expType}'.\n"
+
+		for j in `seq 1 ${numItersPerProvision}`; do
+			echo Starting iteration ${i}-${j}.
+
+			echo Running warmup.
+			${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_bench.sh ${runParams} --ep_only --trash $@"
+
+			echo Running micro measurements.
+			${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_micro.sh ${runParams} $@"
+
+			echo Running benchmarks.
+			${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_bench.sh ${runParams} $@"
 		done
+
+		completed=1
 	done
+done
+done
 done
 
 ${setupDir}/stopInstances.sh ${platform}

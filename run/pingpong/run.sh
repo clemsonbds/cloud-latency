@@ -1,9 +1,13 @@
 #!/bin/bash
 
+utilDir=/nfs/repos/project/util
+
+hostfile="/nfs/instances"
+groupClass=none
 resultDir=.
 resultName=none
 iters=20
-hostfile="/nfs/instances"
+skip=1000
 msgBytes=1
 
 POSITIONAL=()
@@ -52,6 +56,16 @@ case $key in
     shift
     shift
     ;;
+--nodeClassifier)
+    nodeClassifier="$2"
+    shift
+    shift
+    ;;
+--groupClass)
+    groupClass="$2"
+    shift
+    shift
+    ;;
 --trash)
     trash="T"
     shift
@@ -65,27 +79,20 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-executable="/nfs/repos/benchmarks/pingpong/pingpong"
-mpiParams="-np 2 --map-by node"
-skip=1000
-
-if [ ! -z "${hosts}" ]; then
-    mpiParams+=" --host ${hosts}"
-    src=`echo ${hosts} | awk -F "," '{print $1}'`
-    dst=`echo ${hosts} | awk -F "," '{print $2}'`
-else
-    mpiParams+=" --hostfile ${hostfile}"
-    src=`head -n1 ${hostfile}`
-    dst=`head -n2 ${hostfile} | tail -n1`
+if [ -z "${hosts}" ]; then
+    hosts=`${utilDir}/hostfileToHosts.sh ${hostfile} 2`
 fi
+
+# MPI run parameters
+mpiParams="-np 2 --host ${hosts} --map-by node"
 
 if [ ! -z "${rankfile}"]; then
     mpiParams+=" --rankfile ${rankfile}"
 fi
 
-timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
-outFile="${resultDir}/pingpong.${resultName}.${timestamp}.raw"
+executable="/nfs/repos/benchmarks/pingpong/pingpong"
 
+# executable parameters
 ppArgs="-t -s ${skip} -b ${msgBytes}"
 
 if [ -z "${seconds}" ]; then
@@ -93,6 +100,11 @@ if [ -z "${seconds}" ]; then
 else
     ppArgs+=" -d ${seconds}"
 fi
+
+# name the output file
+nodeClasses=`${utilDir}/classifyNodes.sh ${hosts} ${nodeClassifier}`
+timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
+outFile="${resultDir}/pingpong.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
 
 echo Running pingpong between ${src} and ${dst}.
 mpirun ${mpiParams} ${executable} ${ppArgs} 1> ${outFile}

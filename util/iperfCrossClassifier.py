@@ -178,22 +178,26 @@ def write_hostfile(hosts, fn):
 def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--sample_dir', required=True)
-	parser.add_argument('--output_dir', required=True)
 	parser.add_argument('--filter_by')
-	parser.add_argument('--K', type=int, default=2)
-	parser.add_argument('--classes')
+	parser.add_argument('--descending', action='store_true', help='use if the first class name should match largest cluster median value')
+	parser.add_argument('--stdout', action='store_true', help='describe clusters to stdout rather than write hostfiles')
+
+	group = parser.add_mutually_exclusive_group(required=True)
+	parser.add_argument('--output_dir')
+	parser.add_argument('--quiet', action='store_true', help='reduces stdout stream to one class per line (in order provided), comma separated values')
+
+	group = parser.add_mutually_exclusive_group(required=True)
+	group.add_argument('--K', type=int)
+	group.add_argument('--classes')
 
 	args = vars(parser.parse_args())
 
 	# sanity checking on input
-	K = args['K']
-
 	if args['classes']:
 		classes = args['classes'].split(',')
-
-		if len(classes) < args['K']:
-			sys.exit("The class name list needs to be at least K long.")
+		K = len(classes)
 	else:
+		K = args['K']
 		classes = ['class'+str(i) for i in range(1, args['K']+1)]
 
 	# get list of iperf samples in result directory
@@ -209,29 +213,42 @@ def main():
 	# parse the samples for host pairs and receive rate
 	samples = list(parse_samples(filenames))
 
-	K = min(K, len(samples))
+	if len(samples) < K:
+		print("Warning: ", len(samples), " provided, reducing K to match.")
+		K = len(samples)
 
 #	sample_clusters = kmeans(samples, K, 'bps')
 	sample_clusters = jenks(samples, K, 'bps', 1)
-	sample_clusters.sort(key=lambda c: mean(c, 'bps'))
 
+	# sort to match key order
+	sample_clusters.sort(key=lambda c: mean(c, 'bps'), reverse=args['descending'])
+
+	# detach host pairs from measured values
 	pair_clusters = [[s['pair'] for s in c] for c in sample_clusters]
+
+	# reduce hosts in each cluster to unique and fully connected within the cluster
 	host_clusters = [reduce_to_hosts(c) for c in pair_clusters]
 
 	# hack, hosts only exist in one cluster, assume left-dominant
 	# and remove duplicates in classes to the right
-	for i in range(len(host_clusters)-1):
-		for host in host_clusters[i]:
-			if host in host_clusters[i+1]:
-				host_clusters[i+1].remove(host)
+#	for i in range(len(host_clusters)-1):
+#		for host in host_clusters[i]:
+#			if host in host_clusters[i+1]:
+#				host_clusters[i+1].remove(host)
 
 	# write output files
 	for i in range(len(host_clusters)):
-		fn = classes[i]+".hosts"
+		if args['stdout']:
+			if args['quiet']:
+				print(','.join(host_clusters[i]))
+			else:
+				print(classes[i], " - ", host_clusters[i])
+		else:
+			fn = classes[i]+".hosts"
 
-		with open(args['output_dir']+'/'+fn, 'w') as f:
-			for host in host_clusters[i]:
-				f.write(host+'\n')
+			with open(args['output_dir']+'/'+fn, 'w') as f:
+				for host in host_clusters[i]:
+					f.write(host+'\n')
 
 if __name__ == "__main__":
 	main()

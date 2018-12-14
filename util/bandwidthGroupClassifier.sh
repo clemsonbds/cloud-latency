@@ -10,9 +10,10 @@ runDir=${DIR}/../run
 
 hostfile=$1
 classes=$2
+order=${3:-"descending"}
 
 if [ -z "${classes}" ]; then
-	echo "usage: $0 <hostfile> <classes>"
+	echo "usage: $0 <hostfile> <classes> [ascending|descending]"
 	exit
 fi
 
@@ -40,19 +41,21 @@ classifierArgs+=" --sample_dir ${resultDir}"
 classifierArgs+=" --output_dir ${outDir}"
 classifierArgs+=" --filter_by ${resultName}"
 classifierArgs+=" --classes ${classes}"
+classifierArgs+=" --order ${order}"
 
 ${utilDir}/iperfCrossClassifier.py ${classifierArgs}
 
-dominant=
-max_n=0
-
-for cls in `echo ${classes} | tr ',' ' '`; do
-	n=`cat ${outDir}/${cls}.hosts | wc -l`
-	if [ "${n}" -gt "${max_n}" ]; then
-		max_n=${n}
-		dominant=${cls}
-	fi
-done
-
-echo ${dominant}
 rm -rf ${resultDir}
+
+#dominant=
+#max_n=0
+
+#for cls in `echo ${classes} | tr ',' ' '`; do
+#	n=`cat ${outDir}/${cls}.hosts | wc -l`
+#	if [ "${n}" -gt "${max_n}" ]; then
+#		max_n=${n}
+#		dominant=${cls}
+#	fi
+#done
+
+#echo ${dominant}

@@ -16,8 +16,8 @@ gcp.vm.single-az)
 	platform="gcp"
 	expType="single-az"
 	instanceType="n1-highmem-64"
-#	numInstances="7"
-	numInstances="4"
+	numInstances="7"
+#	numInstances="4"
 	azs="b"
 	;;
 gcp.vm.multi-az)
@@ -102,7 +102,7 @@ aws.vmc5.multi-az)
 	;;
 esac
 
-instanceType="c4.large"
+#instanceType="c4.large"
 
 expName=`${utilDir}/getSetting.sh expName ${platform} | awk '{print tolower($0)}'`
 region=`${utilDir}/getSetting.sh region ${platform}`

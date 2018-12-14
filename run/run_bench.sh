@@ -4,12 +4,14 @@ DIR="$(dirname "${BASH_SOURCE[0]}")"
 
 setupDir=${DIR}/../setup
 utilDir=${DIR}/../util
+bastionUtilDir="/nfs/repos/project/util"
 
 platform=${1:-"aws"}
 shift
 
 # extra arguments will be passed to the call to run_bench.sh on bastion
 nodeClassifier="/nfs/getCpuIdentity.sh"
+hostfile="/nfs/instances"
 
 case ${platform} in
 aws)
@@ -28,8 +30,9 @@ gcp)
 	groupTypes+=" single-az"
 	groupTypes+=" multi-az"
 	instanceTypes+=" vm"
-	groupClassifier="/nfs/repos/project/util/bandwidthGroupClassifier.sh"
-	groupClasses="10Gb,16Gb"
+	groupClassifier="${bastionUtilDir}/bandwidthGroupClassifier.sh"
+	groupClasses="16Gb,10Gb" # in order, most desirable class first
+	groupClassOrder="descending" # match class order above
 	groupReqHosts=4
 	;;
 *) # unknown
@@ -54,20 +57,28 @@ for instanceType in ${instanceTypes}; do
 		[ ! -z "${nodeClassifier}" ] && runParams+=" --nodeClassifier ${nodeClassifier}"
 
 		if [ ! -z "${groupClassifier}" ]; then
-			hostfile="/nfs/instances"
-			groupClass=`${utilDir}/classifyGroup.sh ${platform} ${hostfile} ${groupClassifier} ${groupClasses}`
-			runParams+=" --groupClass ${groupClass}"
+			${utilDir}/classifyGroup.sh ${platform} ${hostfile} ${groupClassifier} ${groupClasses} ${groupClassOrder}
+			foundClass=
 
-			hostfile="/nfs/${groupClass}.hosts"
+			for class in `echo ${groupClasses} | tr ',' ' '`; do
+				classHostfile="/nfs/${class}.hosts"
+				hosts=`${utilDir}/sshBastion.sh ${platform} "${bastionUtilDir}/hostfileToHosts.sh ${classHostfile} ${groupReqHosts}"`
+				nhosts=`echo ${hosts} | tr ',' ' ' | wc -w`
 
-			nhosts=`${utilDir}/sshBastion.sh ${platform} "cat ${hostfile} | wc -l"
+				if [ "${nhosts}" -gte "${groupReqHosts}" ]; then
+					echo "Found the required ${nhosts} in class ${class}."
+					runParams+=" --groupClass ${class} --hosts ${hosts}"
+					foundClass=1
+					break
+				fi
+			done
 
-			if [ "${nhosts}" < "${groupReqHosts}" ]; then
-				echo Unable to acquire enough hosts in the same class, reprovisioning.
+			if [ -z "${foundClass}" ]; then
+				echo "Unable to acquire enough hosts in the same class, reprovisioning."
 				continue
 			fi
-
-			${utilDir}/sshBastion.sh ${platform} "head -n ${groupReqHosts} ${hostfile} > temp.hosts; mv temp.hosts ${hostfile}"
+		else
+			runParams+=" --hostfile ${hostfile}"
 		fi
 
 		echo -e "\nRunning benchmarks for experiment configuration '${expType}'.\n"

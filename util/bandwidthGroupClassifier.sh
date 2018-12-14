@@ -24,6 +24,7 @@ nodeClassifier=${utilDir}/hostnameNodeClassifier.sh
 seconds=2
 
 mkdir -p ${resultDir}
+rm -f ${resultDir}/*
 
 measureArgs+=" --hostfile ${hostfile}"
 measureArgs+=" --resultName ${resultName}"
@@ -44,8 +45,6 @@ classifierArgs+=" --classes ${classes}"
 classifierArgs+=" --order ${order}"
 
 ${utilDir}/iperfCrossClassifier.py ${classifierArgs}
-
-rm -rf ${resultDir}
 
 #dominant=
 #max_n=0

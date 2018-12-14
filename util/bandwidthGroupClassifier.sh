@@ -15,6 +15,8 @@ if [ -z "${hostfile}" ]; then
 	exit
 fi
 
+shift
+
 # get set of cross-sectional bandwidth measurements
 resultDir=/nfs/bwthresh/samples
 resultName=bwclassify

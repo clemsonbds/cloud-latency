@@ -183,8 +183,8 @@ def main():
 	parser.add_argument('--stdout', action='store_true', help='describe clusters to stdout rather than write hostfiles')
 
 	group = parser.add_mutually_exclusive_group(required=True)
-	parser.add_argument('--output_dir')
-	parser.add_argument('--quiet', action='store_true', help='reduces stdout stream to one class per line (in order provided), comma separated values')
+	group.add_argument('--output_dir')
+	group.add_argument('--quiet', action='store_true', help='reduces stdout stream to one class per line (in order provided), comma separated values')
 
 	group = parser.add_mutually_exclusive_group(required=True)
 	group.add_argument('--K', type=int)

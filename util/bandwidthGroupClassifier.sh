@@ -9,11 +9,9 @@ utilDir=${DIR}
 runDir=${DIR}/../run
 
 hostfile=$1
-classes=$2
-order=${3:-"descending"}
 
 if [ -z "${classes}" ]; then
-	echo "usage: $0 <hostfile> <classes> [ascending|descending]"
+	echo "usage: $0 <hostfile> [classifier args]"
 	exit
 fi
 
@@ -45,8 +43,7 @@ outDir=`dirname ${hostfile}`
 classifierArgs+=" --sample_dir ${resultDir}"
 classifierArgs+=" --output_dir ${outDir}"
 classifierArgs+=" --filter_by ${resultName}"
-classifierArgs+=" --classes ${classes}"
-classifierArgs+=" --${order}"
+classifierArgs+=" $@"
 
 echo "Classifying bandwidth results with parameters:"
 echo "${classifierArgs}"

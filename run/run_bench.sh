@@ -57,7 +57,7 @@ for instanceType in ${instanceTypes}; do
 		[ ! -z "${nodeClassifier}" ] && runParams+=" --nodeClassifier ${nodeClassifier}"
 
 		if [ ! -z "${groupClassifier}" ]; then
-			${utilDir}/sshBastion.sh ${platform} "${groupClassifier} ${hostfile} ${groupClasses} ${groupClassOrder}"
+			${utilDir}/sshBastion.sh ${platform} "${groupClassifier} ${hostfile} --classes ${groupClasses} --${groupClassOrder}"
 			foundClass=
 
 			for class in `echo ${groupClasses} | tr ',' ' '`; do

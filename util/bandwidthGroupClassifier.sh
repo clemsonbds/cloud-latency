@@ -48,10 +48,11 @@ max_n=0
 
 for cls in `echo ${classes} | tr ',' ' '`; do
 	n=`cat ${outDir}/${cls}.hosts | wc -l`
-	if [ "${n}" > "${max_n}" ]; then
+	if [ "${n}" -gt "${max_n}" ]; then
 		max_n=${n}
 		dominant=${cls}
 	fi
 done
 
 echo ${dominant}
+rm -rf ${resultDir}

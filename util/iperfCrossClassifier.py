@@ -218,6 +218,13 @@ def main():
 	pair_clusters = [[s['pair'] for s in c] for c in sample_clusters]
 	host_clusters = [reduce_to_hosts(c) for c in pair_clusters]
 
+	# hack, hosts only exist in one cluster, assume left-dominant
+	# and remove duplicates in classes to the right
+	for i in range(len(host_clusters)-1):
+		for host in host_clusters[i]:
+			if host in host_clusters[i+1]:
+				host_clusters[i+1].remove(host)
+
 	# write output files
 	for i in range(len(host_clusters)):
 		fn = classes[i]+".hosts"

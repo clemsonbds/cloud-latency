@@ -10,7 +10,7 @@ platform=${1:-"aws"}
 shift
 
 # extra arguments will be passed to the call to run_bench.sh on bastion
-nodeClassifier="/nfs/getCpuIdentity.sh"
+nodeClassifier="/nfs/resources/getCpuIdentity.sh"
 hostfile="/nfs/instances"
 
 case ${platform} in

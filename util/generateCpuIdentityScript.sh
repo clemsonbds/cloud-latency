@@ -1,6 +1,7 @@
 #!/bin/bash
 
 provider=${1:-"aws"}
+target="/nfs/resources/getCpuIdentity.sh"
 
 if [ "${provider}" == "aws" ]; then
 		echo "#!/usr/bin/env bash
@@ -20,7 +21,7 @@ case \"\$output\" in
     exit
     ;;
 esac
-echo \"Could not determine CPU Type\"" > /nfs/getCpuIdentity.sh
+echo \"Could not determine CPU Type\"" > ${target}
 
 elif [ "${provider}" == "gcp" ]; then
 	echo "#!/usr/bin/env bash
@@ -40,7 +41,7 @@ case \"\$output\" in
     exit
     ;;
 esac
-echo \"Could not determine CPU Type\"" > /nfs/getCpuIdentity.sh
+echo \"Could not determine CPU Type\"" > ${target}
 fi
 
-sudo chmod 777 /nfs/getCpuIdentity.sh
+sudo chmod 777 ${target}

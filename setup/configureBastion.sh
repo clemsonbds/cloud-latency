@@ -23,10 +23,28 @@ ${utilDir}/sshBastion.sh ${provider} "sudo mkdir -p /nfs"
 ${utilDir}/sshBastion.sh ${provider} "sudo chmod 777 /nfs"
 ${utilDir}/sshBastion.sh ${provider} "git clone ${repo} /nfs/repos/project"
 ${utilDir}/sshBastion.sh ${provider} "ln -s /nfs/repos/project ~/project"
+${utilDir}/sshBastion.sh ${provider} "sudo mkdir -p /nfs/resources"
 
 # Write out the script to identify the CPU Family for the instance
 ${utilDir}/sshBastion.sh ${provider} "~/project/util/generateCpuIdentityScript.sh ${provider}"
 
 # hand off to bastion local configuration script
 ${utilDir}/sshBastion.sh ${provider} "~/project/setup/bastion/configure.sh"
+
+# MPI location dependent on platform
+if [ "${provider}" == "gcp" ]; then
+	# use newer 2.1.1 from source, yum installs 1.7.x on Centos
+	mpiDir="/opt/ompi-2-1-1"
+else
+	# use the yum installed openmpi, 2.1.1 currently on AWS
+	mpiDir="/usr/lib64/openmpi"
+fi
+
+# point PATH at the right MPI directory
+echo 'export PATH=$PATH:${mpiDir}/bin' >> ~/.bashrc
+
+# special Makefile for Intel MPI benchmarks
+${utilDir}/sshBastion.sh ${provider} "cp ~/project/intelmpi/Makefile.${provider} /nfs/resources/Makefile.intelmpi"
+
+
 ${utilDir}/sshBastion.sh ${provider} "~/project/setup/bastion/prepareBenchmarks.sh"

@@ -37,6 +37,9 @@ fi
 mkdir -p ${resultDir}
 
 case $expType in
+warmup)
+	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} --ep_only --trash $@
+	;;
 gcp.vm.single-az)
 	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
 	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@

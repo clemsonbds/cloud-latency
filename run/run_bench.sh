@@ -48,8 +48,7 @@ for instanceType in ${instanceTypes}; do
 	completed=
 	while [ -z "${completed}" ]; do
 		expType="${platform}.${instanceType}.${groupType}"
-
-		runParams="--expType ${expType}"
+		runParams=
 
 		${setupDir}/stopInstances.sh ${platform}
 		${setupDir}/startInstances.sh ${expType}
@@ -87,13 +86,13 @@ for instanceType in ${instanceTypes}; do
 			echo Starting iteration ${i}-${j}.
 
 			echo Running warmup.
-			${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_bench.sh ${runParams} --ep_only --trash $@"
+			${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_bench.sh --expType warmup ${runParams} $@"
 
 			echo Running micro measurements.
-			${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_micro.sh ${runParams} $@"
+			${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_micro.sh --expType ${expType} ${runParams} $@"
 
 			echo Running benchmarks.
-			${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_bench.sh ${runParams} $@"
+			${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_bench.sh --expType ${expType} ${runParams} $@"
 		done
 
 		completed=1

@@ -8,6 +8,8 @@ sudo yum install -y -q nmap # testing SSH to instances
 sudo yum install -y -q nfs-utils rpcbind # NFS server
 sudo yum install -y -q openmpi openmpi-devel # MPI benchmarks
 sudo yum install -y -q gcc-c++ wget # LAMMPS
+sudo yum install -y -q python-pip # needed to get networkx
+sudo pip install networkx # needed for iperf classifier
 
 # create NFS
 echo -e "\nStarting NFS server on bastion."

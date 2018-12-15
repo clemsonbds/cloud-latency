@@ -65,7 +65,7 @@ for instanceType in ${instanceTypes}; do
 				hosts=`${utilDir}/sshBastion.sh ${platform} "${bastionUtilDir}/hostfileToHosts.sh ${classHostfile} ${groupReqHosts}"`
 				nhosts=`echo ${hosts} | tr ',' ' ' | wc -w`
 
-				if [ "${nhosts}" -gte "${groupReqHosts}" ]; then
+				if [ "${nhosts}" -ge "${groupReqHosts}" ]; then
 					echo "Found the required ${nhosts} in class ${class}."
 					runParams+=" --groupClass ${class} --hosts ${hosts}"
 					foundClass=1

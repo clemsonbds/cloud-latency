@@ -96,7 +96,7 @@ for exec in ${BIN_DIR}/*; do
     size=`echo $exec|tr '.' ' '|awk '{print $2}'`
     procs=`echo $exec|tr '.' ' '|awk '{print $3}'`
 
-    if [ "$test" != "ep" ] && [ -z "$ep_only" ]; then
+    if [ "$test" != "ep" ] && [ ! -z "${ep_only}" ]; then
         continue
     fi
 

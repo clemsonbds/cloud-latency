@@ -4,7 +4,7 @@ utilDir=/nfs/repos/project/util
 
 resultDir=`pwd`
 resultName=none
-hostfile="/nfs/instances"
+hostfile="/nfs/mpi.hosts"
 groupClass=none
 
 POSITIONAL=()
@@ -61,15 +61,15 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-if [ -z "${hosts}" ]; then
-    hosts=`${utilDir}/hostfileToHosts.sh ${hostfile}`
-fi
+[ ! -z "${hosts}" ] && hosts=`${utilDir}/hostfileToHosts.sh ${hostfile}`
 
-mpiParams="-np 128 --host ${hosts} --map-by node --mca plm_rsh_no_tree_spawn 1"
-
-if [[ ! -z "${rankfile}" ]]; then
-    mpiParams+=" --rankfile ${rankfile}"
-fi
+# MPI run parameters
+mpiParams+=" -np 128"
+mpiParams+=" --hostfile ${hostfile}"
+mpiParams+=" --hosts ${hosts}" # filter the hostfile
+mpiParams+=" --map-by node"
+mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
+[ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
 
 executable="/nfs/repos/benchmarks/lammps/micelle/lmp_mpi"
 benchArgs="-in /nfs/repos/benchmarks/lammps/micelle/in.micelle"

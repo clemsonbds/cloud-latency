@@ -4,7 +4,7 @@ utilDir=/nfs/repos/project/util
 
 resultDir=`pwd`
 resultName=none
-hostfile="/nfs/instances"
+hostfile="/nfs/mpi.hosts"
 groupClass=none
 
 POSITIONAL=()
@@ -65,16 +65,14 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-if [ -z "${hosts}" ]; then
-    hosts=`${utilDir}/hostfileToHosts.sh ${hostfile}`
-fi
+[ ! -z "${hosts}" ] && hosts=`${utilDir}/hostfileToHosts.sh ${hostfile}`
 
 # MPI run parameters
-mpiParams="--host ${hosts} --map-by node --mca plm_rsh_no_tree_spawn 1"
-
-if [ ! -z "${rankfile}" ]; then
-    mpiParams+=" --rankfile ${rankfile}"
-fi
+mpiParams+=" --hostfile ${hostfile}"
+mpiParams+=" --hosts ${hosts}" # filter the hostfile
+mpiParams+=" --map-by node"
+mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
+[ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
 
 # output file name pieces
 nodeClasses=`${utilDir}/classifyNodes.sh ${hosts} ${nodeClassifier}`

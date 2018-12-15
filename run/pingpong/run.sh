@@ -2,7 +2,7 @@
 
 utilDir=/nfs/repos/project/util
 
-hostfile="/nfs/instances"
+hostfile="/nfs/mpi.hosts"
 groupClass=none
 resultDir=.
 resultName=none
@@ -79,16 +79,14 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-if [ -z "${hosts}" ]; then
-    hosts=`${utilDir}/hostfileToHosts.sh ${hostfile} 2`
-fi
+[ ! -z "${hosts}" ] && hosts=`${utilDir}/hostfileToHosts.sh ${hostfile} 2`
 
 # MPI run parameters
-mpiParams="-np 2 --host ${hosts} --map-by node"
-
-if [ ! -z "${rankfile}"]; then
-    mpiParams+=" --rankfile ${rankfile}"
-fi
+mpiParams+=" -np 2"
+mpiParams+=" --hostfile ${hostfile}"
+mpiParams+=" --hosts ${hosts}" # filter the hostfile
+mpiParams+=" --map-by node"
+[ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
 
 executable="/nfs/repos/benchmarks/pingpong/pingpong"
 

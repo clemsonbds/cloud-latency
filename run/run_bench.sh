@@ -11,7 +11,7 @@ shift
 
 # extra arguments will be passed to the call to run_bench.sh on bastion
 nodeClassifier="/nfs/resources/getCpuIdentity.sh"
-hostfile="/nfs/instances"
+hostfile="/nfs/mpi.hosts"
 
 case ${platform} in
 aws)
@@ -48,7 +48,7 @@ for instanceType in ${instanceTypes}; do
 	completed=
 	while [ -z "${completed}" ]; do
 		expType="${platform}.${instanceType}.${groupType}"
-		runParams=
+		runParams=" --hostfile ${hostfile}" # must be included, --host acts as a filter
 
 		${setupDir}/stopInstances.sh ${platform}
 		${setupDir}/startInstances.sh ${expType}

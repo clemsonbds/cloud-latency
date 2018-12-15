@@ -5,7 +5,7 @@ utilDir=/nfs/repos/project/util
 resultDir=.
 resultName=none
 seconds=10
-hostfile="/nfs/instances"
+hostfile="/nfs/mpi.hosts"
 groupClass=none
 msgBytes=1
 
@@ -63,9 +63,7 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-if [ -z "${hosts}" ]; then
-    hosts=`${utilDir}/hostfileToHosts.sh ${hostfile} 2`
-fi
+[ ! -z "${hosts}" ] && hosts=`${utilDir}/hostfileToHosts.sh ${hostfile} 2`
 
 executable="iperf3"
 

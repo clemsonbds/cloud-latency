@@ -16,6 +16,7 @@ gcp.vm.single-az)
 	platform="gcp"
 	expType="single-az"
 	instanceType="n1-highmem-64"
+	instanceCores=32
 	numInstances="7"
 #	numInstances="4"
 	azs="b"
@@ -24,6 +25,7 @@ gcp.vm.multi-az)
 	platform="gcp"
 	expType="multi-az"
 	instanceType="n1-highmem-64"
+	instanceCores=32
 	numInstances="4"
 	azs="b,c,a,f"
 	;;
@@ -32,6 +34,7 @@ aws.metal.cluster)
 	expType="single-az"
 	placementGroup="cluster"
 	instanceType="i3.metal"
+	instanceCores=32
 	azs="a"
 	numInstances="4"
 	;;
@@ -40,6 +43,7 @@ aws.vm.cluster)
 	expType="single-az"
 	placementGroup="cluster"
 	instanceType="i3.16xlarge"
+	instanceCores=32
 	azs="a"
 	numInstances="4"
 	;;
@@ -48,6 +52,7 @@ aws.vmc5.cluster)
 	expType="single-az"
 	placementGroup="cluster"
 	instanceType="c5n.18xlarge"
+	instanceCores=32
 	azs="a"
 	numInstances="4"
 	;;
@@ -56,6 +61,7 @@ aws.metal.spread)
 	expType="single-az"
 	placementGroup="spread"
 	instanceType="i3.metal"
+	instanceCores=32
 	azs="a"
 	numInstances="4"
 	;;
@@ -64,6 +70,7 @@ aws.vm.spread)
 	expType="single-az"
 	placementGroup="spread"
 	instanceType="i3.16xlarge"
+	instanceCores=32
 	azs="a"
 	numInstances="4"
 	;;
@@ -72,6 +79,7 @@ aws.vmc5.spread)
 	expType="single-az"
 	placementGroup="spread"
 	instanceType="c5n.18xlarge"
+	instanceCores=32
 	azs="a"
 	numInstances="4"
 	;;
@@ -79,6 +87,7 @@ aws.metal.multi-az)
 	platform="aws"
 	expType="multi-az"
 	instanceType="i3.metal"
+	instanceCores=32
 	azs="a,b,d,e"
 	numInstances="4"
 	;;
@@ -86,6 +95,7 @@ aws.vm.multi-az)
 	platform="aws"
 	expType="multi-az"
 	instanceType="i3.16xlarge"
+	instanceCores=32
 	azs="a,b,d,e"
 	numInstances="4"
 	;;
@@ -93,6 +103,7 @@ aws.vmc5.multi-az)
 	platform="aws"
 	expType="multi-az"
 	instanceType="c5n.18xlarge"
+	instanceCores=32
 	azs="a,b,d,e"
 	numInstances="4"
 	;;
@@ -103,6 +114,7 @@ aws.vmc5.multi-az)
 esac
 
 #instanceType="c4.large"
+#instanceCores=4
 
 expName=`${utilDir}/getSetting.sh expName ${platform} | awk '{print tolower($0)}'`
 region=`${utilDir}/getSetting.sh region ${platform}`
@@ -133,4 +145,5 @@ fi
 echo "Starting experiment '$profile' cloud resources."
 ${DIR}/launchInstances.py ${options}
 
-${DIR}/configureInstances.sh ${platform}
+${DIR}/configureInstances.sh ${platform} ${instanceCores}
+

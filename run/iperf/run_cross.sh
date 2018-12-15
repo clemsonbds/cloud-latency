@@ -1,7 +1,7 @@
 #!/bin/bash
 
 resultName=none
-hostfile="/nfs/instances"
+hostfile="/nfs/mpi.hosts"
 
 DIR="$(dirname "${BASH_SOURCE[0]}")"
 
@@ -16,6 +16,11 @@ case $key in
     shift # past argument
     shift # past value
     ;;
+--hosts)
+    hosts="$2"
+    shift
+    shift
+    ;;
 --hostfile)
     hostfile="$2"
     shift
@@ -29,11 +34,13 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
+[ ! -z "${hosts}" ] && hosts=`${utilDir}/hostfileToHosts.sh ${hostfile}`
+
 srcIndex=0
-for src in `cat ${hostfile}`; do
+for src in `echo ${hosts} | tr ',' ' '`; do
 
     dstIndex=0
-    for dst in `cat ${hostfile}`; do
+    for dst in `echo ${hosts} | tr ',' ' '`; do
         if [ "${dstIndex}" -gt "${srcIndex}" ]; then
             ${DIR}/run.sh --resultName "cross.${resultName}" --hosts "${src},${dst}" $@
         fi

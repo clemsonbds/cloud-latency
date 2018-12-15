@@ -4,7 +4,7 @@ utilDir=/nfs/repos/project/util
 
 resultDir=.
 resultName=none
-hostfile="/nfs/instances"
+hostfile="/nfs/mpi.hosts"
 groupClass=none
 
 POSITIONAL=()
@@ -61,19 +61,16 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-if [ -z "${hosts}" ]; then
-    hosts=`${utilDir}/hostfileToHosts.sh ${hostfile} 2`
-fi
-
+[ ! -z "${hosts}" ] && hosts=`${utilDir}/hostfileToHosts.sh ${hostfile}`
 nhosts=`echo ${hosts} | awk -F, '{ print NF; exit }'`
 
-mpiParams+="-np ${nhosts} --host ${hosts}"
-
-if [[ ! -z "${rankfile}" ]]; then
-    mpiParams+=" --rankfile ${rankfile}"
-fi
-
-mpiParams+=" --map-by node --mca plm_rsh_no_tree_spawn 1"
+# MPI run parameters
+mpiParams+=" -np ${nhosts}"
+mpiParams+=" --hostfile ${hostfile}"
+mpiParams+=" --hosts ${hosts}" # filter the hostfile
+mpiParams+=" --map-by node"
+mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
+[ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
 
 executable="/nfs/repos/benchmarks/intelmpi/IMB-MPI1"
 benchArgs=

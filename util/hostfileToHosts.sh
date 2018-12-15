@@ -12,10 +12,8 @@ num=$2
 
 #hosts=`echo ${hosts} | rev | cut -c 2- | rev` # trim trailing comma
 
-hosts=`cat ${hostfile} | xargs | tr ' ' ','`
+hosts=`cat ${hostfile} | awk '{print $1}' | xargs | tr ' ' ','`
 
-if [ ! -z "${num}" ]; then
-	hosts=`echo ${hosts} | cut -d, -f1-${num}`
-fi
+[ ! -z "${num}" ] && hosts=`echo ${hosts} | cut -d, -f1-${num}`
 
 echo ${hosts}

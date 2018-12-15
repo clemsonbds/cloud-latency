@@ -5,4 +5,4 @@
 #sudo yum install -y -q iperf3
 #sudo yum install -y -q gcc-c++ wget
 #
-#echo 'export PATH=$PATH:/usr/lib64/openmpi/bin' >> ~/.bashrc
+echo 'export PATH=$PATH:/usr/lib64/openmpi/bin' >> ~/.bashrc

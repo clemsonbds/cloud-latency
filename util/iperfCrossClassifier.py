@@ -132,6 +132,15 @@ def jenks(items, K, key, target_GVF, max_iter=10):
 
 	return classes
 
+def stupid(items, K, key):
+	if K>2:
+		sys.exit("no stupid, no time")
+
+	mx = max(items, key=lambda c: c[key])[key]
+	mn = min(items, key=lambda c: c[key])[key]
+	threshold = ((mx - mn)/2) + mn
+	return [[x for x in items if x[key] < threshold], [x for x in items if x[key] >= threshold]]
+
 def parse_samples(fn_list):
 	for fn in fn_list:
 		with open(fn) as f:
@@ -220,7 +229,8 @@ def main():
 		K = len(samples)
 
 #	clusters = kmeans(samples, K, 'bps')
-	clusters = jenks(samples, K, 'bps', 1)
+#	clusters = jenks(samples, K, 'bps', 1)
+	clusters = stupid(samples, K, 'bps')
 
 	# sort to match key order
 	clusters.sort(key=lambda c: mean(c, 'bps'), reverse=args['descending'])

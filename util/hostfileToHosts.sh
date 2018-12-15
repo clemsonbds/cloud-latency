@@ -1,6 +1,6 @@
 #!/bin/bash
 
-hostfile=${1:-"/nfs/instances"}
+hostfile=${1:-"/nfs/mpi.hosts"}
 num=$2
 
 #src=`sed -n 1p ${hostfile}`

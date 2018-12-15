@@ -6,6 +6,8 @@ import argparse
 import json
 import glob
 
+import networkx as nx
+
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -194,11 +196,11 @@ def main():
 
 	# sanity checking on input
 	if args['classes']:
-		classes = args['classes'].split(',')
-		K = len(classes)
+		class_names = args['classes'].split(',')
+		K = len(class_names)
 	else:
 		K = args['K']
-		classes = ['class'+str(i) for i in range(1, args['K']+1)]
+		class_names = ['class'+str(i) for i in range(1, args['K']+1)]
 
 	# get list of iperf samples in result directory
 	pattern = args['sample_dir'] + "/iperf"
@@ -214,53 +216,46 @@ def main():
 	samples = list(parse_samples(filenames))
 
 	if len(samples) < K:
-		print("Warning: ", len(samples), " provided, reducing K to match.")
+		print("Warning: ", len(samples), " samples provided, reducing K to match.")
 		K = len(samples)
 
-#	sample_clusters = kmeans(samples, K, 'bps')
-	sample_clusters = jenks(samples, K, 'bps', 1)
+#	clusters = kmeans(samples, K, 'bps')
+	clusters = jenks(samples, K, 'bps', 1)
 
 	# sort to match key order
-	sample_clusters.sort(key=lambda c: mean(c, 'bps'), reverse=args['descending'])
+	clusters.sort(key=lambda c: mean(c, 'bps'), reverse=args['descending'])
 
-	# detach host pairs from measured values
-	pair_clusters = [[s['pair'] for s in c] for c in sample_clusters]
+	# group classes with their names
+	classes = dict((name, {'cluster':cluster}) for name, cluster in [(class_names[i], clusters[i]) for i in range(K)])
 
-	# reduce hosts in each cluster to unique and fully connected within the cluster
-	host_clusters = [reduce_to_hosts(c) for c in pair_clusters]
+	# build graphs
+	for c in classes.values():
+		edges = [s['pair'] for s in c['cluster']]
+		nodes = [host for t in edges for host in t] # unpack
 
-	# hack, hosts only exist in one cluster, assume left-dominant
-	# and remove duplicates in classes to the right
-#	for i in range(len(host_clusters)-1):
-#		for host in host_clusters[i]:
-#			if host in host_clusters[i+1]:
-#				host_clusters[i+1].remove(host)
+		g = nx.Graph()
+		g.add_nodes_from(nodes)
+		g.add_edges_from(edges)
+		c['graph'] = g
+
+		# find maximal cliques in graphs
+		c['all_cliques'] = nx.algorithms.clique.enumerate_all_cliques(g)
+		c['max_clique'] = max(c['all_cliques'], key=len)
 
 	# write output
 	if args['verbose']:
-		print("Classified samples:")
-	
-		for i in range(len(host_clusters)):
-			print(classes[i], ":")
-
-			for sample in sample_clusters[i]:
-				print(sample)
-
-		print("\nFully connected hosts:")
-
-		for i in range(len(host_clusters)):
-			print(classes[i], " - ", host_clusters[i])
+		pp.pprint(classes)
 
 	elif not args['quiet']:
-		for i in range(len(host_clusters)):
-			print(','.join(host_clusters[i]))
+		for c in classes.values():
+			print(','.join(c['max_clique']))
 
 	if args['output_dir']:
-		for i in range(len(host_clusters)):
-			fn = classes[i]+".hosts"
+		for class_name in classes:
+			fn = '.'.join([class_name, "hosts"])
 
 			with open(args['output_dir']+'/'+fn, 'w') as f:
-				for host in host_clusters[i]:
+				for host in classes[class_name]['max_clique']:
 					f.write(host+'\n')
 
 if __name__ == "__main__":

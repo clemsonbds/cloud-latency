@@ -101,7 +101,7 @@ for exec in ${BIN_DIR}/*; do
     fi
 
     # special case for DT
-    elif [ "$test" == "dt" ]; then
+    if [ "$test" == "dt" ]; then
         procs=128
         benchParams="BH"
     fi

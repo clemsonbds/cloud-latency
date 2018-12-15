@@ -40,11 +40,12 @@ else
 	mpiDir="/usr/lib64/openmpi"
 fi
 
+${utilDir}/sshBastion.sh ${provider} "echo 'export PATH="'$PATH'":"${mpiDir}"/bin' > /nfs/resources/mpi_bin_bashrc"
+
 # point PATH at the right MPI directory
-echo 'export PATH=$PATH:${mpiDir}/bin' >> ~/.bashrc
+${utilDir}/sshBastion.sh ${provider} "cat /nfs/resources/mpi_bin_bashrc >> ~/.bashrc"
 
 # special Makefile for Intel MPI benchmarks
 ${utilDir}/sshBastion.sh ${provider} "cp ~/project/intelmpi/Makefile.${provider} /nfs/resources/Makefile.intelmpi"
-
 
 ${utilDir}/sshBastion.sh ${provider} "~/project/setup/bastion/prepareBenchmarks.sh"

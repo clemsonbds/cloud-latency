@@ -1,0 +1,5 @@
+
+# MPI location dependent on platform
+# use newer 2.1.1 from source, yum installs 1.7.x on Centos
+export PATH=/opt/ompi-2-1-1/bin:$PATH
+export LD_LIBRARY_PATH=/opt/ompi-2-1-1/lib:$LD_LIBRARY_PATH

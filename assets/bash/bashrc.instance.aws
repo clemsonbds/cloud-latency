@@ -1,0 +1,5 @@
+
+# MPI location dependent on platform
+# use the yum installed openmpi, 2.1.1 currently on AWS
+export PATH=/usr/lib64/openmpi/bin:$PATH
+export LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:$LD_LIBRARY_PATH

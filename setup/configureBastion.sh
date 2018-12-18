@@ -8,6 +8,9 @@ provider=${1:-"aws"}
 instanceKey="${DIR}/../assets/ssh/CloudLatencyExpInstance.private"
 sshConfig="${DIR}/../assets/ssh/config"
 
+# remove yum-installed openmpi
+${utilDir}/sshBastion.sh ${provider} "sudo yum remove -y openmpi"
+
 # upload the key and config file so bastion can ssh to instances
 echo -e "\nConfiguring SSH between bastion and instances."
 ${utilDir}/scpBastion.sh ${provider} ${instanceKey} .ssh/instanceKey.private

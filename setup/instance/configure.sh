@@ -7,4 +7,4 @@
 #
 
 #echo 'export PATH=$PATH:/usr/lib64/openmpi/bin' >> ~/.bashrc
-cat /nfs/resources/bashrc.instance >> ~/.bashrc
+cat "source /nfs/resources/bashrc.instance" >> ~/.bashrc

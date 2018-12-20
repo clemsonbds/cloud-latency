@@ -48,6 +48,10 @@ case ${key} in
     shift
     shift
     ;;
+--dryrun)
+    dryrun="T"
+    shift
+    ;;
 --trash)
     trash="T"
     shift
@@ -79,11 +83,17 @@ timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 outFile="${resultDir}/lammps.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
 
 echo Running LAMMPS benchmark.
-curDir=`pwd`
-cd /nfs/repos/benchmarks/lammps/micelle/
-mpirun ${mpiParams} ${executable} ${benchArgs} 1> ${outFile}
+command="mpirun ${mpiParams} ${executable} ${benchArgs} 1> ${outFile}"
 
-# throw away?
-[ -z "$trash" ] || rm -f ${outFile}
+if [ -z "$dryrun" ]; then
+    curDir=`pwd`
+    cd /nfs/repos/benchmarks/lammps/micelle/
+    ${command}
 
-cd ${curDir}
+    # throw away?
+    [ -z "$trash" ] || rm -f ${outFile}
+
+    cd ${curDir}
+else
+    echo ${command}
+fi

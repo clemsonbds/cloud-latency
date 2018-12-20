@@ -50,6 +50,10 @@ case $key in
     shift
     shift
     ;;
+--dryrun)
+    dryrun="T"
+    shift
+    ;;
 --trash)
     trash="T"
     shift
@@ -78,8 +82,13 @@ client=`echo ${hosts} | cut -d, -f2`
 clientParams="-c ${server} -t ${seconds} -J"
 
 echo Running iperf between ${server} and ${client}.
-ssh -q -f ${server} "sh -c 'nohup ${executable} ${serverParams} > /dev/null 2>&1 &'" # start in background and move on
-ssh -q ${client} "${executable} ${clientParams}" > ${outFile}
 
-# throw away?
-[ -z "$trash" ] || rm -f ${outFile}
+if [ -z "$dryrun" ]; then
+    ssh -q -f ${server} "sh -c 'nohup ${executable} ${serverParams} > /dev/null 2>&1 &'" # start in background and move on
+    ssh -q ${client} "${executable} ${clientParams}" > ${outFile}
+
+    # throw away?
+    [ -z "$trash" ] || rm -f ${outFile}
+else
+    echo "fix this someday"
+fi

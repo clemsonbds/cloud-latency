@@ -48,6 +48,10 @@ case ${key} in
     shift
     shift
     ;;
+--dryrun)
+    dryrun="T"
+    shift
+    ;;
 --trash)
     trash="T"
     shift
@@ -80,7 +84,13 @@ timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 outFile="${resultDir}/impi.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
 
 echo Running Intel-MPI benchmark.
-mpirun ${mpiParams} ${executable} ${benchArgs}  1> ${outFile}
+command="mpirun ${mpiParams} ${executable} ${benchArgs} 1> ${outFile}"
 
-# throw away?
-[ -z "$trash" ] || rm -f ${outFile}
+if [ -z "$dryrun" ]; then
+    ${command}
+
+    # throw away?
+    [ -z "$trash" ] || rm -f ${outFile}
+else
+    echo ${command}
+fi

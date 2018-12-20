@@ -108,7 +108,7 @@ for exec in ${BIN_DIR}/*; do
         benchParams="BH"
     fi
 
-    echo $test $size $procs
+    echo Running test $test, size = $size, NP = $procs
 
     outFile="${resultDir}/npb-${test}-${size}.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
 #    touch ${outFile} # avoid 'file not found'
@@ -120,10 +120,10 @@ for exec in ${BIN_DIR}/*; do
 
     if [ -z "$dryrun" ]; then
         ${command}
+
+        # throw away?
+        [ -z "$trash" ] || rm -f ${outFile}
     else
         echo ${command}
     fi
-
-    # throw away?
-    [ -z "$trash" ] || rm -f ${outFile}
 done

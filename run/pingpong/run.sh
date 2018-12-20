@@ -66,6 +66,10 @@ case $key in
     shift
     shift
     ;;
+--dryrun)
+    dryrun="T"
+    shift
+    ;;
 --trash)
     trash="T"
     shift
@@ -105,7 +109,13 @@ timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 outFile="${resultDir}/pingpong.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
 
 echo Running pingpong between ${src} and ${dst}.
-mpirun ${mpiParams} ${executable} ${ppArgs} 1> ${outFile}
+command="mpirun ${mpiParams} ${executable} ${ppArgs} 1> ${outFile}"
 
-# throw away?
-[ -z "$trash" ] || rm -f ${outFile}
+if [ -z "$dryrun" ]; then
+    ${command}
+
+    # throw away?
+    [ -z "$trash" ] || rm -f ${outFile}
+else
+    echo ${command}
+fi

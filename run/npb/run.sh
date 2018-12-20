@@ -48,6 +48,10 @@ case $key in
     shift
     shift
     ;;
+--dryrun)
+    dryrun="T"
+    shift
+    ;;
 --trash)
     trash="T"
     shift
@@ -112,7 +116,13 @@ for exec in ${BIN_DIR}/*; do
 #    while [ `grep "Time in seconds" ${outfile} | wc -l` -lt ${iters} ]; do
     # for iter in `seq 1 ${iters}`; do
 #        echo "mpirun --np ${procs} ${mpiParams} ${BIN_DIR}/${exec} ${benchParams} > ${outFile}"
-        timeout 300 mpirun --np ${procs} ${mpiParams} ${BIN_DIR}/${exec} ${benchParams} > ${outFile}
+    command="timeout 300 mpirun --np ${procs} ${mpiParams} ${BIN_DIR}/${exec} ${benchParams} > ${outFile}"
+
+    if [ -z "$dryrun" ]; then
+        ${command}
+    else
+        echo ${command}
+    fi
 
     # throw away?
     [ -z "$trash" ] || rm -f ${outFile}

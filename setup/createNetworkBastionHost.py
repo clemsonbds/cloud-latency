@@ -68,8 +68,12 @@ def main():
 
             client = None
             try:
-                session = botocore.session.Session(profile=args['profile'])
-                client = session.create_client("ec2", region_name=region)
+                try:
+                    session = botocore.session.Session(profile=args['profile'])
+                    client = session.create_client("ec2", region_name=region)
+                except Exception:
+                    session = botocore.session.Session()
+                    client = session.create_client("ec2", region_name=region)
             except Exception as e:
                 if "NoCredentialsError: Unable to locate credentials" in ''.join(traceback.format_exc()):
                     print("Unable to create a botocore session to AWS. Please ensure that you have your credentials located in the ~/.aws/credentials file. If you do not already have this file you can create one yourself, the format is as follows:\n[default]\naws_access_key_id = YOUR_ACCESS_KEY\naws_secret_access_key = YOUR_SECRET_KEY")
@@ -215,8 +219,12 @@ def main():
                     sys.exit(0)
 
                 try:
-                    session = botocore.session.Session(profile=args['profile'])
-                    client = session.create_client("ec2", region_name=args['region'])
+                    try:
+                        session = botocore.session.Session(profile=args['profile'])
+                        client = session.create_client("ec2", region_name=region)
+                    except Exception:
+                        session = botocore.session.Session()
+                        client = session.create_client("ec2", region_name=region)
                 except Exception as e:
                     print("Unable to create a botocore session to AWS. Please ensure that you have your credentials located in the ~/.aws/credentials file. If you do not already have this file you can create one yourself, the format is as follows:\n[default]\naws_access_key_id = YOUR_ACCESS_KEY\naws_secret_access_key = YOUR_SECRET_KEY")
                     sys.exit(0)

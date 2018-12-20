@@ -6,6 +6,7 @@ resultDir=`pwd`
 resultName=none
 hostfile="/nfs/mpi.hosts"
 groupClass=none
+nodeClasses=none
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
@@ -79,7 +80,7 @@ mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
 [ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
 
 # output file name pieces
-nodeClasses=`${utilDir}/classifyNodes.sh ${hosts} ${nodeClassifier}`
+[ ! -z "${nodeClassifier}" ] && nodeClasses=`${utilDir}/classifyNodes.sh ${hosts} ${nodeClassifier}`
 timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 
 echo Running NPB benchmark.

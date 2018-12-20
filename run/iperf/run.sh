@@ -7,6 +7,7 @@ resultName=none
 seconds=10
 hostfile="/nfs/mpi.hosts"
 groupClass=none
+nodeClasses=none
 msgBytes=1
 
 POSITIONAL=()
@@ -71,7 +72,7 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 executable="iperf3"
 
-nodeClasses=`${utilDir}/classifyNodes.sh ${hosts} ${nodeClassifier}`
+[ ! -z "${nodeClassifier}" ] && nodeClasses=`${utilDir}/classifyNodes.sh ${hosts} ${nodeClassifier}`
 timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 outFile="${resultDir}/iperf.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.json"
 

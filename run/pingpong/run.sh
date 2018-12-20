@@ -4,6 +4,7 @@ utilDir=/nfs/repos/project/util
 
 hostfile="/nfs/mpi.hosts"
 groupClass=none
+nodeClasses=none
 resultDir=.
 resultName=none
 iters=20
@@ -104,7 +105,7 @@ else
 fi
 
 # name the output file
-nodeClasses=`${utilDir}/classifyNodes.sh ${hosts} ${nodeClassifier}`
+[ ! -z "${nodeClassifier}" ] && nodeClasses=`${utilDir}/classifyNodes.sh ${hosts} ${nodeClassifier}`
 timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 outFile="${resultDir}/pingpong.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
 

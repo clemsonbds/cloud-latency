@@ -6,6 +6,7 @@ resultDir=.
 resultName=none
 hostfile="/nfs/mpi.hosts"
 groupClass=none
+nodeClasses=none
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]

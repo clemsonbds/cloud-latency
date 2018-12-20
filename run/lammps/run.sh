@@ -6,6 +6,7 @@ resultDir=`pwd`
 resultName=none
 hostfile="/nfs/mpi.hosts"
 groupClass=none
+nodeClasses=none
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
@@ -78,7 +79,7 @@ mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
 executable="/nfs/repos/benchmarks/lammps/micelle/lmp_mpi"
 benchArgs="-in /nfs/repos/benchmarks/lammps/micelle/in.micelle"
 
-nodeClasses=`${utilDir}/classifyNodes.sh ${hosts} ${nodeClassifier}`
+[ ! -z "${nodeClassifier}" ] && nodeClasses=`${utilDir}/classifyNodes.sh ${hosts} ${nodeClassifier}`
 timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 outFile="${resultDir}/lammps.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
 

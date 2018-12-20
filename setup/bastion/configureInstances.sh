@@ -26,8 +26,8 @@ wait
 # force all instances to mount NFS
 echo -e "\nMounting NFS share on instances."
 for instanceIP in `cat /nfs/instances`; do
-#	ssh -q ${instanceIP} "sudo mkdir -p /nfs"
-#	ssh -q ${instanceIP} "sudo chmod 777 /nfs"
+	ssh -q ${instanceIP} "sudo mkdir -p /nfs"
+	ssh -q ${instanceIP} "sudo chmod 777 /nfs"
 #	ssh -q ${instanceIP} "sudo firewall-cmd --permanent --zone=public --add-service=nfs"
 #	ssh -q ${instanceIP} "sudo firewall-cmd --permanent --zone=public --add-service=mountd"
 #	ssh -q ${instanceIP} "sudo firewall-cmd --permanent --zone=public --add-service=rpc-bind"

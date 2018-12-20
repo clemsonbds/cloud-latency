@@ -66,7 +66,7 @@ for instanceType in ${instanceTypes}; do
 
 				if [ "${nhosts}" -ge "${groupReqHosts}" ]; then
 					echo "Found the required ${nhosts} in class ${class}."
-					runParams+=" --groupClass ${class} --hosts ${hosts}"
+					runParams+=" --groupClass ${class} --host ${hosts}"
 					foundClass=1
 					break
 				fi

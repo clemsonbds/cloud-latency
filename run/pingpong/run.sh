@@ -84,12 +84,12 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-[ ! -z "${hosts}" ] && hosts=`${utilDir}/hostfileToHosts.sh ${hostfile} 2`
+[ -z "${hosts}" ] && hosts=`${utilDir}/hostfileToHosts.sh ${hostfile} 2`
 
 # MPI run parameters
 mpiParams+=" -np 2"
 mpiParams+=" --hostfile ${hostfile}"
-mpiParams+=" --host ${hosts}" # filter the hostfile
+mpiParams+=" --hosts ${hosts}" # filter the hostfile
 mpiParams+=" --map-by node"
 [ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
 

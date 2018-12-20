@@ -68,7 +68,7 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-[ ! -z "${hosts}" ] && hosts=`${utilDir}/hostfileToHosts.sh ${hostfile} 2`
+[ -z "${hosts}" ] && hosts=`${utilDir}/hostfileToHosts.sh ${hostfile} 2`
 
 executable="iperf3"
 

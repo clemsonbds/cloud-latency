@@ -66,13 +66,13 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-[ ! -z "${hosts}" ] && hosts=`${utilDir}/hostfileToHosts.sh ${hostfile}`
+[ -z "${hosts}" ] && hosts=`${utilDir}/hostfileToHosts.sh ${hostfile}`
 nhosts=`echo ${hosts} | awk -F, '{ print NF; exit }'`
 
 # MPI run parameters
 mpiParams+=" -np ${nhosts}"
 mpiParams+=" --hostfile ${hostfile}"
-mpiParams+=" --host ${hosts}" # filter the hostfile
+mpiParams+=" --hosts ${hosts}" # filter the hostfile
 mpiParams+=" --map-by node"
 mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
 [ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
@@ -80,7 +80,7 @@ mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
 executable="/nfs/repos/benchmarks/intelmpi/IMB-MPI1"
 benchArgs=
 
-nodeClasses=`${utilDir}/classifyNodes.sh ${hosts} ${nodeClassifier}`
+[ ! -z "${nodeClassifier}" ] && nodeClasses=`${utilDir}/classifyNodes.sh ${hosts} ${nodeClassifier}`
 timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 outFile="${resultDir}/impi.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
 

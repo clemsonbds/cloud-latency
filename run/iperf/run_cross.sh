@@ -34,7 +34,7 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
-[ ! -z "${hosts}" ] && hosts=`${utilDir}/hostfileToHosts.sh ${hostfile}`
+[ -z "${hosts}" ] && hosts=`${utilDir}/hostfileToHosts.sh ${hostfile}`
 
 srcIndex=0
 for src in `echo ${hosts} | tr ',' ' '`; do

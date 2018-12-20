@@ -164,7 +164,7 @@ def main():
                 # Amazon Linux 2 AMI in N. Virginia
                 # Non preconfigured image
                 # imageId = "ami-b70554c8"
-                imageId = "ami-0b7ddf0a5d96aa736"
+                imageId = "ami-04d70f898dc85844f"
             else:
                 imageId = args['imageId']
 
@@ -229,7 +229,7 @@ def main():
             if args['imageId'] is None:
                 # Image to use for launching the instances to benchmark CentOS 7
                 # imageId = "projects/centos-cloud/global/images/centos-7-v20180815"
-                imageId = "projects/gcp-performance/global/images/latency-experiment-image"
+                imageId = "projects/gcp-performance/global/images/latency-experiment-take-2"
             else:
                 imageId = args['imageId']
 

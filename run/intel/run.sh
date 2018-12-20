@@ -72,7 +72,7 @@ nhosts=`echo ${hosts} | awk -F, '{ print NF; exit }'`
 # MPI run parameters
 mpiParams+=" -np ${nhosts}"
 mpiParams+=" --hostfile ${hostfile}"
-mpiParams+=" --hosts ${hosts}" # filter the hostfile
+mpiParams+=" --host ${hosts}" # filter the hostfile
 mpiParams+=" --map-by node"
 mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
 [ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"

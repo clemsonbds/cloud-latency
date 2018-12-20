@@ -89,7 +89,7 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 # MPI run parameters
 mpiParams+=" -np 2"
 mpiParams+=" --hostfile ${hostfile}"
-mpiParams+=" --hosts ${hosts}" # filter the hostfile
+mpiParams+=" --host ${hosts}" # filter the hostfile
 mpiParams+=" --map-by node"
 [ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
 

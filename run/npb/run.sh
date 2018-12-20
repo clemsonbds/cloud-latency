@@ -74,7 +74,7 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 # MPI run parameters
 mpiParams+=" --hostfile ${hostfile}"
-mpiParams+=" --hosts ${hosts}" # filter the hostfile
+mpiParams+=" --host ${hosts}" # filter the hostfile
 mpiParams+=" --map-by node"
 mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
 [ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"

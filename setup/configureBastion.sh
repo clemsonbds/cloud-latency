@@ -26,7 +26,7 @@ ${utilDir}/sshBastion.sh ${provider} "sudo mkdir -p /nfs"
 ${utilDir}/sshBastion.sh ${provider} "sudo chmod 777 /nfs"
 ${utilDir}/sshBastion.sh ${provider} "git clone ${repo} /nfs/repos/project"
 ${utilDir}/sshBastion.sh ${provider} "ln -s /nfs/repos/project ~/project"
-${utilDir}/sshBastion.sh ${provider} "sudo mkdir -p /nfs/resources"
+${utilDir}/sshBastion.sh ${provider} "mkdir -p /nfs/resources"
 
 # platform-specific files for instances
 ${utilDir}/sshBastion.sh ${provider} "cp ~/project/assets/bash/bashrc.instance.${provider} /nfs/resources/bashrc.instance"

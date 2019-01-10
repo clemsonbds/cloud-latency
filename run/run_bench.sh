@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DIR="$(dirname "${BASH_SOURCE[0]}")"
+utilDir=${DIR}/../util
 setupDir=${DIR}/../setup
 
 bastionUtilDir="/nfs/repos/project/util"

@@ -24,13 +24,11 @@ try:
         response = subprocess.check_output(['aws', 'ec2', '--region', str(region), 'describe-instances', '--filters', 'Name=tag:Name,Values=' + str(expName)+'-Instance ', 'Name=instance-state-name,Values=running', "--output", "json"], stderr=subprocess.STDOUT)
         temp = json.loads(response)
 
-        for instance in temp['Reservations'][0]['Instances']:
-            print(instance['PrivateIpAddress'])
-
-    else:
-        usage()
+        if len(temp['Reservations']) > 0:
+            for instance in temp['Reservations'][0]['Instances']:
+                print(instance['PrivateIpAddress'])
 
 except subprocess.CalledProcessError as e:
-    print(''.join(traceback.format_exc()))
-    print(e.output)
+    print(''.join(traceback.format_exc()), file=sys.stderr)
+    print(e.output, file=sys.stderr)
     sys.exit(0)

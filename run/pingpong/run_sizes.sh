@@ -36,7 +36,7 @@ currentBytes=1
 echo Running pingpong message sizes measurement from bytes ${currentBytes} to ${maxBytes}.
 
 while [ "${currentBytes}" -le "${maxBytes}" ]; do
-	${benchDir}/pingpong/run.sh --resultName "byte-${currentBytes}.${resultName}.${nodeClass}.${groupClass}" --msgBytes "${currentBytes}" $@
+	${benchDir}/pingpong/run.sh --resultName "byte-${currentBytes}.${resultName}" --msgBytes "${currentBytes}" $@
 	currentBytes=$((currentBytes * 2))
 done
 

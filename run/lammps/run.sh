@@ -98,3 +98,5 @@ if [ -z "$dryrun" ]; then
 else
     echo ${command}
 fi
+
+echo ""

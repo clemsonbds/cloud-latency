@@ -109,7 +109,7 @@ fi
 timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 outFile="${resultDir}/pingpong.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
 
-echo Running pingpong between ${src} and ${dst}.
+echo Running pingpong between ${hosts}
 command="mpirun ${mpiParams} ${executable} ${ppArgs} 1> ${outFile}"
 
 if [ -z "$dryrun" ]; then

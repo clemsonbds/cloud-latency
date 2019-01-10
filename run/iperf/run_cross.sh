@@ -36,6 +36,8 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 [ -z "${hosts}" ] && hosts=`${utilDir}/hostfileToHosts.sh ${hostfile}`
 
+echo Running iperf cross measurement between hosts ${hosts}
+
 srcIndex=0
 for src in `echo ${hosts} | tr ',' ' '`; do
 
@@ -50,3 +52,5 @@ for src in `echo ${hosts} | tr ',' ' '`; do
 
     srcIndex=$((srcIndex+1))
 done
+
+echo ""

@@ -128,3 +128,5 @@ for exec in ${BIN_DIR}/*; do
         echo ${command}
     fi
 done
+
+echo ""

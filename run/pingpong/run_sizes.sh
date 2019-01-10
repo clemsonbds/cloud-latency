@@ -31,7 +31,11 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 currentBytes=1
 
+echo Running pingpong message sizes measurement from bytes ${currentBytes} to ${maxBytes}.
+
 while [ "${currentBytes}" -le "${maxBytes}" ]; do
 	${DIR}/run.sh --resultName "byte-${currentBytes}.${resultName}.${nodeClass}.${groupClass}" --msgBytes "${currentBytes}" $@
 	currentBytes=$((currentBytes * 2))
 done
+
+echo ""

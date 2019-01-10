@@ -51,7 +51,7 @@ gcp)
 	shift
 	;;
 --instanceTypes)
-	groupTypes=`echo "$2" | tr ',' ' '`
+	instanceTypes=`echo "$2" | tr ',' ' '`
 	shift
 	shift
 	;;

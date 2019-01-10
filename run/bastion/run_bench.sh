@@ -57,7 +57,7 @@ fi
 
 mkdir -p ${resultDir}
 
-if [ "${expType}" -eq "warmup" ]; then
+if [ "${expType}" == "warmup" ]; then
 	${benchDir}/npb/run.sh --ep_only --trash $@
 	exit
 fi

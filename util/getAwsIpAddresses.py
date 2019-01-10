@@ -7,6 +7,8 @@ import logging
 import subprocess
 import traceback
 
+from __future__ import print_function
+
 region = sys.argv[1]
 expName = sys.argv[2]
 nodeType = sys.argv[3]

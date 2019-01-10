@@ -145,12 +145,12 @@ for instanceType in ${instanceTypes}; do
 		for j in `seq 1 ${numItersPerProvision}`; do
 			echo Starting iteration ${i}-${j}.
 
-			if [ -z "{skip_micro}" ]; then
+			if [ -z "${skip_micro}" ]; then
 				echo Running micro measurements.
 				${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_micro.sh --expType ${expType} ${runParams} $@"
 			fi
 
-			if [ -z "{skip_bench}" ]; then
+			if [ -z "${skip_bench}" ]; then
 				echo Running benchmarks.
 				${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_bench.sh --expType ${expType} ${runParams} $@"
 			fi

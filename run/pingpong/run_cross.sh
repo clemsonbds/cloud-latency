@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DIR="$(dirname "${BASH_SOURCE[0]}")"
-utilDir=${DIR}/../../util
+baseDir=/nfs/repos/project
+utilDir=${baseDir}/util
 
 resultName=none
 hostfile="/nfs/mpi.hosts"

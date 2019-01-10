@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DIR="$(dirname "${BASH_SOURCE[0]}")"
-benchDir=${DIR}/..
+baseDir=/nfs/repos/project
+benchDir=${baseDir}/run
 
 resultDir=/nfs/results/bench
 

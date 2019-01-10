@@ -82,11 +82,11 @@ for instanceType in ${instanceTypes}; do
 
 		echo -e "\nRunning benchmarks for experiment configuration '${expType}'.\n"
 
+		echo Running warmup.
+		${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_bench.sh --expType warmup ${runParams} $@"
+
 		for j in `seq 1 ${numItersPerProvision}`; do
 			echo Starting iteration ${i}-${j}.
-
-			echo Running warmup.
-			${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_bench.sh --expType warmup ${runParams} $@"
 
 			echo Running micro measurements.
 			${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_micro.sh --expType ${expType} ${runParams} $@"

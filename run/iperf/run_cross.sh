@@ -2,6 +2,7 @@
 
 baseDir=/nfs/repos/project
 utilDir=${baseDir}/util
+benchDir=${baseDir}/run
 
 resultName=none
 hostfile="/nfs/mpi.hosts"
@@ -45,7 +46,7 @@ for src in `echo ${hosts} | tr ',' ' '`; do
     dstIndex=0
     for dst in `echo ${hosts} | tr ',' ' '`; do
         if [ "${dstIndex}" -gt "${srcIndex}" ]; then
-            ${DIR}/run.sh --resultName "cross.${resultName}" --hosts "${src},${dst}" $@
+            ${benchDir}/iperf/run.sh --resultName "cross.${resultName}" --hosts "${src},${dst}" $@
         fi
 
         dstIndex=$((dstIndex+1))

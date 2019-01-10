@@ -2,6 +2,7 @@
 
 baseDir=/nfs/repos/project
 utilDir=${baseDir}/util
+benchDir=${baseDir}/run
 
 resultName=none
 maxBytes=1024
@@ -35,7 +36,7 @@ currentBytes=1
 echo Running pingpong message sizes measurement from bytes ${currentBytes} to ${maxBytes}.
 
 while [ "${currentBytes}" -le "${maxBytes}" ]; do
-	${DIR}/run.sh --resultName "byte-${currentBytes}.${resultName}.${nodeClass}.${groupClass}" --msgBytes "${currentBytes}" $@
+	${benchDir}/pingpong/run.sh --resultName "byte-${currentBytes}.${resultName}.${nodeClass}.${groupClass}" --msgBytes "${currentBytes}" $@
 	currentBytes=$((currentBytes * 2))
 done
 

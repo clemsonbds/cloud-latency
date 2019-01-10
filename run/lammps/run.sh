@@ -89,7 +89,7 @@ command="mpirun ${mpiParams} ${executable} ${benchArgs} 1> ${outFile}"
 if [ -z "$dryrun" ]; then
     curDir=`pwd`
     cd /nfs/repos/benchmarks/lammps/micelle/
-    ${command}
+    eval ${command}
 
     # throw away?
     [ -z "$trash" ] || rm -f ${outFile}

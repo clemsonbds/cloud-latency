@@ -113,7 +113,7 @@ echo Running pingpong between ${src} and ${dst}.
 command="mpirun ${mpiParams} ${executable} ${ppArgs} 1> ${outFile}"
 
 if [ -z "$dryrun" ]; then
-    ${command}
+    eval ${command}
 
     # throw away?
     [ -z "$trash" ] || rm -f ${outFile}

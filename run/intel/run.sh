@@ -88,7 +88,7 @@ echo Running Intel-MPI benchmark.
 command="mpirun ${mpiParams} ${executable} ${benchArgs} 1> ${outFile}"
 
 if [ -z "$dryrun" ]; then
-    ${command}
+    eval ${command}
 
     # throw away?
     [ -z "$trash" ] || rm -f ${outFile}

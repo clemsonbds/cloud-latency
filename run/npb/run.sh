@@ -120,7 +120,7 @@ for exec in ${BIN_DIR}/*; do
     command="timeout 300 mpirun --np ${procs} ${mpiParams} ${BIN_DIR}/${exec} ${benchParams} > ${outFile}"
 
     if [ -z "$dryrun" ]; then
-        ${command}
+        eval ${command}
 
         # throw away?
         [ -z "$trash" ] || rm -f ${outFile}

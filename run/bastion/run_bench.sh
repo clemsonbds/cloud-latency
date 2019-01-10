@@ -11,6 +11,14 @@ do
 key="$1"
 
 case $key in
+"warmup"| \
+"gcp.vm.single-az"|"gcp.vm.multi-az"| \
+"aws.metal.cluster"|"aws.vm.cluster"|"aws.vmc5.cluster"| \
+"aws.metal.spread"|"aws.vm.spread"|"aws.vmc5.spread"| \
+"aws.metal.multi-az"|"aws.vm.multi-az"|"aws.vmc5.multi-az")
+	expType="$1"
+	shift
+	;;
 --resultDir)
     resultDir="$2"
     shift # past argument
@@ -21,7 +29,20 @@ case $key in
 	shift
 	shift
 	;;
-*)    # unknown option
+--skip_npb)
+	skip_npb=1
+	shift
+	;;
+--skip_lammps)
+	skip_lammps=1
+	shift
+	;;
+*)
+	if [ -z "${expType}" ]; then
+		echo "Unknown experiment type $1."
+		exit
+	fi
+
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
     ;;
@@ -30,62 +51,16 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 if [ -z "${expType}" ]; then
-	echo "usage: $0 <experiment type>"
+	echo "usage: $0 <experiment type> [kwargs]"
 	exit
 fi
 
 mkdir -p ${resultDir}
 
-case $expType in
-warmup)
-	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} --ep_only --trash $@
-	;;
-gcp.vm.single-az)
-	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	;;
-gcp.vm.multi-az)
-	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	;;
-aws.metal.cluster)
-	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	;;
-aws.vm.cluster)
-	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	;;
-aws.vmc5.cluster)
-	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	;;
-aws.metal.spread)
-	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	;;
-aws.vm.spread)
-	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	;;
-aws.vmc5.spread)
-	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	;;
-aws.metal.multi-az)
-	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	;;
-aws.vm.multi-az)
-	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	;;
-aws.vmc5.multi-az)
-	${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-	;;
-*) # unknown
-	echo "Unknown experiment type '${expType}'."
+if [ "${expType}" -eq "warmup" ]; then
+	${benchDir}/npb/run.sh --ep_only --trash $@
 	exit
-	;;
-esac
+fi
+
+[ -z "${skip_npb}" ]    && ${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
+[ -z "${skip_lammps}" ] && ${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@

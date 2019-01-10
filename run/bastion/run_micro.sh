@@ -26,6 +26,18 @@ case $key in
 	shift
 	shift
 	;;
+--skip_pingpong)
+	skip_pingpong=1
+	shift
+	;;
+--skip_iperf)
+	skip_iperf=1
+	shift
+	;;
+--skip_intel)
+	skip_intel=1
+	shift
+	;;
 *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
@@ -49,62 +61,62 @@ fi
 
 case $expType in
 gcp.vm.single-az)
-	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
-	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
-	${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
+	[ -z "${skip_pingpong}" ] && ${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
+	[ -z "${skip_iperf}" ]    && ${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
+	[ -z "${skip_intel}" ]    && ${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
 	;;
 gcp.vm.multi-az)
-	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
-	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
-	${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
+	[ -z "${skip_pingpong}" ] && ${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
+	[ -z "${skip_iperf}" ]    && ${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
+	[ -z "${skip_intel}" ]    && ${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
 	;;
 aws.metal.cluster)
-	${benchDir}/pingpong/run_sizes.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} --maxBytes ${pingpongMaxBytes} $@
-	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
-	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
-	${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
+	[ -z "${skip_pingpong}" ] && ${benchDir}/pingpong/run_sizes.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} --maxBytes ${pingpongMaxBytes} $@
+	[ -z "${skip_pingpong}" ] && ${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
+	[ -z "${skip_iperf}" ]    && ${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
+	[ -z "${skip_intel}" ]    && ${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
 	;;
 aws.vm.cluster)
-	${benchDir}/pingpong/run_sizes.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} --maxBytes ${pingpongMaxBytes} $@
-	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
-	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
-	${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
+	[ -z "${skip_pingpong}" ] && ${benchDir}/pingpong/run_sizes.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} --maxBytes ${pingpongMaxBytes} $@
+	[ -z "${skip_pingpong}" ] && ${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
+	[ -z "${skip_iperf}" ]    && ${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
+	[ -z "${skip_intel}" ]    && ${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
 	;;
 aws.vmc5.cluster)
-	${benchDir}/pingpong/run_sizes.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} --maxBytes ${pingpongMaxBytes} $@
-	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
-	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
-	${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
+	[ -z "${skip_pingpong}" ] && ${benchDir}/pingpong/run_sizes.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} --maxBytes ${pingpongMaxBytes} $@
+	[ -z "${skip_pingpong}" ] && ${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
+	[ -z "${skip_iperf}" ]    && ${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
+	[ -z "${skip_intel}" ]    && ${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
 	;;
 aws.metal.spread)
-	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
-	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
-	${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
+	[ -z "${skip_pingpong}" ] && ${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
+	[ -z "${skip_iperf}" ]    && ${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
+	[ -z "${skip_intel}" ]    && ${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
 	;;
 aws.vm.spread)
-	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
-	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
-	${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
+	[ -z "${skip_pingpong}" ] && ${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
+	[ -z "${skip_iperf}" ]    && ${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
+	[ -z "${skip_intel}" ]    && ${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
 	;;
 aws.vmc5.spread)
-	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
-	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
-	${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
+	[ -z "${skip_pingpong}" ] && ${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
+	[ -z "${skip_iperf}" ]    && ${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
+	[ -z "${skip_intel}" ]    && ${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
 	;;
 aws.metal.multi-az)
-	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
-	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
-	${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
+	[ -z "${skip_pingpong}" ] && ${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
+	[ -z "${skip_iperf}" ]    && ${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
+	[ -z "${skip_intel}" ]    && ${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
 	;;
 aws.vm.multi-az)
-	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
-	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
-	${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
+	[ -z "${skip_pingpong}" ] && ${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
+	[ -z "${skip_iperf}" ]    && ${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
+	[ -z "${skip_intel}" ]    && ${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
 	;;
 aws.vmc5.multi-az)
-	${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
-	${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
-	${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
+	[ -z "${skip_pingpong}" ] && ${benchDir}/pingpong/run_cross.sh --resultName ${expType} --resultDir ${resultDir} ${pingpongDuration} $@
+	[ -z "${skip_iperf}" ]    && ${benchDir}/iperf/run_cross.sh --resultName ${expType} --resultDir ${resultDir} --seconds ${iperfSeconds} $@
+	[ -z "${skip_intel}" ]    && ${benchDir}/intel/run.sh ${expType} --resultName ${expType} --resultDir ${resultDir} $@
 	;;
 *) # unknown
 	echo "Unknown experiment type '${expType}'."

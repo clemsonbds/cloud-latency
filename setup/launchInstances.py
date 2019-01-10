@@ -545,10 +545,15 @@ def launchInstancesGcp(service, imageId, instanceType, numInstances, experimentT
 
 
 def deleteInstancesAws(client, name):
+    filename = os.path.join(thisDir, "instancesCreated-" + str(name) + ".json")
+
+    if not os.path.isfile(filename):
+        return {"status": "success", "message": "No instances to delete.", "payload": None}
+
     resourcesToDelete = None
 
     # Load the resources to delete from the file written out by the create function
-    with open(thisDir + "/instancesCreated-" + str(name) + ".json") as outputFile:
+    with open(filename) as outputFile:
         resourcesToDelete = json.load(outputFile)
 
     # Delete the Bastion Host
@@ -578,11 +583,16 @@ def deleteInstancesAws(client, name):
 
 
 def deleteInstancesGcp(service, name, projectId, region):
+    filename = os.path.join(thisDir, "instancesCreated-" + str(name) + ".json")
+
+    if not os.path.isfile(filename):
+        return {"status": "success", "message": "No instances to delete.", "payload": None}
+
     resourcesToDelete = None
     listOfOperationsToWaitFor = {}
 
     # Load the resources to delete from the file written out by the create function
-    with open(thisDir + "/instancesCreated-" + str(name) + ".json") as outputFile:
+    with open(filename) as outputFile:
         resourcesToDelete = json.load(outputFile)
 
     try:
@@ -693,8 +703,10 @@ def waitForOperationToComplete(service, projectId, operation, zone=None, region=
 
 
 def loadNetworkResources(name):
+    filename = os.path.join(thisDir, "networkResourcesCreated-" + str(name) + ".json")
+
     try:
-        with open(thisDir + "/networkResourcesCreated-" + str(name) + ".json") as outputFile:
+        with open(filename) as outputFile:
             networkResourcesCreated = json.load(outputFile)
             return {"status": "success", "message": "Successfully loaded the network resources", "payload": networkResourcesCreated}
     except Exception:
@@ -702,8 +714,10 @@ def loadNetworkResources(name):
 
 
 def dumpResourcesCreatedToFile(instancesCreated, name):
+    filename = os.path.join(thisDir, "instancesCreated-" + str(name) + ".json")
+
     try:
-        with open(thisDir + "/instancesCreated-" + str(name) + ".json", "w") as outputFile:
+        with open(filename, "w") as outputFile:
             json.dump(instancesCreated, outputFile, sort_keys=True, indent=4, separators=(',', ': '))
     except Exception:
         return {"status": "error", "message": "Unable to save the instances created for the experiment: " + str(name), "payload": None}

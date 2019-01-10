@@ -1,6 +1,7 @@
 #!/bin/bash
 
-utilDir=/nfs/repos/project/util
+DIR="$(dirname "${BASH_SOURCE[0]}")"
+utilDir=${DIR}/../../util
 
 hostfile="/nfs/mpi.hosts"
 groupClass=none

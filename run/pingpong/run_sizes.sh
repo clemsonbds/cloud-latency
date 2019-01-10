@@ -1,9 +1,10 @@
 #!/bin/bash
 
+DIR="$(dirname "${BASH_SOURCE[0]}")"
+utilDir=${DIR}/../../util
+
 resultName=none
 maxBytes=1024
-
-DIR="$(dirname "${BASH_SOURCE[0]}")"
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]

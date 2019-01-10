@@ -1,8 +1,9 @@
 #!/bin/bash
 
-utilDir=/nfs/repos/project/util
+DIR="$(dirname "${BASH_SOURCE[0]}")"
+utilDir=${DIR}/../../util
 
-resultDir=`pwd`
+resultDir=.
 resultName=none
 hostfile="/nfs/mpi.hosts"
 groupClass=none

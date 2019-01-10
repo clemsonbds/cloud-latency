@@ -1,15 +1,13 @@
 #!/bin/bash
 
 DIR="$(dirname "${BASH_SOURCE[0]}")"
-
 setupDir=${DIR}/../setup
-utilDir=${DIR}/../util
+
 bastionUtilDir="/nfs/repos/project/util"
 nodeClassifier="/nfs/resources/getCpuIdentity.sh"
 hostfile="/nfs/mpi.hosts"
 numItersPerSet=1
 numItersPerProvision=1
-
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]

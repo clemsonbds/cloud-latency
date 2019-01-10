@@ -1,9 +1,10 @@
 #!/bin/bash
 
+DIR="$(dirname "${BASH_SOURCE[0]}")"
+utilDir=${DIR}/../../util
+
 resultName=none
 hostfile="/nfs/mpi.hosts"
-
-DIR="$(dirname "${BASH_SOURCE[0]}")"
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]

@@ -132,10 +132,10 @@ def cluster_by_jenks(items, K, key, target_GVF, max_iter=10):
 
 	return classes
 
-def cluster_by_closest(samples, class_seeds, key):
+def cluster_by_closest(items, class_seeds, key):
 	clusters = [[]]*len(class_seeds)
 
-	for s in samples:
+	for s in items:
 		differences = [abs(seed - s) for seed in class_seeds]
 		min_index = min(xrange(len(class_seeds)), key=differences.__getitem__) # https://stackoverflow.com/a/11825864/3808882
 		clusters[min_index].append(s)
@@ -234,7 +234,7 @@ def main():
 		sys.exit("Error: %d class labels provided, less than K." % len(args.class_means))
 
 	# parse the samples for host pairs and receive rate
-	samples = parse_samples(args.sample_files)
+	samples = list(parse_samples(args.sample_files))
 
 	if not args.quiet:
 		print("Parsed %d samples from %d files." % (len(samples), len(args.sample_files)))

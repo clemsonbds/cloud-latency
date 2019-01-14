@@ -202,42 +202,39 @@ def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--sample_files', required=True, nargs='+', help='JSON result files from iperf')
 	parser.add_argument('--output_dir', help='in addition to stdout, write hostfiles named <class>.hosts')
-	parser.add_argument('--descending', default=True, action='store_true', help='use if the first class name should match largest cluster median value')
+	parser.add_argument('--descending', default=False, action='store_true', help='use if the first class name should match largest cluster median value')
 
 	group = parser.add_mutually_exclusive_group(required=False)
 	group.add_argument('--verbose', action='store_true', help='clusters and values will be described, rather than minimal CSV')
 	group.add_argument('--quiet', action='store_true', help='suppress stdout')
 
 	group = parser.add_mutually_exclusive_group(required=True)
-	group.add_argument('--K', type=int)
-	group.add_argument('--class_labels')
+	group.add_argument('--K', type=int, help='the number of clusters to divide samples into')
+	group.add_argument('--class_labels', type=str, nargs='+', help='two or more class labels, determines the number of clusters K')
 
 	group = parser.add_mutually_exclusive_group(required=False)
 	group.add_argument('--min_distance', type=float, help='recombine clusters whose means are within a factor of X of eachother,\n   i.e. 10 and 9 are within factor of 0.1 of eachother')
-	group.add_argument('--class_means', help='comma separated list of mean values, must match K or length of class_labels')
+	group.add_argument('--class_means', type=float, nargs='+', help='list of mean values, must match K or length of class_labels')
 
-	args = vars(parser.parse_args())
+	args = parser.parse_args()
 
 	# sanity checking on input
-	if args['class_labels']:
-		class_labels = args['class_labels'].split(',')
+	if args.class_labels:
+		class_labels = args.class_labels
 		K = len(class_labels)
 	else:
-		K = args['K']
-		class_labels = ['class'+str(i) for i in range(1, args['K']+1)]
+		K = args.K
+		class_labels = ['class%d'%(i+1) for i in range(K)]
 
-	if args['class_means'] is not None:
-		class_means = args['class_means'].split(',')
+	if len(args.sample_files) < K:
+		print("Warning: ", args.sample_files, " samples provided, reducing K to match.")
+		K = len(args.sample_files)
 
-		if len(class_means) < K:
-			sys.exit("Error: %d class labels provided, less than K." % len(class_means))
-
-	if len(args['sample_files']) < K:
-		print("Warning: ", args['sample_files'], " samples provided, reducing K to match.")
-		K = len(args['sample_files'])
+	if args.class_means is not None and len(args.class_means) < K:
+		sys.exit("Error: %d class labels provided, less than K." % len(args.class_means))
 
 	# parse the samples for host pairs and receive rate
-	samples = parse_samples(args['sample_files'])
+	samples = parse_samples(args.sample_files)
 
 #	clusters = cluster_by_kmeans(samples, K, 'bps')
 #	clusters = cluster_by_jenks(samples, K, 'bps', 1)
@@ -248,7 +245,7 @@ def main():
 		clusters = cluster_by_stupid(samples, K, 'bps')
 
 	# recombine clusters that are too close to eachother
-	if args['min_distance']:
+	if args.min_distance:
 		# start i at the second to last cluster of the list, move from right to left
 		for i in reversed(range(len(clusters)-1)):
 
@@ -256,14 +253,14 @@ def main():
 			for j in reversed(range(i+1, len(clusters))):
 				mean_i = mean(clusters[i], 'bps') # recompute this every time, since it can change with each combining of i and j
 				mean_j = mean(clusters[j], 'bps')
-				min_dist = max(mean_i, mean_j) * args['min_distance'] # always use the maximum mean for the distance
+				min_dist = max(mean_i, mean_j) * args.min_distance # always use the maximum mean for the distance
 				dist_ij = abs(mean_i - mean_j)
 
 				if dist_ij < min_dist:
 					clusters[i].extend(clusters.pop(j))
 
 	# sort to match class label order
-	clusters.sort(key=lambda c: mean(c, 'bps'), reverse=args['descending'])
+	clusters.sort(key=lambda c: mean(c, 'bps'), reverse=args.descending)
 
 	# group classes with their names
 	classes = dict((name, {'cluster':cluster}) for name, cluster in [(class_labels[i], clusters[i]) for i in range(len(clusters))])
@@ -283,18 +280,18 @@ def main():
 		c['max_clique'] = max(c['all_cliques'], key=len)
 
 	# write output
-	if args['verbose']:
+	if args.verbose:
 		pp.pprint(classes)
 
-	elif not args['quiet']:
+	elif not args.quiet:
 		for c in classes.values():
 			print(','.join(c['max_clique']))
 
-	if args['output_dir']:
+	if args.output_dir:
 		for class_name in classes:
 			fn = '.'.join([class_name, "hosts"])
 
-			with open(args['output_dir']+'/'+fn, 'w') as f:
+			with open(os.path.join(args.output_dir, fn), 'w') as f:
 				for host in classes[class_name]['max_clique']:
 					f.write(host+'\n')
 

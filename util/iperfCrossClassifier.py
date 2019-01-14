@@ -132,6 +132,7 @@ def jenks(items, K, key, target_GVF, max_iter=10):
 
 	return classes
 
+# return list of lists of sample dicts
 def stupid(items, K, key):
 	if K>2:
 		sys.exit("no stupid, no time")
@@ -141,6 +142,7 @@ def stupid(items, K, key):
 	threshold = ((mx - mn)/2) + mn
 	return [[x for x in items if x[key] < threshold], [x for x in items if x[key] >= threshold]]
 
+# return generator for dicts like { 'pair': (local_host, remote_host), 'bps': bps }
 def parse_samples(fn_list):
 	for fn in fn_list:
 		with open(fn) as f:
@@ -192,6 +194,7 @@ def main():
 	parser.add_argument('--filter_by', help='a pattern to include in input files')
 	parser.add_argument('--output_dir', help='in addition to stdout, write hostfiles named <class>.hosts')
 	parser.add_argument('--descending', action='store_true', help='use if the first class name should match largest cluster median value')
+	parser.add_argument('--min_distance', default=0.0, type=float, help='recombine clusters whose means are within a factor of X of eachother,\n   i.e. 10 and 9 are within factor of 0.1 of eachother')
 
 	group = parser.add_mutually_exclusive_group(required=False)
 	group.add_argument('--verbose', action='store_true', help='clusters and values will be described, rather than minimal CSV')
@@ -231,6 +234,29 @@ def main():
 #	clusters = kmeans(samples, K, 'bps')
 #	clusters = jenks(samples, K, 'bps', 1)
 	clusters = stupid(samples, K, 'bps')
+
+	# recombine clusters that are too close to eachother
+	if args['min_distance'] > 0.0:
+		while len(clusters) > 1:
+			changed = False
+
+			for i in range(len(clusters)):
+				mean_i = mean(clusters[i], 'bps')
+				min_dist = mean_i * args['min_distance']
+
+				for j in range(len(clusters)):
+					if i == j:
+						continue
+
+					mean_j = mean(clusters[j], 'bps')
+					dist = abs(mean_i - mean_j)
+
+					if dist < min_dist:
+						clusters[i].extend(clusters.pop(j))
+						changed = True
+
+			if not changed:
+				break
 
 	# sort to match key order
 	clusters.sort(key=lambda c: mean(c, 'bps'), reverse=args['descending'])

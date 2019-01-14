@@ -139,6 +139,7 @@ def cluster_by_closest(items, class_seeds, key):
 		differences = [abs(seed - s[key]) for seed in class_seeds]
 		min_index = min(xrange(len(class_seeds)), key=differences.__getitem__) # https://stackoverflow.com/a/11825864/3808882
 		clusters[min_index].append(s)
+		pp.pprint(clusters)
 
 	return clusters
 

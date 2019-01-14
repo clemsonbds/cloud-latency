@@ -19,7 +19,7 @@ def sort(items, key):
 
 def chunk(items, K):
 	n = int((len(items) + 1) / K)
-	return [items[i:i + n] for i in range(0, len(items), n)]
+	return [items[i:i + n] for i in xrange(0, len(items), n)]
 
 def centroid_median(c, key):
 	sort(c, key) # sort the list
@@ -29,7 +29,7 @@ def centroid_mean(c, key):
 	m = mean(c, key)
 	closest_i = 0 # index of current centroid
 
-	for i in range(1, len(c)):
+	for i in xrange(1, len(c)):
 		if dist(c[i][key], m) < dist(c[closest_i][key], m):
 			closest_i = i
 
@@ -97,7 +97,7 @@ def cluster_by_jenks(items, K, key, target_GVF, max_iter=10):
 		mx = 0
 		mn = 0
 
-		for i in range(K):
+		for i in xrange(K):
 			if ssds[i] > ssds[mx]:
 				mx = i
 			if ssds[i] < ssds[mn]:
@@ -133,7 +133,7 @@ def cluster_by_jenks(items, K, key, target_GVF, max_iter=10):
 	return classes
 
 def cluster_by_closest(items, class_seeds, key):
-	clusters = [[]]*len(class_seeds)
+	clusters = [[] for _ in class_seeds]
 
 	for s in items:
 		differences = [abs(seed - s[key]) for seed in class_seeds]
@@ -225,7 +225,7 @@ def main():
 		K = len(class_labels)
 	else:
 		K = args.K
-		class_labels = ['class%d'%(i+1) for i in range(K)]
+		class_labels = ['class%d'%(i+1) for i in xrange(K)]
 
 	if len(args.sample_files) < K:
 		print("Warning: ", args.sample_files, " samples provided, reducing K to match.")
@@ -253,10 +253,10 @@ def main():
 	# recombine clusters that are too close to eachother
 	if args.min_distance:
 		# start i at the second to last cluster of the list, move from right to left
-		for i in reversed(range(len(clusters)-1)):
+		for i in reversed(xrange(len(clusters)-1)):
 
 			# try to combine with each of the clusters to the right, in right-left order
-			for j in reversed(range(i+1, len(clusters))):
+			for j in reversed(xrange(i+1, len(clusters))):
 				mean_i = mean(clusters[i], 'bps') # recompute this every time, since it can change with each combining of i and j
 				mean_j = mean(clusters[j], 'bps')
 				min_dist = max(mean_i, mean_j) * args.min_distance # always use the maximum mean for the distance
@@ -269,7 +269,7 @@ def main():
 	clusters.sort(key=lambda c: mean(c, 'bps'), reverse=args.descending)
 
 	# group classes with their names
-	classes = dict((name, {'cluster':cluster}) for name, cluster in [(class_labels[i], clusters[i]) for i in range(len(clusters))])
+	classes = dict((name, {'cluster':cluster}) for name, cluster in [(class_labels[i], clusters[i]) for i in xrange(len(clusters))])
 
 	# build graphs
 	for c in classes.values():

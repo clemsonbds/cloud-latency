@@ -136,7 +136,7 @@ def cluster_by_closest(items, class_seeds, key):
 	clusters = [[]]*len(class_seeds)
 
 	for s in items:
-		differences = [abs(seed - s) for seed in class_seeds]
+		differences = [abs(seed - s[key]) for seed in class_seeds]
 		min_index = min(xrange(len(class_seeds)), key=differences.__getitem__) # https://stackoverflow.com/a/11825864/3808882
 		clusters[min_index].append(s)
 
@@ -230,8 +230,8 @@ def main():
 		print("Warning: ", args.sample_files, " samples provided, reducing K to match.")
 		K = len(args.sample_files)
 
-	if args.class_means and len(args.class_means) < K:
-		sys.exit("Error: %d class labels provided, less than K." % len(args.class_means))
+	if args.class_means and len(args.class_means) != K:
+		sys.exit("Error: %d class labels provided for %d clusters." % (len(args.class_means), K))
 
 	# parse the samples for host pairs and receive rate
 	samples = list(parse_samples(args.sample_files))
@@ -264,9 +264,6 @@ def main():
 
 	# sort to match class label order
 	clusters.sort(key=lambda c: mean(c, 'bps'), reverse=args.descending)
-
-	print(clusters)
-	print(class_labels)
 
 	# group classes with their names
 	classes = dict((name, {'cluster':cluster}) for name, cluster in [(class_labels[i], clusters[i]) for i in range(len(clusters))])

@@ -237,26 +237,19 @@ def main():
 
 	# recombine clusters that are too close to eachother
 	if args['min_distance'] > 0.0:
-		while len(clusters) > 1:
-			changed = False
+		# start i at the second to last cluster of the list, move from right to left
+		for i in reversed(range(len(clusters)-1)):
 
-			for i in range(len(clusters)):
-				mean_i = mean(clusters[i], 'bps')
-				min_dist = mean_i * args['min_distance']
+			# try to combine with each of the clusters to the right, in right-left order
+			for j in reversed(range(i+1, len(clusters))):
+				mean_i = mean(clusters[i], 'bps') # recompute this every time, since it can change with each combining of i and j
+				mean_j = mean(clusters[j], 'bps')
+				min_dist = max(mean_i, mean_j) * args['min_distance'] # always use the maximum mean for the distance
+				dist_ij = abs(mean_i - mean_j)
 
-				for j in range(len(clusters)):
-					if i == j:
-						continue
+				if dist_ij < min_dist:
+					clusters[i].extend(clusters.pop(j))
 
-					mean_j = mean(clusters[j], 'bps')
-					dist = abs(mean_i - mean_j)
-
-					if dist < min_dist:
-						clusters[i].extend(clusters.pop(j))
-						changed = True
-
-			if not changed:
-				break
 
 	# sort to match key order
 	clusters.sort(key=lambda c: mean(c, 'bps'), reverse=args['descending'])

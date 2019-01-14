@@ -265,6 +265,9 @@ def main():
 	# sort to match class label order
 	clusters.sort(key=lambda c: mean(c, 'bps'), reverse=args.descending)
 
+	print(clusters)
+	print(class_labels)
+
 	# group classes with their names
 	classes = dict((name, {'cluster':cluster}) for name, cluster in [(class_labels[i], clusters[i]) for i in range(len(clusters))])
 

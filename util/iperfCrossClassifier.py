@@ -36,7 +36,7 @@ def centroid_mean(c, key):
 	c[0], c[i] = c[i], c[0] # swap closest with current centroid
 
 # super simple 1-dimension kmeans clustering
-def kmeans(items, K, key, max_iter=10):
+def cluster_by_kmeans(items, K, key, max_iter=10):
 
 	clusters = chunk(items, K)
 	moved = True
@@ -81,7 +81,7 @@ def ssd(items, key):
 	m = mean(items, key)
 	return sum([(i[key]-m) ** 2 for i in items])
 
-def jenks(items, K, key, target_GVF, max_iter=10):
+def cluster_by_jenks(items, K, key, target_GVF, max_iter=10):
 	sort(items, key)
 	classes = chunk(items, K)
 
@@ -132,8 +132,18 @@ def jenks(items, K, key, target_GVF, max_iter=10):
 
 	return classes
 
+def cluster_by_closest(samples, class_seeds, key):
+	clusters = [[]]*len(class_seeds)
+
+	for s in samples:
+		differences = [abs(seed - s) for seed in class_seeds]
+		min_index = min(xrange(len(class_seeds)), key=differences.__getitem__) # https://stackoverflow.com/a/11825864/3808882
+		clusters[min_index].append(s)
+
+	return clusters
+
 # return list of lists of sample dicts
-def stupid(items, K, key):
+def cluster_by_stupid(items, K, key):
 	if K>2:
 		sys.exit("no stupid, no time")
 
@@ -190,11 +200,9 @@ def write_hostfile(hosts, fn):
 
 def main():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--sample_dir', required=True)
-	parser.add_argument('--filter_by', help='a pattern to include in input files')
+	parser.add_argument('--sample_files', required=True, nargs='+', help='JSON result files from iperf')
 	parser.add_argument('--output_dir', help='in addition to stdout, write hostfiles named <class>.hosts')
-	parser.add_argument('--descending', action='store_true', help='use if the first class name should match largest cluster median value')
-	parser.add_argument('--min_distance', default=0.0, type=float, help='recombine clusters whose means are within a factor of X of eachother,\n   i.e. 10 and 9 are within factor of 0.1 of eachother')
+	parser.add_argument('--descending', default=True, action='store_true', help='use if the first class name should match largest cluster median value')
 
 	group = parser.add_mutually_exclusive_group(required=False)
 	group.add_argument('--verbose', action='store_true', help='clusters and values will be described, rather than minimal CSV')
@@ -202,41 +210,45 @@ def main():
 
 	group = parser.add_mutually_exclusive_group(required=True)
 	group.add_argument('--K', type=int)
-	group.add_argument('--classes')
+	group.add_argument('--class_labels')
+
+	group = parser.add_mutually_exclusive_group(required=False)
+	group.add_argument('--min_distance', type=float, help='recombine clusters whose means are within a factor of X of eachother,\n   i.e. 10 and 9 are within factor of 0.1 of eachother')
+	group.add_argument('--class_means', help='comma separated list of mean values, must match K or length of class_labels')
 
 	args = vars(parser.parse_args())
 
 	# sanity checking on input
-	if args['classes']:
-		class_names = args['classes'].split(',')
-		K = len(class_names)
+	if args['class_labels']:
+		class_labels = args['classes'].split(',')
+		K = len(class_labels)
 	else:
 		K = args['K']
-		class_names = ['class'+str(i) for i in range(1, args['K']+1)]
+		class_labels = ['class'+str(i) for i in range(1, args['K']+1)]
 
-	# get list of iperf samples in result directory
-	pattern = args['sample_dir'] + "/iperf"
+	if args['class_means'] is not None:
+		class_means = args['class_means'].split(',')
 
-	if args['filter_by']:
-		pattern += "*" + args['filter_by']
+		if len(class_means) < K:
+			sys.exit("Error: %d class labels provided, less than K." % len(class_means))
 
-	pattern += "*json"
-
-	filenames = glob.glob(pattern)
+	if len(args['sample_files']) < K:
+		print("Warning: ", args['sample_files'], " samples provided, reducing K to match.")
+		K = len(args['sample_files'])
 
 	# parse the samples for host pairs and receive rate
-	samples = list(parse_samples(filenames))
+	samples = parse_samples(args['sample_files'])
 
-	if len(samples) < K:
-		print("Warning: ", len(samples), " samples provided, reducing K to match.")
-		K = len(samples)
+#	clusters = cluster_by_kmeans(samples, K, 'bps')
+#	clusters = cluster_by_jenks(samples, K, 'bps', 1)
 
-#	clusters = kmeans(samples, K, 'bps')
-#	clusters = jenks(samples, K, 'bps', 1)
-	clusters = stupid(samples, K, 'bps')
+	if class_means is not None:
+		clusters = cluster_by_closest(samples, class_means, 'bps')
+	else:
+		clusters = cluster_by_stupid(samples, K, 'bps')
 
 	# recombine clusters that are too close to eachother
-	if args['min_distance'] > 0.0:
+	if args['min_distance']:
 		# start i at the second to last cluster of the list, move from right to left
 		for i in reversed(range(len(clusters)-1)):
 
@@ -250,12 +262,11 @@ def main():
 				if dist_ij < min_dist:
 					clusters[i].extend(clusters.pop(j))
 
-
-	# sort to match key order
+	# sort to match class label order
 	clusters.sort(key=lambda c: mean(c, 'bps'), reverse=args['descending'])
 
 	# group classes with their names
-	classes = dict((name, {'cluster':cluster}) for name, cluster in [(class_names[i], clusters[i]) for i in range(len(clusters))])
+	classes = dict((name, {'cluster':cluster}) for name, cluster in [(class_labels[i], clusters[i]) for i in range(len(clusters))])
 
 	# build graphs
 	for c in classes.values():

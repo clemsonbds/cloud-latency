@@ -7,7 +7,7 @@ platform=${1:-"aws"}
 mpi_slots=${2:-1}
 
 # delete the known hosts on the bastion in case there are IP conflicts
-${utilDir}/sshBastion ${platform} "rm ~/.ssh/known_hosts"
+${utilDir}/sshBastion.sh ${platform} "rm ~/.ssh/known_hosts"
 
 # place a list of instance IPs on bastion
 echo -e "\nUploading instance IPs to bastion."

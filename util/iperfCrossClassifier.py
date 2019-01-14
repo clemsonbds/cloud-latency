@@ -247,6 +247,8 @@ def main():
 	else:
 		clusters = cluster_by_stupid(samples, K, 'bps')
 
+	pp.pprint(clusters)
+
 	# recombine clusters that are too close to eachother
 	if args.min_distance:
 		# start i at the second to last cluster of the list, move from right to left

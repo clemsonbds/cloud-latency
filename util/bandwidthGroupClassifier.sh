@@ -42,7 +42,9 @@ ${runDir}/iperf/run_cross.sh ${measureArgs} > /dev/null
 # put them in same dir as hostfile
 outDir=`dirname ${hostfile}`
 
-classifierArgs+=" --sample_files" ${resultDir}/*bwclassify*
+sample_files=${resultDir}/*bwclassify*
+
+classifierArgs+=" --sample_files ${sample_files}"
 classifierArgs+=" --output_dir ${outDir}"
 classifierArgs+=" $@"
 

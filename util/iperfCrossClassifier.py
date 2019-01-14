@@ -139,7 +139,6 @@ def cluster_by_closest(items, class_seeds, key):
 		differences = [abs(seed - s[key]) for seed in class_seeds]
 		min_index = min(xrange(len(class_seeds)), key=differences.__getitem__) # https://stackoverflow.com/a/11825864/3808882
 		clusters[min_index].append(s)
-		pp.pprint(clusters)
 
 	return clusters
 
@@ -248,8 +247,6 @@ def main():
 	else:
 		clusters = cluster_by_stupid(samples, K, 'bps')
 
-	pp.pprint(clusters)
-
 	# recombine clusters that are too close to eachother
 	if args.min_distance:
 		# start i at the second to last cluster of the list, move from right to left
@@ -283,7 +280,7 @@ def main():
 
 		# find maximal cliques in graphs
 		c['all_cliques'] = nx.algorithms.clique.enumerate_all_cliques(g)
-		c['max_clique'] = max(c['all_cliques'], key=len)
+		c['max_clique'] = max(c['all_cliques'], key=len) if len(c['all_cliques']) > 0 else []
 
 	# write output
 	if args.verbose:

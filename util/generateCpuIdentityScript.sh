@@ -5,8 +5,8 @@ target="/nfs/resources/getCpuIdentity.sh"
 
 if [ "${provider}" == "aws" ]; then
 		echo "#!/usr/bin/env bash
-sudo yum install -y cpuid
-output=\`cpuid -1 | grep \"simple synth\"\`
+sudo yum install -y -q cpuid
+output=\`cpuid -1 2>/dev/null | grep \"simple synth\"\`
 case \"\$output\" in
   *Haswell*)
     echo \"Haswell\"
@@ -25,8 +25,8 @@ echo \"Could not determine CPU Type\"" > ${target}
 
 elif [ "${provider}" == "gcp" ]; then
 	echo "#!/usr/bin/env bash
-sudo yum install -y cpuid
-output=\`cpuid -1 | grep \"simple synth\"\`
+sudo yum install -y -q cpuid
+output=\`cpuid -1 2>/dev/null | grep \"simple synth\"\`
 case \"\$output\" in
   *Haswell*)
     echo \"Haswell\"

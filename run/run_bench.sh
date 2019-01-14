@@ -80,6 +80,10 @@ case ${platform} in
 aws)
 	[ -z "${groupTypes}" ] && groupTypes="cluster spread multi-az"
 	[ -z "${instanceTypes}" ] && instanceTypes="vm vmc5 metal"
+	groupClassifier="${bastionUtilDir}/bandwidthGroupClassifier.sh"
+	groupClasses="10Gb,5Gb" # in order, most desirable class first
+	groupClassOrder="descending" # match class order above
+	groupReqHosts=4
 	;;
 gcp)
 	[ -z "${groupTypes}" ] && groupTypes="single-az multi-az"

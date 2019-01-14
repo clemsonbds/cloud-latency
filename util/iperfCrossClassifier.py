@@ -220,7 +220,7 @@ def main():
 
 	# sanity checking on input
 	if args['class_labels']:
-		class_labels = args['classes'].split(',')
+		class_labels = args['class_labels'].split(',')
 		K = len(class_labels)
 	else:
 		K = args['K']

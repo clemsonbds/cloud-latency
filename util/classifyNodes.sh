@@ -8,15 +8,14 @@ if [ -z "${hosts}" ]; then
 	exit
 fi
 
-# name the output file
-nodeClasses="none"
-
-if [ ! -z "${nodeClassifier}" ]; then
+if [ ! -z "${classifier}" ]; then
     for host in `echo ${hosts} | tr ',' ' '`; do
-        nodeClasses+=','`ssh -q ${host} ${nodeClassifier} | tail -1`
+        nodeClasses+=','`ssh -q ${host} ${classifier} | tail -1`
     done
 
     nodeClasses=`echo ${nodeClasses} | cut -c 2-` # trim leading comma
+else
+	nodeClasses="none"
 fi
 
 echo ${nodeClasses}

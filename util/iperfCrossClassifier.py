@@ -230,7 +230,7 @@ def main():
 		print("Warning: ", args.sample_files, " samples provided, reducing K to match.")
 		K = len(args.sample_files)
 
-	if args.class_means is not None and len(args.class_means) < K:
+	if args.class_means and len(args.class_means) < K:
 		sys.exit("Error: %d class labels provided, less than K." % len(args.class_means))
 
 	# parse the samples for host pairs and receive rate
@@ -239,8 +239,8 @@ def main():
 #	clusters = cluster_by_kmeans(samples, K, 'bps')
 #	clusters = cluster_by_jenks(samples, K, 'bps', 1)
 
-	if class_means is not None:
-		clusters = cluster_by_closest(samples, class_means, 'bps')
+	if args.class_means:
+		clusters = cluster_by_closest(samples, args.class_means, 'bps')
 	else:
 		clusters = cluster_by_stupid(samples, K, 'bps')
 

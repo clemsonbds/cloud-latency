@@ -42,15 +42,14 @@ ${runDir}/iperf/run_cross.sh ${measureArgs} > /dev/null
 # put them in same dir as hostfile
 outDir=`dirname ${hostfile}`
 
-classifierArgs+=" --sample_dir ${resultDir}"
+classifierArgs+=" --sample_files" ${resultDir}/*bwclassify*
 classifierArgs+=" --output_dir ${outDir}"
-classifierArgs+=" --filter_by ${resultName}"
 classifierArgs+=" $@"
 
 echo "Classifying bandwidth results with parameters:"
 echo "${classifierArgs}"
 
-${utilDir}/iperfCrossClassifier.py ${classifierArgs}
+${utilDir}/iperfCrossClassifier.py "${classifierArgs}"
 
 echo "Done."
 

@@ -279,8 +279,8 @@ def main():
 		c['graph'] = g
 
 		# find maximal cliques in graphs
-		c['all_cliques'] = nx.algorithms.clique.enumerate_all_cliques(g)
-		c['max_clique'] = max(c['all_cliques'], key=len) if len(c['all_cliques']) > 0 else []
+		cliques = list(nx.algorithms.clique.enumerate_all_cliques(g))
+		c['max_clique'] = max(cliques, key=len) if len(cliques) > 0 else []
 
 	# write output
 	if args.verbose:

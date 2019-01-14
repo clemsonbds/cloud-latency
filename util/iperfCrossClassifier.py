@@ -255,7 +255,7 @@ def main():
 	clusters.sort(key=lambda c: mean(c, 'bps'), reverse=args['descending'])
 
 	# group classes with their names
-	classes = dict((name, {'cluster':cluster}) for name, cluster in [(class_names[i], clusters[i]) for i in range(K)])
+	classes = dict((name, {'cluster':cluster}) for name, cluster in [(class_names[i], clusters[i]) for i in range(len(clusters))])
 
 	# build graphs
 	for c in classes.values():

@@ -236,6 +236,9 @@ def main():
 	# parse the samples for host pairs and receive rate
 	samples = parse_samples(args.sample_files)
 
+	if not args.quiet:
+		print("Parsed %d samples from %d files." % (len(samples), len(args.sample_files)))
+
 #	clusters = cluster_by_kmeans(samples, K, 'bps')
 #	clusters = cluster_by_jenks(samples, K, 'bps', 1)
 

@@ -241,7 +241,7 @@ def main():
 	samples = list(parse_samples(sample_files))
 
 	if not args.quiet:
-		print("Parsed %d samples from %d files." % (len(samples), len(args.sample_files)))
+		print("Parsed %d samples from %d files." % (len(samples), len(sample_files)))
 
 	if len(samples) < K:
 		print("Warning: ", len(samples), " samples provided, reducing K to match.")

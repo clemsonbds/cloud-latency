@@ -53,7 +53,7 @@ classifierArgs+=" $@"
 echo "Classifying bandwidth results with parameters:"
 echo "${classifierArgs}"
 
-${utilDir}/iperfCrossClassifier.py "${classifierArgs}"
+${utilDir}/iperfCrossClassifier.py ${classifierArgs}
 
 echo "Done."
 

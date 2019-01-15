@@ -261,23 +261,23 @@ def main():
 	else:
 		clusters = cluster_by_stupid(samples, K, 'bps')
 
-	# recombine clusters that are too close to eachother
-	if args.min_distance:
-		# start i at the second to last cluster of the list, move from right to left
-		for i in reversed(xrange(len(clusters)-1)):
+		# recombine clusters that are too close to eachother
+		if args.min_distance:
+			# start i at the second to last cluster of the list, move from right to left
+			for i in reversed(xrange(len(clusters)-1)):
 
-			# try to combine with each of the clusters to the right, in right-left order
-			for j in reversed(xrange(i+1, len(clusters))):
-				mean_i = mean(clusters[i], 'bps') # recompute this every time, since it can change with each combining of i and j
-				mean_j = mean(clusters[j], 'bps')
-				min_dist = max(mean_i, mean_j) * args.min_distance # always use the maximum mean for the distance
-				dist_ij = abs(mean_i - mean_j)
+				# try to combine with each of the clusters to the right, in right-left order
+				for j in reversed(xrange(i+1, len(clusters))):
+					mean_i = mean(clusters[i], 'bps') # recompute this every time, since it can change with each combining of i and j
+					mean_j = mean(clusters[j], 'bps')
+					min_dist = max(mean_i, mean_j) * args.min_distance # always use the maximum mean for the distance
+					dist_ij = abs(mean_i - mean_j)
 
-				if dist_ij < min_dist:
-					clusters[i].extend(clusters.pop(j))
+					if dist_ij < min_dist:
+						clusters[i].extend(clusters.pop(j))
 
-	# sort to match class label order
-	clusters.sort(key=lambda c: mean(c, 'bps') if len(c) > 0 else 0, reverse=args.descending)
+		# sort to match class label order
+		clusters.sort(key=lambda c: mean(c, 'bps') if len(c) > 0 else 0, reverse=args.descending)
 
 	# group classes with their names
 	classes = dict((name, {'cluster':cluster}) for name, cluster in [(class_labels[i], clusters[i]) for i in xrange(len(clusters))])

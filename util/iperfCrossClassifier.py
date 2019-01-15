@@ -301,8 +301,8 @@ def main():
 		pp.pprint(classes)
 
 	elif not args.quiet:
-		for c in classes.values():
-			print(','.join(c['max_clique']))
+		for name, c in classes.items():
+			print(name, ":  ", ','.join(c['max_clique']))
 
 	if args.output_dir:
 		for class_name in classes:

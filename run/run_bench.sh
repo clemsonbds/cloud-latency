@@ -136,8 +136,6 @@ for instanceType in ${instanceTypes}; do
 				echo "Unable to acquire enough hosts in the same class, reprovisioning."
 				continue
 			fi
-		else
-			runParams+=" --hostfile ${hostfile}"
 		fi
 
 		echo -e "\nRunning benchmarks for experiment configuration '${expType}'.\n"

@@ -156,12 +156,15 @@ def cluster_by_stupid(items, K, key):
 def parse_samples(fn_list):
 	for fn in fn_list:
 		with open(fn) as f:
-			sample = json.load(f)
-			yield {
-				'pair':(sample['start']['connected'][0]['local_host'],
-						sample['start']['connected'][0]['remote_host']),
-				'bps':sample['end']['sum_received']['bits_per_second']
-			}
+			try:
+				sample = json.load(f)
+				yield {
+					'pair':(sample['start']['connected'][0]['local_host'],
+							sample['start']['connected'][0]['remote_host']),
+					'bps':sample['end']['sum_received']['bits_per_second']
+				}
+			except ValueError:
+				print("Warning, could not load JSON object from sample ", fn, ".")
 
 # mean of a list of dicts
 def mean(l, key):
@@ -229,7 +232,7 @@ def main():
 		class_labels = ['class%d'%(i+1) for i in xrange(K)]
 
 	# get list of iperf samples in result directory
-	pattern = os.path.join(args.sample_dir, "/iperf")
+	pattern = os.path.join(args.sample_dir, "iperf")
 
 	if args.filter_by:
 		pattern += "*" + args.filter_by

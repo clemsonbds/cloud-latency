@@ -36,7 +36,8 @@ aws.metal.cluster)
 	instanceType="i3.metal"
 	instanceCores=32
 	azs="a"
-	numInstances="4"
+#	numInstances="4"
+	numInstances="7" # need to make sure we get enough of the same bandwidth class
 	;;
 aws.vm.cluster)
 	platform="aws"
@@ -45,7 +46,8 @@ aws.vm.cluster)
 	instanceType="i3.16xlarge"
 	instanceCores=32
 	azs="a"
-	numInstances="4"
+#	numInstances="4"
+	numInstances="7" # need to make sure we get enough of the same bandwidth class
 	;;
 aws.vmc5.cluster)
 	platform="aws"
@@ -54,7 +56,8 @@ aws.vmc5.cluster)
 	instanceType="c5n.18xlarge"
 	instanceCores=32
 	azs="a"
-	numInstances="4"
+#	numInstances="4"
+	numInstances="7" # need to make sure we get enough of the same bandwidth class
 	;;
 aws.metal.spread)
 	platform="aws"
@@ -63,7 +66,8 @@ aws.metal.spread)
 	instanceType="i3.metal"
 	instanceCores=32
 	azs="a"
-	numInstances="4"
+#	numInstances="4"
+	numInstances="7" # need to make sure we get enough of the same bandwidth class
 	;;
 aws.vm.spread)
 	platform="aws"
@@ -72,7 +76,8 @@ aws.vm.spread)
 	instanceType="i3.16xlarge"
 	instanceCores=32
 	azs="a"
-	numInstances="4"
+#	numInstances="4"
+	numInstances="7" # need to make sure we get enough of the same bandwidth class
 	;;
 aws.vmc5.spread)
 	platform="aws"
@@ -81,7 +86,8 @@ aws.vmc5.spread)
 	instanceType="c5n.18xlarge"
 	instanceCores=32
 	azs="a"
-	numInstances="4"
+#	numInstances="4"
+	numInstances="7" # need to make sure we get enough of the same bandwidth class
 	;;
 aws.metal.multi-az)
 	platform="aws"

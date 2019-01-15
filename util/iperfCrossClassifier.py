@@ -200,7 +200,9 @@ def write_hostfile(hosts, fn):
 
 def main():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--sample_files', required=True, nargs='+', help='JSON result files from iperf')
+	parser.add_argument('--sample_dir', required=True)
+	parser.add_argument('--filter_by', help='a pattern to include in input files')
+#	parser.add_argument('--sample_files', required=True, nargs='+', help='JSON result files from iperf')
 	parser.add_argument('--output_dir', help='in addition to stdout, write hostfiles named <class>.hosts')
 	parser.add_argument('--descending', default=False, action='store_true', help='use if the first class name should match largest cluster median value')
 
@@ -226,18 +228,27 @@ def main():
 		K = args.K
 		class_labels = ['class%d'%(i+1) for i in xrange(K)]
 
-	if len(args.sample_files) < K:
-		print("Warning: ", args.sample_files, " samples provided, reducing K to match.")
-		K = len(args.sample_files)
+	# get list of iperf samples in result directory
+	pattern = os.path.join(args.sample_dir, "/iperf")
 
-	if args.class_means and len(args.class_means) != K:
-		sys.exit("Error: %d class labels provided for %d clusters." % (len(args.class_means), K))
+	if args.filter_by:
+		pattern += "*" + args.filter_by
+
+	pattern += "*json"
+	sample_files = glob.glob(pattern)
 
 	# parse the samples for host pairs and receive rate
-	samples = list(parse_samples(args.sample_files))
+	samples = list(parse_samples(sample_files))
 
 	if not args.quiet:
 		print("Parsed %d samples from %d files." % (len(samples), len(args.sample_files)))
+
+	if len(samples) < K:
+		print("Warning: ", len(samples), " samples provided, reducing K to match.")
+		K = len(samples)
+
+	if args.class_means and len(args.class_means) != K:
+		sys.exit("Error: %d class labels provided for %d clusters." % (len(args.class_means), K))
 
 #	clusters = cluster_by_kmeans(samples, K, 'bps')
 #	clusters = cluster_by_jenks(samples, K, 'bps', 1)

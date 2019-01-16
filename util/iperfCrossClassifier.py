@@ -280,7 +280,7 @@ def main():
 		clusters.sort(key=lambda c: mean(c, 'bps') if len(c) > 0 else 0, reverse=args.descending)
 
 	# group classes with their names
-	classes = dict((name, {'cluster':cluster}) for name, cluster in [(class_labels[i], clusters[i]) for i in xrange(len(clusters))])
+	classes = dict((name, {'cluster':cluster}) for name, cluster in zip(class_labels, clusters))
 
 	# build graphs
 	for c in classes.values():
@@ -293,8 +293,14 @@ def main():
 		c['graph'] = g
 
 		# find maximal cliques in graphs
-		cliques = list(nx.algorithms.clique.enumerate_all_cliques(g))
-		c['max_clique'] = max(cliques, key=len) if len(cliques) > 0 else []
+		cliques = nx.algorithms.clique.enumerate_all_cliques(g)
+		c['max_clique'] = set(max(cliques, key=len) if len(cliques) > 0 else [])
+
+	# if a node appears in a high bw cluster, we need to remove it from other clusters
+	for i in xrange(0, len(class_labels)-1): # maintain top-down order
+		for host in classes[class_labels[i]]['max_clique']:
+			for j in xrange(i+1, len(class_labels)):
+				classes[class_labels[j]]['max_clique'].discard(host)
 
 	# write output
 	if args.verbose:

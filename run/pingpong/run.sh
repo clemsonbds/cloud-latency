@@ -85,7 +85,8 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-[ -z "${hostfilter}" ] && hostfilter=`${utilDir}/hostfileToHosts.sh ${hostfile} 2`
+[ -z "${hostfilter}" ] && hostfilter=`${utilDir}/hostfileToHosts.sh ${hostfile}`
+hostfilter=`echo ${hostfilter} | cut -d, -f1-2`
 
 # MPI run parameters
 mpiParams+=" -np 2"

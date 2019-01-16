@@ -293,7 +293,7 @@ def main():
 		c['graph'] = g
 
 		# find maximal cliques in graphs
-		cliques = nx.algorithms.clique.enumerate_all_cliques(g)
+		cliques = list(nx.algorithms.clique.enumerate_all_cliques(g))
 		c['max_clique'] = set(max(cliques, key=len) if len(cliques) > 0 else [])
 
 	# if a node appears in a high bw cluster, we need to remove it from other clusters

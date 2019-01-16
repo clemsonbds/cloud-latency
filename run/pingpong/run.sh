@@ -43,8 +43,8 @@ case $key in
     shift
     shift
     ;;
---hosts)
-    hosts="$2"
+--hostfilter)
+    hostfilter="$2"
     shift
     shift
     ;;
@@ -85,12 +85,12 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-[ -z "${hosts}" ] && hosts=`${utilDir}/hostfileToHosts.sh ${hostfile} 2`
+[ -z "${hostfilter}" ] && hostfilter=`${utilDir}/hostfileToHosts.sh ${hostfile} 2`
 
 # MPI run parameters
 mpiParams+=" -np 2"
 mpiParams+=" --hostfile ${hostfile}"
-mpiParams+=" --host ${hosts}" # filter the hostfile
+mpiParams+=" --host ${hostfilter}" # filter the hostfile
 mpiParams+=" --map-by node"
 [ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
 
@@ -106,11 +106,11 @@ else
 fi
 
 # name the output file
-[ ! -z "${nodeClassifier}" ] && nodeClasses=`${utilDir}/classifyNodes.sh ${hosts} ${nodeClassifier}`
+[ ! -z "${nodeClassifier}" ] && nodeClasses=`${utilDir}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
 timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 outFile="${resultDir}/pingpong.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
 
-echo Running pingpong between ${hosts}
+echo Running pingpong between ${hostfilter}
 command="mpirun ${mpiParams} ${executable} ${ppArgs} 1> ${outFile}"
 
 if [ -z "$dryrun" ]; then

@@ -18,8 +18,8 @@ case $key in
     shift # past argument
     shift # past value
     ;;
---hosts)
-    hosts="$2"
+--hostfilter)
+    hostfilter="$2"
     shift
     shift
     ;;
@@ -37,17 +37,17 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-[ -z "${hosts}" ] && hosts=`${utilDir}/hostfileToHosts.sh ${hostfile}`
+[ -z "${hostfilter}" ] && hostfilter=`${utilDir}/hostfileToHosts.sh ${hostfile}`
 
-echo Running pingpong cross measurement between hosts ${hosts}
+echo Running pingpong cross measurement between hosts ${hostfilter}
 
 srcIndex=0
-for src in `echo ${hosts} | tr ',' ' '`; do
+for src in `echo ${hostfilter} | tr ',' ' '`; do
 
     dstIndex=0
-    for dst in `echo ${hosts} | tr ',' ' '`; do
+    for dst in `echo ${hostfilter} | tr ',' ' '`; do
         if [ "${dstIndex}" -gt "${srcIndex}" ]; then
-            ${benchDir}/pingpong/run.sh --resultName "cross.${resultName}" --hosts "${src},${dst}" $@
+            ${benchDir}/pingpong/run.sh --resultName "cross.${resultName}" --hostfilter "${src},${dst}" $@
         fi
 
         dstIndex=$((dstIndex+1))

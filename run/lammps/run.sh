@@ -25,8 +25,8 @@ case ${key} in
     shift # past argument
     shift # past value
     ;;
---hosts)
-    hosts="$2"
+--hostfilter)
+    hostfilter="$2"
     shift
     shift
     ;;
@@ -67,12 +67,12 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-[ -z "${hosts}" ] && hosts=`${utilDir}/hostfileToHosts.sh ${hostfile}`
+[ -z "${hostfilter}" ] && hostfilter=`${utilDir}/hostfileToHosts.sh ${hostfile}`
 
 # MPI run parameters
 mpiParams+=" -np 128"
 mpiParams+=" --hostfile ${hostfile}"
-mpiParams+=" --host ${hosts}" # filter the hostfile
+mpiParams+=" --host ${hostfilter}" # filter the hostfile
 mpiParams+=" --map-by node"
 mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
 [ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
@@ -80,7 +80,7 @@ mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
 executable="/nfs/repos/benchmarks/lammps/micelle/lmp_mpi"
 benchArgs="-in /nfs/repos/benchmarks/lammps/micelle/in.micelle"
 
-[ ! -z "${nodeClassifier}" ] && nodeClasses=`${utilDir}/classifyNodes.sh ${hosts} ${nodeClassifier}`
+[ ! -z "${nodeClassifier}" ] && nodeClasses=`${utilDir}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
 timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 outFile="${resultDir}/lammps.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
 

@@ -108,7 +108,7 @@ for instanceType in ${instanceTypes}; do
 	completed=
 	while [ -z "${completed}" ]; do
 		expType="${platform}.${instanceType}.${groupType}"
-		runParams=" --hostfile ${hostfile}" # must be included, --host acts as a filter
+		runParams=" --hostfile ${hostfile}" # must be included, the MPI parameter --host acts as a filter
 
 		${setupDir}/stopInstances.sh ${platform}
 		${setupDir}/startInstances.sh ${expType}
@@ -121,12 +121,12 @@ for instanceType in ${instanceTypes}; do
 
 			for class in ${groupClassLabels}; do
 				classHostfile="/nfs/${class}.hosts"
-				hosts=`${utilDir}/sshBastion.sh ${platform} "${bastionUtilDir}/hostfileToHosts.sh ${classHostfile} ${groupReqHosts}"`
-				nhosts=`echo ${hosts} | tr ',' ' ' | wc -w`
+				hostfilter=`${utilDir}/sshBastion.sh ${platform} "${bastionUtilDir}/hostfileToHosts.sh ${classHostfile} ${groupReqHosts}"`
+				nhosts=`echo ${hostfilter} | tr ',' ' ' | wc -w`
 
 				if [ "${nhosts}" -ge "${groupReqHosts}" ]; then
 					echo "Found the required ${nhosts} in class ${class}."
-					runParams+=" --groupClass ${class} --host ${hosts}"
+					runParams+=" --groupClass ${class} --hostfilter ${hostfilter}"
 					foundClass=1
 					break
 				fi

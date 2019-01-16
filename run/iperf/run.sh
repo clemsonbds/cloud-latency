@@ -32,8 +32,8 @@ case $key in
     shift
     shift
     ;;
---hosts)
-    hosts="$2"
+--hostfilter)
+    hostfilter="$2"
     shift
     shift
     ;;
@@ -69,18 +69,18 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-[ -z "${hosts}" ] && hosts=`${utilDir}/hostfileToHosts.sh ${hostfile} 2`
+[ -z "${hostfilter}" ] && hostfilter=`${utilDir}/hostfileToHosts.sh ${hostfile} 2`
 
 executable="iperf3"
 
-[ ! -z "${nodeClassifier}" ] && nodeClasses=`${utilDir}/classifyNodes.sh ${hosts} ${nodeClassifier}`
+[ ! -z "${nodeClassifier}" ] && nodeClasses=`${utilDir}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
 timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 outFile="${resultDir}/iperf.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.json"
 
-server=`echo ${hosts} | cut -d, -f1`
+server=`echo ${hostfilter} | cut -d, -f1`
 serverParams="-s -1"
 
-client=`echo ${hosts} | cut -d, -f2`
+client=`echo ${hostfilter} | cut -d, -f2`
 clientParams="-c ${server} -t ${seconds} -J"
 
 echo Running iperf between ${server} and ${client}.

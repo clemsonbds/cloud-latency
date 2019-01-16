@@ -119,7 +119,7 @@ for instanceType in ${instanceTypes}; do
 			${utilDir}/sshBastion.sh ${platform} "${groupClassifier} ${hostfile} --class_labels ${groupClassLabels} --class_means ${groupClassMeans} --${groupClassOrder}"
 			foundClass=
 
-			for class in `echo ${groupClasses} | tr ',' ' '`; do
+			for class in ${groupClassLabels}; do
 				classHostfile="/nfs/${class}.hosts"
 				hosts=`${utilDir}/sshBastion.sh ${platform} "${bastionUtilDir}/hostfileToHosts.sh ${classHostfile} ${groupReqHosts}"`
 				nhosts=`echo ${hosts} | tr ',' ' ' | wc -w`

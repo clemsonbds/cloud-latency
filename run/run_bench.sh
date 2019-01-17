@@ -54,6 +54,11 @@ gcp)
 	shift
 	shift
 	;;
+--groupClass)
+	groupReqClass="$2"
+	shift
+	shift
+	;;
 --skip_warmup)
 	skip_warmup=1
 	shift
@@ -99,7 +104,7 @@ gcp)
 	;;
 esac
 
-for i in `seq 1 ${numItersPerSet}`; do
+for outer_iter in `seq 1 ${numItersPerSet}`; do
 for groupType in ${groupTypes}; do
 for instanceType in ${instanceTypes}; do
 
@@ -111,31 +116,44 @@ for instanceType in ${instanceTypes}; do
 		${setupDir}/stopInstances.sh ${platform}
 		${setupDir}/startInstances.sh ${expType}
 
+		# specify a node classifier to be run by all experiments
 		[ ! -z "${nodeClassifier}" ] && runParams+=" --nodeClassifier ${nodeClassifier}"
 
+		# make sure we're running experiments with all the same class of node
 		if [ ! -z "${groupClassifier}" ]; then
+			# classify the nodes
 			nclasses=`echo ${groupClassLabels} | wc -w`
 			classes_csv=`${utilDir}/sshBastion.sh ${platform} "${groupClassifier} ${hostfile} --labels ${groupClassLabels} --thresholds ${groupClassThresholds}" | tail -n ${nclasses}`
-#			${utilDir}/sshBastion.sh ${platform} "rm -f /nfs/*.classified.hosts"
 			foundClass=
 
+			# limit to classes with enough nodes to run our experiment
 			for line in `echo ${classes_csv}`; do
-#			for class in ${groupClassLabels}; do
-#				classHostfile="/nfs/${class}.classified.hosts"
 				class=`echo ${line} | cut -d, -f1`
+
+				# if we specified a particular class, we don't care about others
+				[ ! -z "${groupReqClass}" ] && [ "${groupReqClass}" != "${class}" ] && continue
+
+				# get and count the hosts in the class
 				hostfilter=`echo ${line} | cut -d, -f2-`
-#				hostfilter=`${utilDir}/sshBastion.sh ${platform} "${bastionUtilDir}/hostfileToHosts.sh ${classHostfile} ${groupReqHosts}"`
 				nhosts=`echo ${hostfilter} | tr ',' ' ' | wc -w`
 
-				if [ "${nhosts}" -ge "${groupReqHosts}" ]; then
-					echo "Found ${nhosts} of the required ${groupReqHosts} in class ${class}."
-					hostfilter=`echo ${hostfilter} | cut -d, -f1-"${groupReqHosts}"`
-					runParams+=" --groupClass ${class} --hostfilter ${hostfilter}"
-					foundClass=1
-					break
-				fi
+				# if there isn't enough in this class, keep looking
+				# TODO: start deprovisioning the hosts we don't need
+				[ "${nhosts}" -lt "${groupReqHosts}" ] && continue
+
+				# if there is enough, we can stop looking and move on
+				echo "Found ${nhosts} of the required ${groupReqHosts} in class ${class}."
+
+				# shorten to the first N hosts that we require
+				hostfilter=`echo ${hostfilter} | cut -d, -f1-"${groupReqHosts}"`
+
+				# set our run parameters for all the experiments
+				runParams+=" --groupClass ${class} --hostfilter ${hostfilter}"
+				foundClass=1
+				break
 			done
 
+			# TODO: throw away some and get new ones instead of grabbing another random bunch of hosts
 			if [ -z "${foundClass}" ]; then
 				echo "Unable to acquire enough hosts in the same class, reprovisioning."
 				continue
@@ -149,8 +167,8 @@ for instanceType in ${instanceTypes}; do
 			${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_bench.sh --expType warmup ${runParams} $@"
 		fi
 
-		for j in `seq 1 ${numItersPerProvision}`; do
-			echo Starting iteration ${i}-${j}.
+		for inner_iter in `seq 1 ${numItersPerProvision}`; do
+			echo Starting iteration ${outer_iter}-${inner_iter}.
 
 			if [ -z "${skip_micro}" ]; then
 				echo Running micro measurements.

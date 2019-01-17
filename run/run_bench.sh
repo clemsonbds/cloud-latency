@@ -128,7 +128,7 @@ for instanceType in ${instanceTypes}; do
 				nhosts=`echo ${hostfilter} | tr ',' ' ' | wc -w`
 
 				if [ "${nhosts}" -ge "${groupReqHosts}" ]; then
-					echo "Found ${nhosts} of the required ${$groupReqHosts} in class ${class}."
+					echo "Found ${nhosts} of the required ${groupReqHosts} in class ${class}."
 					hostfilter=`echo ${hostfilter} | cut -d, -f1-"${groupReqHosts}"`
 					runParams+=" --groupClass ${class} --hostfilter ${hostfilter}"
 					foundClass=1

@@ -118,7 +118,7 @@ def cluster_by_threshold(items, K, class_thresholds, key):
 	if len(class_thresholds) != K-1:
 		raise ValueError("%d class threshold values provided for %d clusters." % (len(class_thresholds), K))
 
-	thresholds = sorted(class_thresholds, reverse=True)
+	thresholds = sorted(class_thresholds, reverse=True) + [0]
 	clusters = [[] for _ in range(K)]
 
 	for s in items:

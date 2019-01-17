@@ -17,6 +17,8 @@ fi
 
 shift
 
+echo "Classifying hosts based on bandwidth."
+
 # get set of cross-sectional bandwidth measurements
 resultDir=/nfs/bwthresh/samples
 resultName=bwclassify
@@ -33,8 +35,8 @@ measureArgs+=" --seconds ${seconds}"
 measureArgs+=" --nodeClassifier ${nodeClassifier}"
 
 nhosts=`wc -l ${hostfile}`
-echo "Running cross-sectional bandwidth study of ${nhosts} hosts, with parameters:"
-echo "${measureArgs}"
+echo "Running cross-sectional bandwidth study of ${nhosts} hosts."
+#echo "${measureArgs}"
 
 ${runDir}/iperf/run_cross.sh ${measureArgs} > /dev/null
 

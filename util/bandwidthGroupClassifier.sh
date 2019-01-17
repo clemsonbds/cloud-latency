@@ -42,20 +42,18 @@ ${runDir}/iperf/run_cross.sh ${measureArgs} > /dev/null
 # put them in same dir as hostfile
 outDir=`dirname ${hostfile}`
 
-#sample_files=${resultDir}/*bwclassify*
+sample_files=`echo ${resultDir}/*${resultName}*` # weirdness with brace expansion and wildcards requires echo
 
-classifierArgs+=" --sample_dir ${resultDir}"
-classifierArgs+=" --filter_by ${resultName}"
-#classifierArgs+=" --sample_files ${sample_files}"
+classifierArgs+=" --sample_files ${sample_files}"
 classifierArgs+=" --output_dir ${outDir}"
 classifierArgs+=" $@"
 
-echo "Classifying bandwidth results with parameters:"
-echo "${classifierArgs}"
+#echo "Classifying bandwidth results with parameters:"
+#echo "${classifierArgs}"
 
 ${utilDir}/iperfCrossClassifier.py ${classifierArgs}
 
-echo "Done."
+#echo "Done."
 
 #dominant=
 #max_n=0

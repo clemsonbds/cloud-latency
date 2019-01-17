@@ -21,8 +21,8 @@ def parse_args():
 	group.add_argument('--labels', type=str, nargs='+', help='two or more class labels, in DESCENDING bandwidth order')
 
 	group = parser.add_mutually_exclusive_group(required=True)
-	group.add_argument('--class_means', type=float, nargs='+', help='list of mean values, must match number of class_labels')
-	group.add_argument('--class_thresholds', type=float, nargs='+', help='list of threshold values, 1 less than number of class labels')
+	group.add_argument('--means', type=float, nargs='+', help='list of mean values, must match number of class_labels')
+	group.add_argument('--thresholds', type=float, nargs='+', help='list of threshold values, 1 less than number of class labels')
 
 #	subp = subparsers.add_parser('dynamic', help='use a clustering algorithm to divide samples into K clusters')
 #	subp.add_argument('--K', required=True, type=int, help='the number of clusters')
@@ -36,11 +36,11 @@ def main():
 
 	# sanity checking on input
 	if args.labels:
-		class_labels = args.labels
+		labels = args.labels
 	else:
-		class_labels = ['class%d'%(i+1) for i in range(args.K)]
+		labels = ['class%d'%(i+1) for i in range(args.K)]
 
-	K = len(class_labels)
+	K = len(labels)
 
 	# get list of iperf samples in result directory
 #	pattern = os.path.join(args.sample_dir, "iperf")
@@ -58,12 +58,12 @@ def main():
 	if len(samples) < K:
 		raise ValueError("Only %d samples were provided for %d clusters." % (len(samples), K))
 
-	if args.class_means:
-		clusters = cluster_by_proximity(samples, K, args.class_means, 'bps')
-		sort_keys = args.class_means
-	elif args.class_thresholds:
-		clusters = cluster_by_threshold(samples, K, args.class_thresholds, 'bps')
-		sort_keys = args.class_thresholds+[0]
+	if args.means:
+		clusters = cluster_by_proximity(samples, K, args.means, 'bps')
+		sort_keys = args.means
+	elif args.thresholds:
+		clusters = cluster_by_threshold(samples, K, args.thresholds, 'bps')
+		sort_keys = args.thresholds+[0]
 #	elif args.cluster_method == 'dynamic':
 #		clusters = cluster_by_magic(samples, K, 'bps')
 
@@ -71,7 +71,7 @@ def main():
 		'label':label.strip(),
 		'samples':cluster,
 		'sort_key':key
-	} for label, cluster, key in zip(class_labels, clusters, sort_keys)]
+	} for label, cluster, key in zip(labels, clusters, sort_keys)]
 
 	# reduce to hosts that share the group characteristic with all other hosts in the group
 	for group in groups:

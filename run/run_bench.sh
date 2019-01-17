@@ -81,18 +81,16 @@ aws)
 	[ -z "${groupTypes}" ] && groupTypes="cluster spread multi-az"
 	[ -z "${instanceTypes}" ] && instanceTypes="vm vmc5 metal"
 	groupClassifier="${bastionUtilDir}/bandwidthGroupClassifier.sh"
-	groupClassLabels="15Gb 10Gb 5Gb" # in order, most desirable class first
-	groupClassMeans="15000000000 10000000000 5000000000"
-	groupClassOrder="descending" # match class order above
+	groupClassLabels="15Gb 10Gb 5Gb" # in order, descending
+	groupClassThresholds="9800000000 5500000000" # must match class label order
 	groupReqHosts=4
 	;;
 gcp)
 	[ -z "${groupTypes}" ] && groupTypes="single-az multi-az"
 	[ -z "${instanceTypes}" ] && instanceTypes="vm"
 	groupClassifier="${bastionUtilDir}/bandwidthGroupClassifier.sh"
-	groupClassLabels="16Gb 10Gb" # in order, most desirable class first
-	groupClassMeans="15000000000 10000000000"
-	groupClassOrder="descending" # match class order above
+	groupClassLabels="16Gb 10Gb" # in order, descending
+	groupClassThresholds="9800000000" # must match class label order
 	groupReqHosts=4
 	;;
 *) # unknown
@@ -116,7 +114,7 @@ for instanceType in ${instanceTypes}; do
 		[ ! -z "${nodeClassifier}" ] && runParams+=" --nodeClassifier ${nodeClassifier}"
 
 		if [ ! -z "${groupClassifier}" ]; then
-			${utilDir}/sshBastion.sh ${platform} "${groupClassifier} ${hostfile} --class_labels ${groupClassLabels} --class_means ${groupClassMeans} --${groupClassOrder}"
+			${utilDir}/sshBastion.sh ${platform} "${groupClassifier} ${hostfile} --labels ${groupClassLabels} --thresholds ${groupClassThresholds}"
 			foundClass=
 
 			for class in ${groupClassLabels}; do

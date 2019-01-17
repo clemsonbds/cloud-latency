@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
 import logging as log
+import pprint
+
+pp = pprint.PrettyPrinter(indent=4)
 
 def parse_args():
 	import argparse
@@ -94,9 +97,12 @@ def main():
 			filename = '.'.join([group['label'], "hosts"])
 			write_hostfile(args.output_dir, filename, group['exclusive_hosts'])
 
+	# write log
+	log.info(pp.pformat(groups))
+
 	# write stdout
 	if args.json:
-		pprint(groups)
+		pp.pprint(groups)
 	else:
 		for group in groups:
 			print(group['label']+","+','.join(group['exclusive_hosts']))
@@ -191,11 +197,6 @@ def write_hostfile(output_dir, filename, hosts):
 	with open(os.path.join(output_dir, filename), 'w') as f:
 		for host in hosts:
 			f.write(host+'\n')
-
-def pprint(structure):
-	import pprint
-	pp = pprint.PrettyPrinter(indent=4)
-	pp.pprint(structure)
 
 def log_init(logfile=None, verbose=False):
 	import logging as log

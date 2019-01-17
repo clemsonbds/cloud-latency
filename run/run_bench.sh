@@ -114,16 +114,22 @@ for instanceType in ${instanceTypes}; do
 		[ ! -z "${nodeClassifier}" ] && runParams+=" --nodeClassifier ${nodeClassifier}"
 
 		if [ ! -z "${groupClassifier}" ]; then
-			${utilDir}/sshBastion.sh ${platform} "${groupClassifier} ${hostfile} --labels ${groupClassLabels} --thresholds ${groupClassThresholds}"
+			nclasses=`echo ${groupClassLabels} | wc -w`
+			classes_csv=`${utilDir}/sshBastion.sh ${platform} "${groupClassifier} ${hostfile} --labels ${groupClassLabels} --thresholds ${groupClassThresholds}" | tail -n ${nclasses}`
+#			${utilDir}/sshBastion.sh ${platform} "rm -f /nfs/*.classified.hosts"
 			foundClass=
 
-			for class in ${groupClassLabels}; do
-				classHostfile="/nfs/${class}.hosts"
-				hostfilter=`${utilDir}/sshBastion.sh ${platform} "${bastionUtilDir}/hostfileToHosts.sh ${classHostfile} ${groupReqHosts}"`
+			for line in `echo ${classes_csv}`; do
+#			for class in ${groupClassLabels}; do
+#				classHostfile="/nfs/${class}.classified.hosts"
+				class=`echo ${line} | cut -d, -f1`
+				hostfilter=`echo ${line} | cut -d, -f2-`
+#				hostfilter=`${utilDir}/sshBastion.sh ${platform} "${bastionUtilDir}/hostfileToHosts.sh ${classHostfile} ${groupReqHosts}"`
 				nhosts=`echo ${hostfilter} | tr ',' ' ' | wc -w`
 
 				if [ "${nhosts}" -ge "${groupReqHosts}" ]; then
-					echo "Found the required ${nhosts} in class ${class}."
+					echo "Found ${nhosts} of the required ${$groupReqHosts} in class ${class}."
+					hostfilter=`echo ${hostfilter} | cut -d, -f1-"${groupReqHosts}"`
 					runParams+=" --groupClass ${class} --hostfilter ${hostfilter}"
 					foundClass=1
 					break

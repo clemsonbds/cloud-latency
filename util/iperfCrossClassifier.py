@@ -11,10 +11,10 @@ def parse_args():
 #	parser.add_argument('--sample_dir', required=True)
 #	parser.add_argument('--filter_by', help='a pattern to include in input files')
 	parser.add_argument('--sample_files', nargs='+', help='JSON result files from iperf')
-	parser.add_argument('--stdout_type', default='csv', choices=['none','csv','json'])
 	parser.add_argument('--output_dir', help='write hostfiles named <class>.hosts to this directory')
 	parser.add_argument('--verbose', default=False, action='store_true', help='output processing steps, followed by the output specified by stdout_type')
 	parser.add_argument("--logfile", nargs='?', default=None, const="./%s.log" % (time.strftime('%m-%d-%Y_%H:%M:%S')))
+	parser.add_argument('--json', default=False, action='store_true', help='print the cluster structure in JSON format rather than CSV')
 
 	group = parser.add_mutually_exclusive_group(required=True)
 	group.add_argument('--K', type=int, help='the number of groups to divide samples into, will generate labels')
@@ -95,9 +95,9 @@ def main():
 			write_hostfile(args.output_dir, filename, group['exclusive_hosts'])
 
 	# write stdout
-	if args.stdout_type == 'json':
+	if args.json:
 		pprint(groups)
-	elif args.stdout_type == 'csv':
+	else:
 		for group in groups:
 			print(group['label']+","+','.join(group['exclusive_hosts']))
 

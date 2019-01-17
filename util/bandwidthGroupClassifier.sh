@@ -47,7 +47,7 @@ outDir=`dirname ${hostfile}`
 sample_files=`echo ${resultDir}/*${resultName}*` # weirdness with brace expansion and wildcards requires echo
 
 classifierArgs+=" --sample_files ${sample_files}"
-classifierArgs+=" --output_dir ${outDir}"
+#classifierArgs+=" --output_dir ${outDir}"
 classifierArgs+=" $@"
 
 #echo "Classifying bandwidth results with parameters:"

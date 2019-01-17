@@ -1,4 +1,4 @@
-#!/usr/bin/env python -O
+#!/usr/bin/env python
 
 import logging as log
 

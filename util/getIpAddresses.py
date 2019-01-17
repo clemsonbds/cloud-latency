@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from __future__ import print_function
 
@@ -29,7 +29,7 @@ def get_gcp_addresses(args):
 		response = request.execute()
 
 	except HttpError as e:
-		perror("GCP HTTP error: %s" % e._get_reason())
+		perror(e._get_reason())
 		raise CloudResponseError from e
 
 	instances = sum([zone['instances'] for zone in response['items']], [])

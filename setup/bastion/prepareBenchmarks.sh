@@ -1,31 +1,13 @@
 #!/bin/bash
 
-baseDir=/nfs/repos/benchmarks
+REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)
 
-rm -rf ${baseDir}
+benchmarks_dir=${REPO}/benchmarks
+install_dir=$HOME
 
-# fetch benchmark suites
-
-# mpi pingpong
-benchDir=${baseDir}/pingpong
-git clone https://github.com/Rakurai/mpi-pingpong.git ${benchDir}
-sed -i 's|/opt/local/include|/opt/local/include -std=gnu99|' ${benchDir}/Makefile
-(cd ${benchDir} && make)
-
-# intel MPI
-benchDir="/nfs/repos/project/intelmpi"
-installDir="${baseDir}/intelmpi"
-${benchDir}/install.sh ${installDir}
-${benchDir}/build.sh ${installDir}
-
-# LAMMPS
-benchDir="/nfs/repos/project/lammps"
-cd ${benchDir}
-./install.sh
-./build.sh
-
-# NPB
-benchDir="/nfs/repos/project/npb"
-cd ${benchDir}
-./install.sh
-./build.sh
+# fetch and compile benchmark suites from the install/build scripts
+for bench_dir in `find ${benchmarks_dir} -maxdepth 1 -mindepth 1 -type d`; do
+	dest_dir=${install_dir}/`basename ${bench_dir}`
+	${bench_dir}install.sh ${dest_dir}
+	${bench_dir}build.sh ${dest_dir}
+done

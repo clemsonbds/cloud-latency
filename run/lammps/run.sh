@@ -1,7 +1,7 @@
 #!/bin/bash
 
-baseDir=/nfs/repos/project
-utilDir=${baseDir}/util
+REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)
+UTIL=${REPO}/util
 
 resultDir=.
 resultName=none
@@ -67,7 +67,7 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-[ -z "${hostfilter}" ] && hostfilter=`${utilDir}/hostfileToHosts.sh ${hostfile}`
+[ -z "${hostfilter}" ] && hostfilter=`${UTIL}/hostfileToHosts.sh ${hostfile}`
 
 # MPI run parameters
 mpiParams+=" -np 128"
@@ -77,10 +77,10 @@ mpiParams+=" --map-by node"
 mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
 [ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
 
-executable="/nfs/repos/benchmarks/lammps/micelle/lmp_mpi"
-benchArgs="-in /nfs/repos/benchmarks/lammps/micelle/in.micelle"
+executable="/nfs/bin/lammps/lmp_mpi"
+benchArgs="-in /nfs/repos/benchmarks/lammps/micelle/in.micelle $@"
 
-[ ! -z "${nodeClassifier}" ] && nodeClasses=`${utilDir}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
+[ ! -z "${nodeClassifier}" ] && nodeClasses=`${UTIL}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
 timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 outFile="${resultDir}/lammps.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
 

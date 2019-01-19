@@ -4,9 +4,9 @@
 # take a hostfile and classify the hosts into two groups around a mean bandwith threshold
 #
 
-DIR="$(dirname "${BASH_SOURCE[0]}")"
-utilDir=${DIR}
-runDir=${DIR}/../run
+REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)
+UTIL=${REPO}/util
+RUN=${REPO}/run
 
 hostfile=$1
 
@@ -22,7 +22,7 @@ echo "Classifying hosts based on bandwidth."
 # get set of cross-sectional bandwidth measurements
 resultDir=/nfs/bwthresh/samples
 resultName=bwclassify
-nodeClassifier=${utilDir}/hostnameNodeClassifier.sh
+nodeClassifier=${UTIL}/hostnameNodeClassifier.sh
 seconds=2
 
 mkdir -p ${resultDir}
@@ -38,7 +38,7 @@ nhosts=`wc -l ${hostfile}`
 echo "Running cross-sectional bandwidth study of ${nhosts} hosts."
 #echo "${measureArgs}"
 
-${runDir}/iperf/run_cross.sh ${measureArgs} > /dev/null
+${RUN}/iperf/run_cross.sh ${measureArgs} > /dev/null
 
 # break into two hostfiles
 # put them in same dir as hostfile
@@ -53,19 +53,6 @@ classifierArgs+=" $@"
 #echo "Classifying bandwidth results with parameters:"
 #echo "${classifierArgs}"
 
-${utilDir}/iperfCrossClassifier.py ${classifierArgs}
+${UTIL}/iperfCrossClassifier.py ${classifierArgs}
 
 #echo "Done."
-
-#dominant=
-#max_n=0
-
-#for cls in `echo ${classes} | tr ',' ' '`; do
-#	n=`cat ${outDir}/${cls}.hosts | wc -l`
-#	if [ "${n}" -gt "${max_n}" ]; then
-#		max_n=${n}
-#		dominant=${cls}
-#	fi
-#done
-
-#echo ${dominant}

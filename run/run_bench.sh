@@ -1,10 +1,12 @@
 #!/bin/bash
 
-DIR="$(dirname "${BASH_SOURCE[0]}")"
-utilDir=${DIR}/../util
-setupDir=${DIR}/../setup
+REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)
+UTIL=${REPO}/util
+SETUP=${REPO}/setup
 
-bastionUtilDir="/nfs/repos/project/util"
+BASTION_REPO="/nfs/repos/project"
+BASTION_UTIL="${BASTION_REPO}/util"
+BASTION_RUN="${BASTION_REPO}/run"
 nodeClassifier="/nfs/resources/getCpuIdentity.sh"
 hostfile="/nfs/mpi.hosts"
 numItersPerSet=1
@@ -85,7 +87,7 @@ case ${platform} in
 aws)
 	[ -z "${groupTypes}" ] && groupTypes="cluster spread multi-az"
 	[ -z "${instanceTypes}" ] && instanceTypes="vm vmc5 metal"
-	groupClassifier="${bastionUtilDir}/bandwidthGroupClassifier.sh"
+	groupClassifier="${BASTION_UTIL}/bandwidthGroupClassifier.sh"
 	groupClassLabels="15Gb 10Gb 5Gb" # in order, descending
 	groupClassThresholds="9800000000 5500000000" # must match class label order
 	groupReqHosts=4
@@ -93,7 +95,7 @@ aws)
 gcp)
 	[ -z "${groupTypes}" ] && groupTypes="single-az multi-az"
 	[ -z "${instanceTypes}" ] && instanceTypes="vm"
-	groupClassifier="${bastionUtilDir}/bandwidthGroupClassifier.sh"
+	groupClassifier="${BASTION_UTIL}/bandwidthGroupClassifier.sh"
 	groupClassLabels="16Gb 10Gb" # in order, descending
 	groupClassThresholds="9800000000" # must match class label order
 	groupReqHosts=4
@@ -113,8 +115,8 @@ for instanceType in ${instanceTypes}; do
 		expType="${platform}.${instanceType}.${groupType}"
 		runParams=" --hostfile ${hostfile}" # must be included, the MPI parameter --host acts as a filter
 
-		${setupDir}/stopInstances.sh ${platform}
-		${setupDir}/startInstances.sh ${expType}
+		${SETUP}/stopInstances.sh ${platform}
+		${SETUP}/startInstances.sh ${expType}
 
 		# specify a node classifier to be run by all experiments
 		[ ! -z "${nodeClassifier}" ] && runParams+=" --nodeClassifier ${nodeClassifier}"
@@ -123,7 +125,7 @@ for instanceType in ${instanceTypes}; do
 		if [ ! -z "${groupClassifier}" ]; then
 			# classify the nodes
 			nclasses=`echo ${groupClassLabels} | wc -w`
-			classes_csv=`${utilDir}/sshBastion.sh ${platform} "${groupClassifier} ${hostfile} --labels ${groupClassLabels} --thresholds ${groupClassThresholds}" | tail -n ${nclasses}`
+			classes_csv=`${UTIL}/sshBastion.sh ${platform} "${groupClassifier} ${hostfile} --labels ${groupClassLabels} --thresholds ${groupClassThresholds}" | tail -n ${nclasses}`
 			foundClass=
 
 			# limit to classes with enough nodes to run our experiment
@@ -164,7 +166,7 @@ for instanceType in ${instanceTypes}; do
 
 		if [ -z "${skip_warmup}" ]; then
 			echo Running warmup.
-			${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_bench.sh --expType warmup ${runParams} $@"
+			${UTIL}/sshBastion.sh ${platform} "${BASTION_RUN}/run_bench.sh --expType warmup ${runParams} $@"
 		fi
 
 		for inner_iter in `seq 1 ${numItersPerProvision}`; do
@@ -172,12 +174,12 @@ for instanceType in ${instanceTypes}; do
 
 			if [ -z "${skip_micro}" ]; then
 				echo Running micro measurements.
-				${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_micro.sh --expType ${expType} ${runParams} $@"
+				${UTIL}/sshBastion.sh ${platform} "${BASTION_RUN}/run_micro.sh --expType ${expType} ${runParams} $@"
 			fi
 
 			if [ -z "${skip_bench}" ]; then
 				echo Running benchmarks.
-				${utilDir}/sshBastion.sh ${platform} "~/project/run/bastion/run_bench.sh --expType ${expType} ${runParams} $@"
+				${UTIL}/sshBastion.sh ${platform} "${BASTION_RUN}/run_bench.sh --expType ${expType} ${runParams} $@"
 			fi
 		done
 

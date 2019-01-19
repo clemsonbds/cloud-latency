@@ -1,7 +1,8 @@
 #!/bin/bash
 
-DIR="$(dirname "${BASH_SOURCE[0]}")"
-utilDir=${DIR}/../util
+REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)
+UTIL=${REPO}/util
+SETUP=${REPO}/setup
 
 # just a set of shortcuts to start an experiment
 
@@ -122,9 +123,9 @@ esac
 #instanceType="c4.large"
 #instanceCores=4
 
-expName=`${utilDir}/getSetting.sh expName ${platform} | awk '{print tolower($0)}'`
-region=`${utilDir}/getSetting.sh region ${platform}`
-keyName=`${utilDir}/getSetting.sh instanceKeyPair ${platform}`
+expName=`${UTIL}/getSetting.sh expName ${platform} | awk '{print tolower($0)}'`
+region=`${UTIL}/getSetting.sh region ${platform}`
+keyName=`${UTIL}/getSetting.sh instanceKeyPair ${platform}`
 
 options="--create --name ${expName} --cloudProvider ${platform}  --region ${region} --keyName ${keyName} --azs ${azs} --experimentType ${expType} --profile ${creds}"
 
@@ -136,7 +137,7 @@ if [ "${platform}" == "aws" ]; then
 fi
 
 if [ "${platform}" == "gcp" ]; then
-	projectID=`${utilDir}/getSetting.sh projectID ${platform}`
+	projectID=`${UTIL}/getSetting.sh projectID ${platform}`
 	options+=" --projectId ${projectID}"
 fi
 
@@ -149,7 +150,6 @@ if [ ! -z "${numInstances}" ]; then
 fi
 
 echo "Starting experiment '$profile' cloud resources."
-${DIR}/launchInstances.py ${options}
+${SETUP}/launchInstances.py ${options}
 
-${DIR}/configureInstances.sh ${platform} ${instanceCores}
-
+${SETUP}/configureInstances.sh ${platform} ${instanceCores}

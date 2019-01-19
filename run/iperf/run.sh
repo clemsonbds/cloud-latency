@@ -1,7 +1,7 @@
 #!/bin/bash
 
-baseDir=/nfs/repos/project
-utilDir=${baseDir}/util
+REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)
+UTIL=${REPO}/util
 
 resultDir=.
 resultName=none
@@ -69,11 +69,11 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-[ -z "${hostfilter}" ] && hostfilter=`${utilDir}/hostfileToHosts.sh ${hostfile} 2`
+[ -z "${hostfilter}" ] && hostfilter=`${UTIL}/hostfileToHosts.sh ${hostfile} 2`
 
 executable="iperf3"
 
-[ ! -z "${nodeClassifier}" ] && nodeClasses=`${utilDir}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
+[ ! -z "${nodeClassifier}" ] && nodeClasses=`${UTIL}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
 timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 outFile="${resultDir}/iperf.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.json"
 

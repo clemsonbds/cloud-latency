@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIR="$(dirname "${BASH_SOURCE[0]}")"
+repo_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)
 
 # installing needed stuff
 # sudo yum update -y -q

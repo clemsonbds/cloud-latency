@@ -1,7 +1,8 @@
 #!/bin/bash
 
-baseDir=/nfs/repos/project
-utilDir=${baseDir}/util
+REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)
+UTIL=${REPO}/util
+RUN=${REPO}/run
 
 resultDir=.
 resultName=none
@@ -67,7 +68,7 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-[ -z "${hostfilter}" ] && hostfilter=`${utilDir}/hostfileToHosts.sh ${hostfile}`
+[ -z "${hostfilter}" ] && hostfilter=`${UTIL}/hostfileToHosts.sh ${hostfile}`
 nhosts=`echo ${hostfilter} | awk -F, '{ print NF; exit }'`
 
 # MPI run parameters
@@ -78,10 +79,10 @@ mpiParams+=" --map-by node"
 mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
 [ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
 
-executable="/nfs/repos/benchmarks/intelmpi/IMB-MPI1"
-benchArgs=
+executable="/nfs/bin/intelmpi/IMB"
+benchArgs="$@"
 
-[ ! -z "${nodeClassifier}" ] && nodeClasses=`${utilDir}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
+[ ! -z "${nodeClassifier}" ] && nodeClasses=`${UTIL}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
 timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 outFile="${resultDir}/impi.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
 

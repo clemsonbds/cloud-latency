@@ -1,7 +1,7 @@
 #!/bin/bash
 
-baseDir=/nfs/repos/project
-utilDir=${baseDir}/util
+REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)
+UTIL=${REPO}/util
 
 hostfile="/nfs/mpi.hosts"
 groupClass=none
@@ -85,7 +85,7 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-[ -z "${hostfilter}" ] && hostfilter=`${utilDir}/hostfileToHosts.sh ${hostfile}`
+[ -z "${hostfilter}" ] && hostfilter=`${UTIL}/hostfileToHosts.sh ${hostfile}`
 hostfilter=`echo ${hostfilter} | cut -d, -f1-2`
 
 # MPI run parameters
@@ -95,7 +95,7 @@ mpiParams+=" --host ${hostfilter}" # filter the hostfile
 mpiParams+=" --map-by node"
 [ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
 
-executable="/nfs/repos/benchmarks/pingpong/pingpong"
+executable="/nfs/bin/pingpong/pingpong"
 
 # executable parameters
 ppArgs="-t -s ${skip} -b ${msgBytes}"
@@ -106,8 +106,10 @@ else
     ppArgs+=" -d ${seconds}"
 fi
 
+ppArgs+=" $@"
+
 # name the output file
-[ ! -z "${nodeClassifier}" ] && nodeClasses=`${utilDir}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
+[ ! -z "${nodeClassifier}" ] && nodeClasses=`${UTIL}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
 timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 outFile="${resultDir}/pingpong.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
 

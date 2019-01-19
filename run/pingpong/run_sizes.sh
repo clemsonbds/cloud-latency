@@ -1,8 +1,8 @@
 #!/bin/bash
 
-baseDir=/nfs/repos/project
-utilDir=${baseDir}/util
-benchDir=${baseDir}/run
+REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)
+UTIL=${REPO}/util
+RUN=${REPO}/run
 
 resultName=none
 maxBytes=1024
@@ -36,7 +36,7 @@ currentBytes=1
 echo Running pingpong message sizes measurement from bytes ${currentBytes} to ${maxBytes}.
 
 while [ "${currentBytes}" -le "${maxBytes}" ]; do
-	${benchDir}/pingpong/run.sh --resultName "byte-${currentBytes}.${resultName}" --msgBytes "${currentBytes}" $@
+	${RUN}/pingpong/run.sh --resultName "byte-${currentBytes}.${resultName}" --msgBytes "${currentBytes}" "$@"
 	currentBytes=$((currentBytes * 2))
 done
 

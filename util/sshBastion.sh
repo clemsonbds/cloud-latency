@@ -1,12 +1,13 @@
 #!/bin/bash
 
-DIR="$(dirname "${BASH_SOURCE[0]}")"
+REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)
+UTIL=${REPO}/util
 
 platform=${1:-"aws"}
 shift
 
-bastionIP=`${DIR}/getBastionIP.sh ${platform}`
-bastionKey=`${DIR}/getSetting.sh bastionPrivateKey ${platform}`
-bastionUser=`${DIR}/getSetting.sh bastionUser ${platform}`
+bastionIP=`${UTIL}/getBastionIP.sh ${platform}`
+bastionKey=`${UTIL}/getSetting.sh bastionPrivateKey ${platform}`
+bastionUser=`${UTIL}/getSetting.sh bastionUser ${platform}`
 
 ssh -q -i ${bastionKey} ${bastionUser}@${bastionIP} $@

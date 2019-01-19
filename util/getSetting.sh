@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DIR="$(dirname "${BASH_SOURCE[0]}")"
-settingsFile=${DIR}/../assets/settings.ini
+REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)
+settingsFile=${REPO}/assets/settings.ini
 
 if [ -z "$1" ]; then
 	echo "usage: $0 <key> [platform]"

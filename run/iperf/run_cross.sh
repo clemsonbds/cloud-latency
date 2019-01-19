@@ -1,8 +1,8 @@
 #!/bin/bash
 
-baseDir=/nfs/repos/project
-utilDir=${baseDir}/util
-benchDir=${baseDir}/run
+REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)
+UTIL=${REPO}/util
+RUN=${REPO}/run
 
 resultName=none
 hostfile="/nfs/mpi.hosts"
@@ -36,7 +36,7 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
-[ -z "${hostfilter}" ] && hostfilter=`${utilDir}/hostfileToHosts.sh ${hostfile}`
+[ -z "${hostfilter}" ] && hostfilter=`${UTIL}/hostfileToHosts.sh ${hostfile}`
 
 echo Running iperf cross measurement between hosts ${hostfilter}
 
@@ -46,7 +46,7 @@ for src in `echo ${hostfilter} | tr ',' ' '`; do
     dstIndex=0
     for dst in `echo ${hostfilter} | tr ',' ' '`; do
         if [ "${dstIndex}" -gt "${srcIndex}" ]; then
-            ${benchDir}/iperf/run.sh --resultName "cross.${resultName}" --hostfilter "${src},${dst}" $@
+            ${RUN}/iperf/run.sh --resultName "cross.${resultName}" --hostfilter "${src},${dst}" "$@"
         fi
 
         dstIndex=$((dstIndex+1))

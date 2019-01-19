@@ -1,7 +1,7 @@
 #!/bin/bash
 
-baseDir=/nfs/repos/project
-benchDir=${baseDir}/run
+REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)
+RUN=${REPO}/run
 
 resultDir=/nfs/results/bench
 
@@ -58,9 +58,9 @@ fi
 mkdir -p ${resultDir}
 
 if [ "${expType}" == "warmup" ]; then
-	${benchDir}/npb/run.sh --ep_only --trash $@
+	${RUN}/npb/run.sh --ep_only --trash $@
 	exit
 fi
 
-[ -z "${skip_npb}" ]    && ${benchDir}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
-[ -z "${skip_lammps}" ] && ${benchDir}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@
+[ -z "${skip_npb}" ]    && ${RUN}/npb/run.sh --resultName ${expType} --resultDir ${resultDir} $@
+[ -z "${skip_lammps}" ] && ${RUN}/lammps/run.sh --resultName ${expType} --resultDir ${resultDir} $@

@@ -31,7 +31,7 @@ ${UTIL}/sshBastion.sh ${provider} "mkdir -p /nfs/resources"
 # platform-specific files for instances
 ${UTIL}/sshBastion.sh ${provider} "cp ~/project/assets/bash/bashrc.instance.${provider} /nfs/resources/bashrc.instance"
 ${UTIL}/sshBastion.sh ${provider} "~/project/util/generateCpuIdentityScript.sh ${provider}"
-${UTIL}/sshBastion.sh ${provider} "cp ~/project/intelmpi/Makefile.${provider} /nfs/resources/Makefile.intelmpi"
+${UTIL}/sshBastion.sh ${provider} "cp ~/project/benchmarks/intelmpi/Makefile.${provider} /nfs/resources/Makefile.intelmpi"
 
 # hand off to bastion local configuration scripts
 ${UTIL}/sshBastion.sh ${provider} "~/project/setup/bastion/configure.sh"

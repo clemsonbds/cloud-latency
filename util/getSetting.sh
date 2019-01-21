@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)
+REPO=$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && git rev-parse --show-toplevel)
 settingsFile=${REPO}/assets/settings.ini
 
 if [ -z "$1" ]; then

@@ -4,7 +4,7 @@
 # take a hostfile and classify the hosts into two groups around a mean bandwith threshold
 #
 
-REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)
+REPO=$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && git rev-parse --show-toplevel)
 UTIL=${REPO}/util
 RUN=${REPO}/run
 

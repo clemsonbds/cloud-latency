@@ -1,6 +1,6 @@
 #!/bin/bash
 
-repo_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)
+REPO=$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && git rev-parse --show-toplevel)
 
 bastionLocalIP=`/usr/sbin/ifconfig | grep eth0 -A 1 | tail -n 1 | awk '{print $2}'`
 

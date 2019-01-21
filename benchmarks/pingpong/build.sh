@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-install_dir=$1
+install_dir=${1:-"$HOME/pingpong"}
 target=${2:-"all"}
 
 build_dir=${install_dir}

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-install_dir=$1
+install_dir=${1:-"$HOME/lammps"}
 target=${2:-"mpi"}
 
 build_dir=${install_dir}/src

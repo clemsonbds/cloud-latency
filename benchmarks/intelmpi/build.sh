@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-install_dir=$1
+install_dir=${1:-"$HOME/intelmpi"}
 target=${2:-"IMB-MPI1"}
 
 build_dir=${install_dir}
 bin_dir=/nfs/bin/intelmpi
-exec_file={target}
+exec_file=${target}
 new_exec_file=IMB # standardized for the run script
 
 make --directory ${build_dir} ${target}

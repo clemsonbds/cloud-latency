@@ -40,6 +40,11 @@ case $key in
     shift
     shift
     ;;
+--nhosts)
+    nhosts="$2"
+    shift
+    shift
+    ;;
 --nodeClassifier)
     nodeClassifier="$2"
     shift
@@ -71,7 +76,7 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-[ -z "${hostfilter}" ] && hostfilter=`${UTIL}/hostfileToHosts.sh ${hostfile}`
+[ -z "${hostfilter}" ] && hostfilter=`${UTIL}/hostfileToHosts.sh ${hostfile} ${nhosts}`
 
 # MPI run parameters
 mpiParams+=" --hostfile ${hostfile}"

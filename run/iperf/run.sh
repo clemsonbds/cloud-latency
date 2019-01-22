@@ -3,7 +3,6 @@
 REPO=$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && git rev-parse --show-toplevel)
 UTIL=${REPO}/util
 
-resultDir=.
 resultName=none
 seconds=10
 hostfile="/nfs/mpi.hosts"
@@ -73,9 +72,12 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 executable="iperf3"
 
-[ ! -z "${nodeClassifier}" ] && nodeClasses=`${UTIL}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
-timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
-outFile="${resultDir}/iperf.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.json"
+if [ ! -z "${resultDir}" ]; then
+    [ ! -z "${nodeClassifier}" ] && nodeClasses=`${UTIL}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
+    timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
+    outFile="${resultDir}/iperf.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.json"
+    output="> ${outFile}"
+fi
 
 server=`echo ${hostfilter} | cut -d, -f1`
 serverParams="-s -1"
@@ -87,7 +89,7 @@ echo Running iperf between ${server} and ${client}.
 
 if [ -z "$dryrun" ]; then
     ssh -q -f ${server} "sh -c 'nohup ${executable} ${serverParams} > /dev/null 2>&1 &'" # start in background and move on
-    ssh -q ${client} "${executable} ${clientParams}" > ${outFile}
+    ssh -q ${client} "${executable} ${clientParams}" ${output}
 
     # throw away?
     [ -z "$trash" ] || rm -f ${outFile}

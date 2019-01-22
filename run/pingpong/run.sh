@@ -6,8 +6,8 @@ UTIL=${REPO}/util
 hostfile="/nfs/mpi.hosts"
 groupClass=none
 nodeClasses=none
-resultDir=.
 resultName=none
+
 iters=20
 skip=1000
 msgBytes=1
@@ -109,12 +109,15 @@ fi
 ppArgs+=" $@"
 
 # name the output file
-[ ! -z "${nodeClassifier}" ] && nodeClasses=`${UTIL}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
-timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
-outFile="${resultDir}/pingpong.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
+if [ ! -z "${resultDir}" ]; then
+    [ ! -z "${nodeClassifier}" ] && nodeClasses=`${UTIL}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
+    timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
+    outFile="${resultDir}/pingpong.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
+    output="1> ${outFile}"
+fi
 
 echo Running pingpong between ${hostfilter}
-command="mpirun ${mpiParams} ${executable} ${ppArgs} 1> ${outFile}"
+command="mpirun ${mpiParams} ${executable} ${ppArgs} ${output}"
 
 if [ -z "$dryrun" ]; then
     eval ${command}

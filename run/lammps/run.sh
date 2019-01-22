@@ -3,7 +3,6 @@
 REPO=$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && git rev-parse --show-toplevel)
 UTIL=${REPO}/util
 
-resultDir=.
 resultName=none
 hostfile="/nfs/mpi.hosts"
 groupClass=none
@@ -85,12 +84,15 @@ mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
 executable="/nfs/bin/lammps/lmp_mpi"
 benchArgs="-in /nfs/repos/benchmarks/lammps/micelle/in.micelle $@"
 
-[ ! -z "${nodeClassifier}" ] && nodeClasses=`${UTIL}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
-timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
-outFile="${resultDir}/lammps.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
+if [ ! -z "${resultDir}" ]; then
+    [ ! -z "${nodeClassifier}" ] && nodeClasses=`${UTIL}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
+    timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
+    outFile="${resultDir}/lammps.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
+    output="1> ${outFile}"
+fi
 
 echo Running LAMMPS benchmark.
-command="mpirun ${mpiParams} ${executable} ${benchArgs} 1> ${outFile}"
+command="mpirun ${mpiParams} ${executable} ${benchArgs} ${output}"
 
 if [ -z "$dryrun" ]; then
     curDir=`pwd`

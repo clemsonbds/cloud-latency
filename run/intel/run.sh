@@ -4,7 +4,6 @@ REPO=$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && git rev-parse --show
 UTIL=${REPO}/util
 RUN=${REPO}/run
 
-resultDir=.
 resultName=none
 hostfile="/nfs/mpi.hosts"
 groupClass=none
@@ -87,12 +86,15 @@ mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
 executable="/nfs/bin/intelmpi/IMB"
 benchArgs="$@"
 
-[ ! -z "${nodeClassifier}" ] && nodeClasses=`${UTIL}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
-timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
-outFile="${resultDir}/impi.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
+if [ ! -z "${resultDir}" ]; then
+    [ ! -z "${nodeClassifier}" ] && nodeClasses=`${UTIL}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
+    timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
+    outFile="${resultDir}/impi.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
+    output="1> ${outFile}"
+fi
 
 echo Running Intel-MPI benchmark.
-command="mpirun ${mpiParams} ${executable} ${benchArgs} 1> ${outFile}"
+command="mpirun ${mpiParams} ${executable} ${benchArgs} ${output}"
 
 if [ -z "$dryrun" ]; then
     eval ${command}

@@ -92,7 +92,7 @@ hostfilter=`echo ${hostfilter} | cut -d, -f1-2`
 mpiParams+=" -np 2"
 mpiParams+=" --hostfile ${hostfile}"
 mpiParams+=" --host ${hostfilter}" # filter the hostfile
-mpiParams+=" --map-by node"
+mpiParams+=" --map-by node" # one each on first and second nodes
 [ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
 
 executable="/nfs/bin/pingpong/pingpong"

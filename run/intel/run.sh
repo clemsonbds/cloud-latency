@@ -79,7 +79,7 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 mpiParams+=" -np ${nhosts}"
 mpiParams+=" --hostfile ${hostfile}"
 mpiParams+=" --host ${hostfilter}" # filter the hostfile
-mpiParams+=" --map-by node"
+mpiParams+=" --map-by node" # distribute one process to each node
 mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
 [ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
 

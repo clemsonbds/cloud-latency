@@ -8,6 +8,9 @@ hostfile="/nfs/mpi.hosts"
 groupClass=none
 nodeClasses=none
 
+bin_dir=/nfs/bin/lammps
+input_dir=/nfs/bin/lammps/bench
+
 POSITIONAL=()
 while [[ $# -gt 0 ]]
 do
@@ -72,12 +75,16 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
 [ -z "${hostfilter}" ] && hostfilter=`${UTIL}/hostfileToHosts.sh ${hostfile} ${nhosts}`
+[ -z "${nhosts}" ] && nhosts=`echo ${hostfilter} | awk -F, '{ print NF; exit }'`
+
+# get the smallest host in the first n hosts
+nprocs_per_host=`grep "slots=" ${hostfile} | head -n ${nhosts} | sed 's/.*slots[\s]*=[\s]*\([0-9]\+\).*/\1/' | sort -n | head -n 1`
+nprocs=$((nprocs_per_host * nhosts))
 
 # MPI run parameters
-mpiParams+=" -np 128"
+mpiParams+=" -np ${nprocs}"
 mpiParams+=" --hostfile ${hostfile}"
 mpiParams+=" --host ${hostfilter}" # filter the hostfile
-mpiParams+=" --map-by node"
 mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
 [ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
 
@@ -87,24 +94,34 @@ benchArgs="-in /nfs/repos/benchmarks/lammps/micelle/in.micelle $@"
 if [ ! -z "${resultDir}" ]; then
     [ ! -z "${nodeClassifier}" ] && nodeClasses=`${UTIL}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
     timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
-    outFile="${resultDir}/lammps.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
-    output="1> ${outFile}"
 fi
 
-echo Running LAMMPS benchmark.
-command="mpirun ${mpiParams} ${executable} ${benchArgs} ${output}"
+for input in ${input_dir}/in.*; do
+    infile=`basename $input`
+    bench=`echo $infile|cut -d. -f2-|tr '.' '-'` # strips the 'in.'
+    exec=lmp.`echo $benchmark|cut -d- -f1` # strips the '-scaled' if it exists, append to 'lmp.'
+    dim_x=${nprocs_per_host}
+    dim_y=${nhosts}
 
-if [ -z "$dryrun" ]; then
-    curDir=`pwd`
-    cd /nfs/repos/benchmarks/lammps/micelle/
-    eval ${command}
+    bench_params="-in ${infile} -var x ${dim_x} -var y ${dim_y}"
 
-    # throw away?
-    [ -z "$trash" ] || rm -f ${outFile}
+    echo Running LAMMPS benchmark ${bench} using executable ${exec} and parameters ${bench_params}
 
-    cd ${curDir}
-else
-    echo ${command}
-fi
+    if [ ! -z "${resultDir}" ]; then
+        outFile="${resultDir}/lammps-${bench}.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
+        output="2> /dev/null 1> ${outFile}"
+    fi
+
+    command="mpirun ${mpiParams} ${bin_dir}/${exec} ${bench_params} ${output}"
+
+    if [ -z "$dryrun" ]; then
+        $(cd ${input_dir} && eval ${command})
+
+        # throw away?
+        [ -z "$trash" ] || rm -f ${outFile}
+    else
+        echo ${command}
+    fi
+done
 
 echo ""

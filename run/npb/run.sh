@@ -80,7 +80,7 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 # MPI run parameters
 mpiParams+=" --hostfile ${hostfile}"
 mpiParams+=" --host ${hostfilter}" # filter the hostfile
-mpiParams+=" --map-by node"
+mpiParams+=" --map-by node" # variable number of processes, ensure even spread
 mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
 [ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
 

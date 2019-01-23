@@ -3,7 +3,6 @@
 REPO=$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && git rev-parse --show-toplevel)
 UTIL=${REPO}/util
 
-resultDir=.
 resultName=none
 hostfile="/nfs/mpi.hosts"
 groupClass=none
@@ -40,6 +39,11 @@ case $key in
     shift
     shift
     ;;
+--nhosts)
+    nhosts="$2"
+    shift
+    shift
+    ;;
 --nodeClassifier)
     nodeClassifier="$2"
     shift
@@ -71,7 +75,7 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-[ -z "${hostfilter}" ] && hostfilter=`${UTIL}/hostfileToHosts.sh ${hostfile}`
+[ -z "${hostfilter}" ] && hostfilter=`${UTIL}/hostfileToHosts.sh ${hostfile} ${nhosts}`
 
 # MPI run parameters
 mpiParams+=" --hostfile ${hostfile}"
@@ -81,8 +85,10 @@ mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
 [ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
 
 # output file name pieces
-[ ! -z "${nodeClassifier}" ] && nodeClasses=`${UTIL}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
-timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
+if [ ! -z "${resultDir}" ]; then
+    [ ! -z "${nodeClassifier}" ] && nodeClasses=`${UTIL}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
+    timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
+fi
 
 echo Running NPB benchmark.
 #mpirun ${mpiParams} ${executable} ${benchArgs} 1> ${outFile}
@@ -90,7 +96,6 @@ echo Running NPB benchmark.
 #hostfile="/nfs/files/scripts/env/mpi_hosts"
 #rankfile="/nfs/files/scripts/env/mpi_ranks_bynode" # fill each node in order, change rankfile to distribute
 #mpi_params="--mca btl ^tcp --rankfile ${rankfile}"
-outParams="2>/dev/null"
 
 BIN_DIR=/nfs/bin/npb
 
@@ -112,13 +117,14 @@ for exec in ${BIN_DIR}/*; do
 
     echo Running test $test, size = $size, NP = $procs
 
-    outFile="${resultDir}/npb-${test}-${size}.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
-#    touch ${outFile} # avoid 'file not found'
+    if [ ! -z "${resultDir}" ]; then
+        outFile="${resultDir}/npb-${test}-${size}.${resultName}.${nodeClasses}.${groupClass}.${timestamp}.raw"
+        output="2> /dev/null 1> ${outFile}"
+    fi
 
-#    while [ `grep "Time in seconds" ${outfile} | wc -l` -lt ${iters} ]; do
-    # for iter in `seq 1 ${iters}`; do
-#        echo "mpirun --np ${procs} ${mpiParams} ${BIN_DIR}/${exec} ${benchParams} > ${outFile}"
-    command="timeout 300 mpirun --np ${procs} ${mpiParams} ${BIN_DIR}/${exec} ${benchParams} > ${outFile}"
+#   touch ${outFile} # avoid 'file not found'
+#   while [ `grep "Time in seconds" ${outfile} | wc -l` -lt ${iters} ]; do
+    command="timeout 300 mpirun --np ${procs} ${mpiParams} ${BIN_DIR}/${exec} ${benchParams} ${output}"
 
     if [ -z "$dryrun" ]; then
         eval ${command}

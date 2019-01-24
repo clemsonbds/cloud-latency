@@ -48,4 +48,6 @@ mv ${build_dir}/${exec_file} ${bin_dir}/${new_exec_file}.rhodo
 make ${make_args} no-molecule no-kspace no-rigid
 
 # link the data/input directory on the shared filesystem
-ln -sf ${install_dir}/bench ${bin_dir}/bench
+#ln -sf ${install_dir}/bench ${bin_dir}/bench # NOPE
+mkdir -p ${bin_dir}/data
+cp ${install_dir}/bench/* ${bin_dir}/data

@@ -2,7 +2,7 @@
 
 REPO=$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && git rev-parse --show-toplevel)
 UTIL=${REPO}/util
-RUN=${REPO}/run
+RUN=${REPO}/benchmarks
 
 resultName=none
 maxBytes=1024

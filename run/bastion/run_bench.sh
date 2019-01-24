@@ -1,7 +1,7 @@
 #!/bin/bash
 
 REPO=$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && git rev-parse --show-toplevel)
-RUN=${REPO}/run
+RUN=${REPO}/benchmarks
 
 resultDir=/nfs/results/bench
 

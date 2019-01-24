@@ -99,7 +99,7 @@ fi
 for input in ${input_dir}/in.*; do
     infile=`basename $input`
     bench=`echo $infile|cut -d. -f2-|tr '.' '-'` # strips the 'in.'
-    exec=lmp.`echo $benchmark|cut -d- -f1` # strips the '-scaled' if it exists, append to 'lmp.'
+    exec="lmp."`echo $benchmark|cut -d- -f1` # strips the '-scaled' if it exists, append to 'lmp.'
     dim_x=${nprocs_per_host}
     dim_y=${nhosts}
 
@@ -115,7 +115,7 @@ for input in ${input_dir}/in.*; do
     command="mpirun ${mpiParams} ${bin_dir}/${exec} ${bench_params} ${output}"
 
     if [ -z "$dryrun" ]; then
-        $(cd ${input_dir} && eval ${command})
+        (cd ${input_dir} && eval ${command})
 
         # throw away?
         [ -z "$trash" ] || rm -f ${outFile}

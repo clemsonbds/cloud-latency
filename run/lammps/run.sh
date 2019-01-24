@@ -9,7 +9,7 @@ groupClass=none
 nodeClasses=none
 
 bin_dir=/nfs/bin/lammps
-input_dir=/nfs/bin/lammps/bench
+input_dir=/nfs/bin/lammps/data
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
@@ -99,11 +99,12 @@ fi
 for input in ${input_dir}/in.*; do
     infile=`basename $input`
     bench=`echo $infile|cut -d. -f2-|tr '.' '-'` # strips the 'in.'
-    exec="lmp."`echo $benchmark|cut -d- -f1` # strips the '-scaled' if it exists, append to 'lmp.'
-    dim_x=${nprocs_per_host}
-    dim_y=${nhosts}
+    exec="lmp."`echo $bench|cut -d- -f1` # strips the '-scaled' if it exists, append to 'lmp.'
+    dim_x="-var x 8" #${nprocs_per_host}"
+    dim_y="-var y 4" #${nhosts}"
+    dim_z="-var z 4"
 
-    bench_params="-in ${infile} -var x ${dim_x} -var y ${dim_y}"
+    bench_params="-in ${infile} ${dim_x} ${dim_y} ${dim_z}"
 
     echo Running LAMMPS benchmark ${bench} using executable ${exec} and parameters ${bench_params}
 

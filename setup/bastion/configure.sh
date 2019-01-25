@@ -10,6 +10,7 @@ REPO=$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && git rev-parse --show
 # sudo yum install -y -q gcc-c++ wget # LAMMPS
 # sudo yum install -y -q python-pip # needed to get networkx
 # sudo pip install networkx # needed for iperf classifier
+sudo yum install -y -q python3
 
 # create NFS
 echo -e "\nStarting NFS server on bastion."

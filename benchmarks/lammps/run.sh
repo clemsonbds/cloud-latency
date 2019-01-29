@@ -100,9 +100,13 @@ for input in ${input_dir}/in.*; do
     infile=`basename $input`
     bench=`echo $infile|cut -d. -f2-|tr '.' '-'` # strips the 'in.'
     exec="lmp."`echo $bench|cut -d- -f1` # strips the '-scaled' if it exists, append to 'lmp.'
-    dim_x="-var x 8" #${nprocs_per_host}"
-    dim_y="-var y 4" #${nhosts}"
-    dim_z="-var z 4"
+    triplet=`${UTIL}/minTriplet.py`
+    dim_x=`echo ${triplet}|cut -d, -f1`
+    dim_y=`echo ${triplet}|cut -d, -f2`
+    dim_z=`echo ${triplet}|cut -d, -f3`
+#    dim_x="-var x 8" #${nprocs_per_host}"
+#    dim_y="-var y 4" #${nhosts}"
+#    dim_z="-var z 4"
 
     bench_params="-in ${infile} ${dim_x} ${dim_y} ${dim_z}"
 

@@ -61,11 +61,8 @@ def get_aws_addresses(args):
 		raise CloudResponseError from e
 
 	result = json.loads(response)
+	instances = sum([reservation['Instances'] for reservation in result['Reservations']], [])
 
-	if len(result['Reservations']) == 0:
-		return []
-
-	instances = result['Reservations'][0]['Instances']
 	address_key = "%sIpAddress" % address_type
 
 	return [instance[address_key] for instance in instances]

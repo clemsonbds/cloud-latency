@@ -12,8 +12,9 @@ mkdir -p ${bin_dir}
 
 make_args="--directory ${build_dir}"
 
-ncores=`grep ^cpu\\scores /proc/cpuinfo | uniq |  awk '{print $4}'` # number of physical cores
-[ "${ncores}" -gt 1 ] && make_args+=" -j ${ncores}"
+#ncores=`grep ^cpu\\scores /proc/cpuinfo | uniq |  awk '{print $4}'` # number of physical cores
+ncores=`grep "^cpu\\scores" /proc/cpuinfo | wc -l` # number of threads
+make_args+=" -j ${ncores}"
 
 make ${make_args} no-all
 #make --directory ${build_dir} clean-all

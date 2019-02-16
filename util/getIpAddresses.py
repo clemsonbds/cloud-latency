@@ -32,7 +32,7 @@ def get_gcp_addresses(args):
 		perror(e._get_reason())
 		raise CloudResponseError from e
 
-	instances = sum([zone['instances'] for zone in response['items']], [])
+	instances = sum([zone['instances'] if 'instances' in zone else [] for zone in response['items'].values()], [])
 	return [instance['networkInterfaces'][0]['networkIP'] for instance in instances]
 
 def get_aws_addresses(args):

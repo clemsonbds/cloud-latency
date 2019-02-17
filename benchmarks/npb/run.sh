@@ -60,6 +60,10 @@ case $key in
     shift
     shift
     ;;
+--infiniband)
+    infiniband="T"
+    shift
+    ;;
 --dryrun)
     dryrun="T"
     shift
@@ -91,7 +95,9 @@ fi
 
 # MPI run parameters
 mpiParams+=" --map-by node" # variable number of processes, ensure even spread
-mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
+[ ! -z "${infiniband}" ] && mpiParams+=" --mca btl openib,self,sm"
+mpiParams+=" --mca plm_rsh_no_tree_spawn 1" # don't have slave nodes spawn more, requires more sshing
+mpiParams+=" --mca mpi_cuda_support 0" # don't try to use CUDA
 [ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
 
 # output file name pieces

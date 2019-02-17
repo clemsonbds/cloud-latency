@@ -18,24 +18,6 @@ $HOME/cloud-latency/npb/build.sh
 #for interface in ib eth; do
   for x in `seq 1 ${iterations}`; do
 
-    timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
-
-    for exec_file in ${bin_dir}/*; do
-      exec=`basename ${exec_file}`
-      test=`echo ${exec}|tr '.' ' '|awk '{print $1}'`
-      size=`echo ${exec}|tr '.' ' '|awk '{print $2}'`
-      procs=`echo ${exec}|tr '.' ' '|awk '{print $3}'`
-
-      # special case for DT
-      bench_params=
-      if [ "$test" = "dt" ]; then
-        procs=128
-        bench_params="BH"
-      fi
-
-      out_file="${out_dir}/npb.${test}-${size}.palmetto.metal.ib.${timestamp}.raw"
-
-      mpirun -n ${procs} ${mpi_params} ${exec_file} ${bench_params} > ${out_file}
-    done
+    $HOME/cloud-latency/benchmarks/npb/run.sh --resultName palmetto --infiniband --binDir ${bin_dir} --resultDir ${out_dir}
   done
 #done

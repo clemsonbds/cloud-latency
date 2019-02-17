@@ -4,9 +4,10 @@ REPO=$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && git rev-parse --show
 UTIL=${REPO}/util
 
 resultName=none
-hostfile="/nfs/mpi.hosts"
+#hostfile="/nfs/mpi.hosts"
 groupClass=none
 nodeClasses=none
+binDir=/nfs/bin/npb
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
@@ -18,6 +19,11 @@ case $key in
     resultDir="$2"
     shift # past argument
     shift # past value
+    ;;
+--binDir)
+    binDir="$2"
+    shift
+    shift
     ;;
 --resultName)
     resultName="$2"
@@ -74,19 +80,23 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
+if [ ! -z "${hostfile}" ]; then
+    mpiParams+=" --hostfile ${hostfile}"
 
-[ -z "${hostfilter}" ] && hostfilter=`${UTIL}/hostfileToHosts.sh ${hostfile} ${nhosts}`
+    if [ -z "${hostfilter}" ]; then
+        hostfilter=`${UTIL}/hostfileToHosts.sh ${hostfile} ${nhosts}`
+        mpiParams+=" --host ${hostfilter}" # filter the hostfile
+    fi
+fi
 
 # MPI run parameters
-mpiParams+=" --hostfile ${hostfile}"
-mpiParams+=" --host ${hostfilter}" # filter the hostfile
 mpiParams+=" --map-by node" # variable number of processes, ensure even spread
 mpiParams+=" --mca plm_rsh_no_tree_spawn 1"
 [ ! -z "${rankfile}" ] && mpiParams+=" --rankfile ${rankfile}"
 
 # output file name pieces
 if [ ! -z "${resultDir}" ]; then
-    [ ! -z "${nodeClassifier}" ] && nodeClasses=`${UTIL}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
+    nodeClasses=`${UTIL}/classifyNodes.sh ${hostfilter} ${nodeClassifier}`
     timestamp="`date '+%Y-%m-%d_%H:%M:%S'`"
 fi
 
@@ -97,9 +107,7 @@ echo Running NPB benchmark.
 #rankfile="/nfs/files/scripts/env/mpi_ranks_bynode" # fill each node in order, change rankfile to distribute
 #mpi_params="--mca btl ^tcp --rankfile ${rankfile}"
 
-BIN_DIR=/nfs/bin/npb
-
-for exec in ${BIN_DIR}/*; do
+for exec in ${binDir}/*; do
     exec=`basename $exec`
     test=`echo $exec|tr '.' ' '|awk '{print $1}'`
     size=`echo $exec|tr '.' ' '|awk '{print $2}'`

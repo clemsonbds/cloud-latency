@@ -32,7 +32,7 @@ def get_gcp_addresses(args):
 		perror(e._get_reason())
 		raise CloudResponseError from e
 
-	instances = sum([zone['instances'] for zone in response['items']], [])
+	instances = sum([zone['instances'] if 'instances' in zone else [] for zone in response['items'].values()], [])
 	return [instance['networkInterfaces'][0]['networkIP'] for instance in instances]
 
 def get_aws_addresses(args):
@@ -61,11 +61,8 @@ def get_aws_addresses(args):
 		raise CloudResponseError from e
 
 	result = json.loads(response)
+	instances = sum([reservation['Instances'] for reservation in result['Reservations']], [])
 
-	if len(result['Reservations']) == 0:
-		return []
-
-	instances = result['Reservations'][0]['Instances']
 	address_key = "%sIpAddress" % address_type
 
 	return [instance[address_key] for instance in instances]

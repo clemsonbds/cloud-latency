@@ -132,7 +132,7 @@ for exec in ${binDir}/*; do
 
 #   touch ${outFile} # avoid 'file not found'
 #   while [ `grep "Time in seconds" ${outfile} | wc -l` -lt ${iters} ]; do
-    command="timeout 300 mpirun --np ${procs} ${mpiParams} ${BIN_DIR}/${exec} ${benchParams} ${output}"
+    command="timeout 300 mpirun --np ${procs} ${mpiParams} ${binDir}/${exec} ${benchParams} ${output}"
 
     if [ -z "$dryrun" ]; then
         eval ${command}

@@ -13,13 +13,14 @@ mkdir -p $out_dir
 
 module load gcc/${GCC_VER} openmpi/${OMP_VER}
 
-$HOME/cloud-latency/npb/build.sh
+$HOME/cloud-latency/benchmarks/npb/build.sh
 
 for network in eth mlx; do
   module rm openmpi/${OMP_VER}-eth
   module rm openmpi/${OMP_VER}-mlx
   module load openmpi/${OMP_VER}-${network}
 
+  #NPB
   for x in `seq 1 ${iterations}`; do
     $HOME/cloud-latency/benchmarks/npb/run.sh --resultName palmetto-${network} --binDir ${bin_dir} --resultDir ${out_dir}
   done

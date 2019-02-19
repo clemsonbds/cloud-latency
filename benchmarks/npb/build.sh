@@ -11,4 +11,4 @@ make --directory ${build_dir} ${target}
 mkdir -p ${bin_dir}
 rm -f ${bin_dir}/*
 
-cp ${build_dir}/bin/* ${bin_dir}/
+mv ${build_dir}/bin/* ${bin_dir}/

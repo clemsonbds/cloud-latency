@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N mpi-lat
 #PBS -q dicelab
-#PBS -l select=4:chip_type=6148g:node_model=r740:ncpus=40:mem=256gb:mpiprocs=32,walltime=03:00:00
+#PBS -l select=4:chip_type=6148g:ncpus=40:mem=256gb:mpiprocs=32,walltime=04:00:00
 
 GCC_VER=8.2.0
 OMP_VER=2.1.1

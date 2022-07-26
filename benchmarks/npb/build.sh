@@ -4,7 +4,7 @@ install_dir=${1:-"$HOME/npb"}
 target=${2:-"suite"}
 
 build_dir=${install_dir}
-bin_dir=/nfs/bin/npb
+bin_dir=$HOME/bin/npb
 
 make --directory ${build_dir} ${target}
 

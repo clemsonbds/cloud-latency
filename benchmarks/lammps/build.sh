@@ -4,7 +4,7 @@ install_dir=${1:-"$HOME/lammps"}
 target=${2:-"mpi"}
 
 build_dir=${install_dir}/src
-bin_dir=/nfs/bin/lammps
+bin_dir=$HOME/bin/lammps
 exec_file=lmp_${target} # probably lmp_mpi, but could could be compiler or MPI specific
 new_exec_file=lmp # standardized for the run script
 
